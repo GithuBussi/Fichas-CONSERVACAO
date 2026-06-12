@@ -19,13 +19,21 @@
     background: #2a2a32;
     border-radius: 12px;
     padding: 20px;
-    max-width: 480px;
+    max-width: 560px;
     width: 100%;
     display: flex;
     flex-direction: column;
     gap: 20px;
   }
-  input[type="text"], textarea, input[type="number"] {
+  h2 {
+    font-size: 15px;
+    font-weight: 700;
+    margin: 0;
+    color: #9fb4ff;
+    border-bottom: 1px solid #444;
+    padding-bottom: 6px;
+  }
+  input[type="text"], textarea, input[type="number"], select {
     background: #1e1e24;
     border: 1px solid #444;
     color: #f0f0f0;
@@ -34,8 +42,9 @@
     font-size: 16px;
     font-family: inherit;
   }
-  input[type="text"] { width: 100%; font-weight: 600; }
-  input[type="number"] { width: 80px; }
+  input[type="text"] { width: 100%; }
+  input[type="number"] { width: 70px; text-align: center; }
+  select { font-size: 14px; }
   textarea {
     width: 100%;
     resize: vertical;
@@ -47,6 +56,12 @@
     margin-bottom: 8px;
     display: block;
     color: #ccc;
+  }
+  label.sub {
+    font-size: 11px;
+    color: #999;
+    display: block;
+    margin-bottom: 4px;
   }
   input[type="range"] {
     -webkit-appearance: none;
@@ -81,7 +96,7 @@
   }
   .row input[type="range"] { flex: 1; }
   .out {
-    min-width: 100px;
+    min-width: 60px;
     text-align: right;
     font-weight: 600;
     font-size: 14px;
@@ -152,13 +167,280 @@
     color: #888;
     margin: 0;
   }
+
+  /* Identidade */
+  .id-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  .id-grid .full { grid-column: 1 / -1; }
+  .field label {
+    font-size: 11px;
+    color: #999;
+    display: block;
+    margin-bottom: 4px;
+  }
+
+  /* Atributos */
+  .attr-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+  }
+  .attr-box {
+    background: #1e1e24;
+    border: 1px solid #444;
+    border-radius: 8px;
+    padding: 10px;
+    text-align: center;
+  }
+  .attr-box label {
+    font-size: 11px;
+    color: #999;
+    display: block;
+    margin-bottom: 6px;
+  }
+  .attr-box input {
+    width: 100%;
+    text-align: center;
+    font-size: 18px;
+    font-weight: 700;
+  }
+
+  /* Combate base */
+  .combat-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  .combat-box {
+    background: #1e1e24;
+    border: 1px solid #444;
+    border-radius: 8px;
+    padding: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+  }
+  .combat-box label { font-size: 13px; color: #ccc; }
+  .combat-box .unit { font-size: 12px; color: #999; }
+
+  /* Vida/Stamina dado */
+  .dice-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 6px;
+    font-size: 12px;
+    color: #999;
+  }
+  .dice-row input[type="text"] { width: 70px; padding: 6px 8px; font-size: 13px; }
+
+  /* Status boxes */
+  .status-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+  }
+  .status-box textarea {
+    height: 60px;
+  }
+  .status-box label { font-size: 11px; color: #999; display:block; margin-bottom:4px; }
+
+  /* Perícias */
+  .skill-table {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .skill-header, .skill-row {
+    display: grid;
+    grid-template-columns: 1.6fr 0.7fr 1.3fr 0.6fr 0.6fr 0.6fr;
+    gap: 6px;
+    align-items: center;
+    font-size: 12px;
+  }
+  .skill-header {
+    color: #999;
+    font-size: 10px;
+    text-transform: uppercase;
+    border-bottom: 1px solid #444;
+    padding-bottom: 4px;
+  }
+  .skill-row { padding: 4px 0; border-bottom: 1px solid #333; }
+  .skill-name { font-size: 13px; }
+  .skill-attr { color: #888; font-size: 11px; }
+  .skill-row select, .skill-row input { width: 100%; padding: 4px 6px; font-size: 12px; }
+  .skill-total {
+    font-weight: 700;
+    text-align: center;
+    color: #9fb4ff;
+    font-size: 14px;
+  }
+
+  /* Defesas */
+  .def-table {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .def-header, .def-row {
+    display: grid;
+    grid-template-columns: 1fr 1.2fr 0.6fr 0.9fr 0.7fr 0.6fr;
+    gap: 6px;
+    align-items: center;
+    font-size: 12px;
+  }
+  .def-header {
+    color: #999;
+    font-size: 10px;
+    text-transform: uppercase;
+    border-bottom: 1px solid #444;
+    padding-bottom: 4px;
+  }
+  .def-row { padding: 4px 0; border-bottom: 1px solid #333; }
+  .def-name { font-size: 13px; font-weight: 600; }
+  .def-attr { color: #888; font-size: 11px; text-align: center; }
+  .def-fixed { color: #888; font-size: 11px; }
+  .def-row select, .def-row input { width: 100%; padding: 4px 6px; font-size: 12px; }
+  .def-total {
+    font-weight: 700;
+    text-align: center;
+    color: #9fb4ff;
+    font-size: 14px;
+  }
+  .def-armor-input {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    font-size: 11px;
+    color: #999;
+    padding: 2px 0 6px;
+  }
+  .def-armor-input input { width: 70px; padding: 4px 6px; font-size: 12px; }
+  .dmg-limit-box {
+    background: #1e1e24;
+    border: 1px solid #444;
+    border-radius: 8px;
+    padding: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 13px;
+    color: #ccc;
+  }
+  .dmg-limit-box span#dmgLimitOut {
+    font-weight: 700;
+    font-size: 16px;
+    color: #9fb4ff;
+  }
 </style>
 </head>
 <body>
 <div class="card">
 
-  <input type="text" id="charName" placeholder="Nome do personagem">
+  <h2>Identidade</h2>
+  <div class="id-grid">
+    <div class="field full">
+      <label>Nome do personagem</label>
+      <input type="text" id="charName">
+    </div>
+    <div class="field">
+      <label>Jogador</label>
+      <input type="text" id="playerName">
+    </div>
+    <div class="field">
+      <label>Classe</label>
+      <input type="text" id="charClass">
+    </div>
+    <div class="field">
+      <label>Nível</label>
+      <input type="number" id="charLevel" value="1" min="0">
+    </div>
+  </div>
 
+  <h2>Atributos</h2>
+  <div class="attr-grid">
+    <div class="attr-box"><label>Força</label><input type="number" id="attrFOR" value="0"></div>
+    <div class="attr-box"><label>Destreza</label><input type="number" id="attrDES" value="0"></div>
+    <div class="attr-box"><label>Constituição</label><input type="number" id="attrCON" value="0"></div>
+    <div class="attr-box"><label>Sabedoria</label><input type="number" id="attrSAB" value="0"></div>
+    <div class="attr-box"><label>Inteligência</label><input type="number" id="attrINT" value="0"></div>
+    <div class="attr-box"><label>Carisma</label><input type="number" id="attrCAR" value="0"></div>
+  </div>
+
+  <h2>Combate</h2>
+  <div class="combat-grid">
+    <div class="combat-box">
+      <label>Ataque base</label>
+      <input type="number" id="atkBase" value="0" style="width:60px;">
+    </div>
+    <div class="combat-box">
+      <label>Deslocamento</label>
+      <input type="number" id="moveSpeed" value="6" style="width:60px;">
+      <span class="unit">quadrados</span>
+    </div>
+  </div>
+
+  <h2>Defesas</h2>
+  <div class="def-table" id="defTable">
+    <div class="def-header">
+      <span>Defesa</span>
+      <span>Nível/Armadura</span>
+      <span>Atributo</span>
+      <span>Bônus de classe</span>
+      <span>Outros</span>
+      <span>Total</span>
+    </div>
+
+    <div class="def-row" data-def="reflexos">
+      <span class="def-name">Reflexos</span>
+      <select class="def-mode">
+        <option value="level">Metade do nível</option>
+        <option value="armor">Bônus de armadura</option>
+      </select>
+      <span class="def-attr">DES</span>
+      <input type="number" class="def-class" value="0">
+      <input type="number" class="def-other" value="0">
+      <span class="def-total">0</span>
+    </div>
+    <div class="def-armor-input" data-for="reflexos">
+      <label>Bônus de armadura (Reflexos)</label>
+      <input type="number" class="armor-bonus" value="0">
+    </div>
+
+    <div class="def-row" data-def="fortitude">
+      <span class="def-name">Fortitude</span>
+      <span class="def-fixed">Nível ÷ 2 + armadura</span>
+      <span class="def-attr">CON</span>
+      <input type="number" class="def-class" value="0">
+      <input type="number" class="def-other" value="0">
+      <span class="def-total">0</span>
+    </div>
+    <div class="def-armor-input" data-for="fortitude">
+      <label>Bônus de armadura (Fortitude)</label>
+      <input type="number" class="armor-bonus" value="0">
+    </div>
+
+    <div class="def-row" data-def="vontade">
+      <span class="def-name">Vontade</span>
+      <span class="def-fixed">Nível ÷ 2</span>
+      <span class="def-attr">SAB</span>
+      <input type="number" class="def-class" value="0">
+      <input type="number" class="def-other" value="0">
+      <span class="def-total">0</span>
+    </div>
+  </div>
+
+  <div class="dmg-limit-box">
+    <label>Dano limite (Fortitude + Outros)</label>
+    <span id="dmgLimitOut">0</span>
+  </div>
+
+  <h2>Vida e Stamina</h2>
   <div>
     <label class="title">Vida (PV)</label>
     <div class="row">
@@ -169,6 +451,10 @@
     <div class="maxrow">
       <input type="number" id="hpMax" value="20" min="1">
       <span>PV máximo</span>
+    </div>
+    <div class="dice-row">
+      <span>Dado de vida:</span>
+      <input type="text" id="hpDice" placeholder="ex: 1d10">
     </div>
   </div>
 
@@ -183,38 +469,69 @@
       <input type="number" id="spMax" value="20" min="1">
       <span>PS máximo</span>
     </div>
+    <div class="dice-row">
+      <span>Dado de stamina:</span>
+      <input type="text" id="spDice" placeholder="ex: 1d6">
+    </div>
   </div>
 
+  <h2>Condição e emoção</h2>
   <div>
-    <label class="title">Condição física (1-4)</label>
+    <label class="title">Condição física (0-4)</label>
     <div class="row">
-      <input type="range" min="1" max="4" value="1" step="1" id="condSlider">
-      <span class="out" id="condOut">1 - Saudável</span>
+      <input type="range" min="0" max="4" value="0" step="1" id="condSlider">
+      <span class="out" id="condOut">0</span>
     </div>
   </div>
 
   <div>
-    <label class="title">Estado emocional (1-4)</label>
+    <label class="title">Estado emocional (0-4)</label>
     <div class="row">
-      <input type="range" min="1" max="4" value="1" step="1" id="emoSlider">
-      <span class="out" id="emoOut">1 - Calmo</span>
+      <input type="range" min="0" max="4" value="0" step="1" id="emoSlider">
+      <span class="out" id="emoOut">0</span>
+    </div>
+    <label class="sub" style="margin-top:8px;">Descrição do estado atual</label>
+    <textarea id="emoDesc" rows="2" placeholder="Descreva como o personagem está se sentindo..."></textarea>
+  </div>
+
+  <h2>Estados / efeitos ativos</h2>
+  <div class="status-grid">
+    <div class="status-box">
+      <label>Estado 1</label>
+      <textarea id="status1" placeholder="ex: Atordoado (2 turnos)"></textarea>
+    </div>
+    <div class="status-box">
+      <label>Estado 2</label>
+      <textarea id="status2"></textarea>
+    </div>
+    <div class="status-box">
+      <label>Estado 3</label>
+      <textarea id="status3"></textarea>
     </div>
   </div>
 
-  <div>
-    <label class="title">Marcas de morte</label>
-    <div class="death-row">
-      <div class="death-dot" data-i="0">X</div>
-      <div class="death-dot" data-i="1">X</div>
-      <div class="death-dot" data-i="2">X</div>
+  <h2>Marcas de morte</h2>
+  <div class="death-row">
+    <div class="death-dot" data-i="0">X</div>
+    <div class="death-dot" data-i="1">X</div>
+    <div class="death-dot" data-i="2">X</div>
+  </div>
+  <p id="deathMsg">Personagem morto</p>
+
+  <h2>Perícias</h2>
+  <div class="skill-table" id="skillTable">
+    <div class="skill-header">
+      <span>Perícia</span>
+      <span>Atrib.</span>
+      <span>Treino</span>
+      <span>Aprim.</span>
+      <span>Outros</span>
+      <span>Total</span>
     </div>
-    <p id="deathMsg">Personagem morto</p>
   </div>
 
-  <div>
-    <label class="title">Notas / inventário</label>
-    <textarea id="notes" rows="5"></textarea>
-  </div>
+  <h2>Notas / inventário</h2>
+  <textarea id="notes" rows="5"></textarea>
 
   <button id="saveBtn">Salvar ficha</button>
   <p class="hint">Os dados ficam salvos neste navegador (cada pessoa tem a sua própria ficha, salva localmente).</p>
@@ -222,11 +539,9 @@
 </div>
 
 <script>
-const condLabels = {1:"1 - Saudável", 2:"2 - Ferido", 3:"3 - Gravemente ferido", 4:"4 - Incapacitado"};
-const emoLabels = {1:"1 - Calmo", 2:"2 - Estressado", 3:"3 - Abalado", 4:"4 - Em pânico"};
-
 function $(id){ return document.getElementById(id); }
 
+/* ---------- Barras de vida/stamina ---------- */
 function updateBar(slider, out, bar, maxInput){
   const max = parseInt(maxInput.value) || 1;
   if(parseInt(slider.max) !== max){ slider.max = max; }
@@ -235,18 +550,18 @@ function updateBar(slider, out, bar, maxInput){
   out.textContent = val + " / " + max;
   bar.style.width = Math.round((val/max)*100) + "%";
 }
-
 function refreshHP(){ updateBar($('hpSlider'), $('hpOut'), $('hpBar'), $('hpMax')); }
 function refreshSP(){ updateBar($('spSlider'), $('spOut'), $('spBar'), $('spMax')); }
-
 $('hpSlider').addEventListener('input', refreshHP);
 $('hpMax').addEventListener('input', refreshHP);
 $('spSlider').addEventListener('input', refreshSP);
 $('spMax').addEventListener('input', refreshSP);
 
-$('condSlider').addEventListener('input', e => { $('condOut').textContent = condLabels[e.target.value]; });
-$('emoSlider').addEventListener('input', e => { $('emoOut').textContent = emoLabels[e.target.value]; });
+/* ---------- Condição e emoção (0-4, só número) ---------- */
+$('condSlider').addEventListener('input', e => { $('condOut').textContent = e.target.value; });
+$('emoSlider').addEventListener('input', e => { $('emoOut').textContent = e.target.value; });
 
+/* ---------- Marcas de morte ---------- */
 let deathState = [false,false,false];
 document.querySelectorAll('.death-dot').forEach(dot => {
   dot.addEventListener('click', () => {
@@ -257,13 +572,281 @@ document.querySelectorAll('.death-dot').forEach(dot => {
   });
 });
 
+/* ---------- Perícias ---------- */
+// Mapeamento perícia -> atributo (chave do input de atributo). 'NONE' = sem atributo (misticismo). 'CHOICE' = jogador escolhe (ofício).
+const skills = [
+  {name:"Acrobacia", attr:"DES"},
+  {name:"Adestrar Animais", attr:"INT"},
+  {name:"Atletismo", attr:"FOR"},
+  {name:"Atuação", attr:"CAR"},
+  {name:"Diplomacia", attr:"CAR"},
+  {name:"Furtividade", attr:"DES"},
+  {name:"História", attr:"INT"},
+  {name:"Iniciativa", attr:"DES"},
+  {name:"Intimidação", attr:"CAR"},
+  {name:"Intuição", attr:"INT"},
+  {name:"Mecânica", attr:"INT"},
+  {name:"Misticismo", attr:"NONE"},
+  {name:"Natureza", attr:"INT"},
+  {name:"Percepção", attr:"INT"},
+  {name:"Persuasão", attr:"CAR"},
+  {name:"Pilotar/Dirigir", attr:"DES"},
+  {name:"Predistigitação", attr:"DES"},
+  {name:"Resistência", attr:"CON"},
+  {name:"Sobrevivência", attr:"INT"},
+  {name:"Tática", attr:"INT"},
+  {name:"Tratar Ferimentos", attr:"INT"},
+  {name:"Usar Computadores", attr:"INT"},
+  {name:"Ofício", attr:"CHOICE"}
+];
+
+const attrIds = { FOR:"attrFOR", DES:"attrDES", CON:"attrCON", SAB:"attrSAB", INT:"attrINT", CAR:"attrCAR" };
+const attrLabels = { FOR:"FOR", DES:"DES", CON:"CON", SAB:"SAB", INT:"INT", CAR:"CAR", NONE:"-" };
+
+function getAttrMod(key){
+  if(key === "NONE") return 0;
+  const id = attrIds[key];
+  if(!id) return 0;
+  return parseInt($(id).value) || 0;
+}
+
+function trainingBonus(level, tier){
+  // tier: 0=Nenhum, 1=Treinado, 2=Graduado, 3=Mestrado, n>=4 = Aprimoramento (n-3)
+  const half = Math.floor(level / 2);
+  if(tier === 0) return 0;
+  if(tier === 1) return 2;
+  if(tier === 2) return Math.max(2, half);
+  if(tier === 3) return 2 + half;
+  // Aprimoramento I, II, III... cada nível acima de Mestrado soma +1
+  return (2 + half) + (tier - 3);
+}
+
+function buildSkillTable(){
+  const table = $('skillTable');
+  skills.forEach((skill, idx) => {
+    const row = document.createElement('div');
+    row.className = 'skill-row';
+    row.dataset.idx = idx;
+
+    // Nome + atributo (ou seletor de atributo p/ Ofício)
+    const nameCell = document.createElement('div');
+    if(skill.attr === "CHOICE"){
+      nameCell.innerHTML = '<span class="skill-name">' + skill.name + '</span>';
+    } else {
+      nameCell.innerHTML = '<span class="skill-name">' + skill.name + '</span>';
+    }
+    row.appendChild(nameCell);
+
+    // Coluna atributo
+    const attrCell = document.createElement('div');
+    attrCell.className = 'skill-attr';
+    if(skill.attr === "CHOICE"){
+      const sel = document.createElement('select');
+      sel.className = 'attr-choice';
+      ["FOR","DES","CON","SAB","INT","CAR"].forEach(a => {
+        const opt = document.createElement('option');
+        opt.value = a; opt.textContent = a;
+        sel.appendChild(opt);
+      });
+      attrCell.appendChild(sel);
+    } else {
+      attrCell.textContent = attrLabels[skill.attr];
+    }
+    row.appendChild(attrCell);
+
+    // Treino (select)
+    const trainCell = document.createElement('div');
+    const trainSel = document.createElement('select');
+    trainSel.className = 'train-select';
+    [
+      {v:0, t:"Nenhum"},
+      {v:1, t:"Treinado"},
+      {v:2, t:"Graduado"},
+      {v:3, t:"Mestrado"}
+    ].forEach(o => {
+      const opt = document.createElement('option');
+      opt.value = o.v; opt.textContent = o.t;
+      trainSel.appendChild(opt);
+    });
+    trainCell.appendChild(trainSel);
+    row.appendChild(trainCell);
+
+    // Aprimoramento (numero, 0 = nenhum, 1=I, 2=II...)
+    const aprimCell = document.createElement('div');
+    const aprimInput = document.createElement('input');
+    aprimInput.type = 'number';
+    aprimInput.className = 'aprim-input';
+    aprimInput.value = 0;
+    aprimInput.min = 0;
+    aprimCell.appendChild(aprimInput);
+    row.appendChild(aprimCell);
+
+    // Outros (número, bônus livre)
+    const otherCell = document.createElement('div');
+    const otherInput = document.createElement('input');
+    otherInput.type = 'number';
+    otherInput.className = 'other-input';
+    otherInput.value = 0;
+    otherCell.appendChild(otherInput);
+    row.appendChild(otherCell);
+
+    // Total
+    const totalCell = document.createElement('div');
+    totalCell.className = 'skill-total';
+    totalCell.textContent = '0';
+    row.appendChild(totalCell);
+
+    table.appendChild(row);
+
+    // Listeners para recalcular
+    const recalc = () => calcSkillTotal(row, skill);
+    trainSel.addEventListener('change', recalc);
+    aprimInput.addEventListener('input', recalc);
+    otherInput.addEventListener('input', recalc);
+    if(skill.attr === "CHOICE"){
+      attrCell.querySelector('select').addEventListener('change', recalc);
+    }
+  });
+
+  // Recalcular tudo quando atributos mudarem ou nível mudar
+  Object.values(attrIds).forEach(id => {
+    $(id).addEventListener('input', recalcAllSkills);
+  });
+  $('charLevel').addEventListener('input', recalcAllSkills);
+}
+
+function calcSkillTotal(row, skill){
+  const level = parseInt($('charLevel').value) || 0;
+  const trainSel = row.querySelector('.train-select');
+  const aprimInput = row.querySelector('.aprim-input');
+  const otherInput = row.querySelector('.other-input');
+  const totalCell = row.querySelector('.skill-total');
+
+  let attrKey = skill.attr;
+  if(attrKey === "CHOICE"){
+    attrKey = row.querySelector('.attr-choice').value;
+  }
+  const attrMod = getAttrMod(attrKey);
+
+  const tierBase = parseInt(trainSel.value);
+  const aprimLevels = parseInt(aprimInput.value) || 0;
+  // tier efetivo: se aprimLevels > 0, tier = 3 + aprimLevels (Aprimoramento), senão tier base
+  let effectiveTier = tierBase;
+  if(aprimLevels > 0){
+    effectiveTier = 3 + aprimLevels;
+  }
+  const training = trainingBonus(level, effectiveTier);
+  const other = parseInt(otherInput.value) || 0;
+
+  const total = Math.floor(attrMod + training + other);
+  totalCell.textContent = total >= 0 ? "+" + total : total;
+}
+
+function recalcAllSkills(){
+  document.querySelectorAll('.skill-row').forEach(row => {
+    const idx = parseInt(row.dataset.idx);
+    calcSkillTotal(row, skills[idx]);
+  });
+}
+
+buildSkillTable();
+recalcAllSkills();
+
+/* ---------- Defesas ---------- */
+function calcDefenses(){
+  const level = parseInt($('charLevel').value) || 0;
+  const half = Math.floor(level / 2);
+
+  // Reflexos
+  const refRow = document.querySelector('.def-row[data-def="reflexos"]');
+  const refMode = refRow.querySelector('.def-mode').value;
+  const refArmorInput = document.querySelector('.def-armor-input[data-for="reflexos"] .armor-bonus');
+  const refBase = (refMode === 'armor') ? (parseInt(refArmorInput.value) || 0) : half;
+  const refDex = getAttrMod('DES');
+  const refClass = parseInt(refRow.querySelector('.def-class').value) || 0;
+  const refOther = parseInt(refRow.querySelector('.def-other').value) || 0;
+  const refTotal = Math.floor(refBase + refDex + refClass + refOther + 10);
+  refRow.querySelector('.def-total').textContent = refTotal;
+
+  document.querySelector('.def-armor-input[data-for="reflexos"]').style.display =
+    (refMode === 'armor') ? 'flex' : 'none';
+
+  // Fortitude
+  const fortRow = document.querySelector('.def-row[data-def="fortitude"]');
+  const fortArmorInput = document.querySelector('.def-armor-input[data-for="fortitude"] .armor-bonus');
+  const fortArmor = parseInt(fortArmorInput.value) || 0;
+  const fortCon = getAttrMod('CON');
+  const fortClass = parseInt(fortRow.querySelector('.def-class').value) || 0;
+  const fortOther = parseInt(fortRow.querySelector('.def-other').value) || 0;
+  const fortTotal = Math.floor(half + fortArmor + fortCon + fortClass + fortOther + 10);
+  fortRow.querySelector('.def-total').textContent = fortTotal;
+
+  // Vontade
+  const vonRow = document.querySelector('.def-row[data-def="vontade"]');
+  const vonSab = getAttrMod('SAB');
+  const vonClass = parseInt(vonRow.querySelector('.def-class').value) || 0;
+  const vonOther = parseInt(vonRow.querySelector('.def-other').value) || 0;
+  const vonTotal = Math.floor(half + vonSab + vonClass + vonOther + 10);
+  vonRow.querySelector('.def-total').textContent = vonTotal;
+
+  // Dano limite = (half + bônus de armadura de Fortitude + CON + classe + outros), sem o +10
+  const dmgLimit = Math.floor(half + fortArmor + fortCon + fortClass + fortOther);
+  $('dmgLimitOut').textContent = dmgLimit;
+}
+
+document.querySelector('.def-mode').addEventListener('change', calcDefenses);
+document.querySelectorAll('.def-class, .def-other, .armor-bonus').forEach(el => {
+  el.addEventListener('input', calcDefenses);
+});
+Object.values(attrIds).forEach(id => {
+  $(id).addEventListener('input', calcDefenses);
+});
+$('charLevel').addEventListener('input', calcDefenses);
+
+calcDefenses();
+
+/* ---------- Salvar / Carregar ---------- */
 function save(){
+  const skillData = [];
+  document.querySelectorAll('.skill-row').forEach(row => {
+    const attrChoice = row.querySelector('.attr-choice');
+    skillData.push({
+      train: row.querySelector('.train-select').value,
+      aprim: row.querySelector('.aprim-input').value,
+      other: row.querySelector('.other-input').value,
+      attrChoice: attrChoice ? attrChoice.value : null
+    });
+  });
+
   const data = {
     name: $('charName').value,
-    hp: $('hpSlider').value, hpMax: $('hpMax').value,
-    sp: $('spSlider').value, spMax: $('spMax').value,
-    cond: $('condSlider').value, emo: $('emoSlider').value,
-    death: deathState, notes: $('notes').value
+    player: $('playerName').value,
+    cls: $('charClass').value,
+    level: $('charLevel').value,
+    attrs: {
+      FOR: $('attrFOR').value, DES: $('attrDES').value, CON: $('attrCON').value,
+      SAB: $('attrSAB').value, INT: $('attrINT').value, CAR: $('attrCAR').value
+    },
+    atkBase: $('atkBase').value,
+    moveSpeed: $('moveSpeed').value,
+    defenses: {
+      refMode: document.querySelector('.def-mode').value,
+      refArmor: document.querySelector('.def-armor-input[data-for="reflexos"] .armor-bonus').value,
+      refClass: document.querySelector('.def-row[data-def="reflexos"] .def-class').value,
+      refOther: document.querySelector('.def-row[data-def="reflexos"] .def-other').value,
+      fortArmor: document.querySelector('.def-armor-input[data-for="fortitude"] .armor-bonus').value,
+      fortClass: document.querySelector('.def-row[data-def="fortitude"] .def-class').value,
+      fortOther: document.querySelector('.def-row[data-def="fortitude"] .def-other').value,
+      vonClass: document.querySelector('.def-row[data-def="vontade"] .def-class').value,
+      vonOther: document.querySelector('.def-row[data-def="vontade"] .def-other').value
+    },
+    hp: $('hpSlider').value, hpMax: $('hpMax').value, hpDice: $('hpDice').value,
+    sp: $('spSlider').value, spMax: $('spMax').value, spDice: $('spDice').value,
+    cond: $('condSlider').value, emo: $('emoSlider').value, emoDesc: $('emoDesc').value,
+    status: [$('status1').value, $('status2').value, $('status3').value],
+    death: deathState,
+    skills: skillData,
+    notes: $('notes').value
   };
   try {
     localStorage.setItem('rpgSheet', JSON.stringify(data));
@@ -277,18 +860,61 @@ function load(){
   let data;
   try { data = JSON.parse(localStorage.getItem('rpgSheet')); } catch(e){ return; }
   if(!data) return;
+
   $('charName').value = data.name || '';
+  $('playerName').value = data.player || '';
+  $('charClass').value = data.cls || '';
+  $('charLevel').value = data.level || 1;
+
+  if(data.attrs){
+    $('attrFOR').value = data.attrs.FOR ?? 0;
+    $('attrDES').value = data.attrs.DES ?? 0;
+    $('attrCON').value = data.attrs.CON ?? 0;
+    $('attrSAB').value = data.attrs.SAB ?? 0;
+    $('attrINT').value = data.attrs.INT ?? 0;
+    $('attrCAR').value = data.attrs.CAR ?? 0;
+  }
+
+  $('atkBase').value = data.atkBase ?? 0;
+  $('moveSpeed').value = data.moveSpeed ?? 6;
+
+  if(data.defenses){
+    const d = data.defenses;
+    document.querySelector('.def-mode').value = d.refMode ?? 'level';
+    document.querySelector('.def-armor-input[data-for="reflexos"] .armor-bonus').value = d.refArmor ?? 0;
+    document.querySelector('.def-row[data-def="reflexos"] .def-class').value = d.refClass ?? 0;
+    document.querySelector('.def-row[data-def="reflexos"] .def-other').value = d.refOther ?? 0;
+    document.querySelector('.def-armor-input[data-for="fortitude"] .armor-bonus').value = d.fortArmor ?? 0;
+    document.querySelector('.def-row[data-def="fortitude"] .def-class').value = d.fortClass ?? 0;
+    document.querySelector('.def-row[data-def="fortitude"] .def-other').value = d.fortOther ?? 0;
+    document.querySelector('.def-row[data-def="vontade"] .def-class').value = d.vonClass ?? 0;
+    document.querySelector('.def-row[data-def="vontade"] .def-other').value = d.vonOther ?? 0;
+  }
+
   $('hpMax').value = data.hpMax || 20;
   $('hpSlider').max = data.hpMax || 20;
   $('hpSlider').value = data.hp ?? 20;
+  $('hpDice').value = data.hpDice || '';
+
   $('spMax').value = data.spMax || 20;
   $('spSlider').max = data.spMax || 20;
   $('spSlider').value = data.sp ?? 20;
-  $('condSlider').value = data.cond || 1;
-  $('emoSlider').value = data.emo || 1;
+  $('spDice').value = data.spDice || '';
+
+  $('condSlider').value = data.cond ?? 0;
+  $('condOut').textContent = $('condSlider').value;
+  $('emoSlider').value = data.emo ?? 0;
+  $('emoOut').textContent = $('emoSlider').value;
+  $('emoDesc').value = data.emoDesc || '';
+
+  if(data.status){
+    $('status1').value = data.status[0] || '';
+    $('status2').value = data.status[1] || '';
+    $('status3').value = data.status[2] || '';
+  }
+
   $('notes').value = data.notes || '';
-  $('condOut').textContent = condLabels[$('condSlider').value];
-  $('emoOut').textContent = emoLabels[$('emoSlider').value];
+
   if(data.death){
     data.death.forEach((d,i) => {
       if(d){
@@ -298,6 +924,23 @@ function load(){
     });
     $('deathMsg').style.visibility = deathState.every(Boolean) ? 'visible' : 'hidden';
   }
+
+  if(data.skills){
+    document.querySelectorAll('.skill-row').forEach((row, idx) => {
+      const sd = data.skills[idx];
+      if(!sd) return;
+      row.querySelector('.train-select').value = sd.train ?? 0;
+      row.querySelector('.aprim-input').value = sd.aprim ?? 0;
+      row.querySelector('.other-input').value = sd.other ?? 0;
+      const attrChoice = row.querySelector('.attr-choice');
+      if(attrChoice && sd.attrChoice){
+        attrChoice.value = sd.attrChoice;
+      }
+    });
+  }
+
+  recalcAllSkills();
+  calcDefenses();
 }
 
 $('saveBtn').addEventListener('click', save);
