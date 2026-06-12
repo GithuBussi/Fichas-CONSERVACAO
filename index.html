@@ -5,6 +5,15 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Ficha de Personagem</title>
 <style>
+  :root {
+    --c-for: #e25c5c;
+    --c-des: #7ed957;
+    --c-con: #ff9f43;
+    --c-sab: #4dd0e1;
+    --c-int: #4a8cff;
+    --c-car: #d4c026;
+    --c-sp: #a55cff;
+  }
   * { box-sizing: border-box; }
   body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
@@ -113,7 +122,7 @@
     transition: width .15s;
   }
   .hp-fill { background: #4caf50; }
-  .sp-fill { background: #3aa0ff; }
+  .sp-fill { background: var(--c-sp); }
   .maxrow {
     display: flex;
     align-items: center;
@@ -124,31 +133,41 @@
   }
   .death-row {
     display: flex;
-    gap: 12px;
+    gap: 16px;
+    justify-content: center;
+    padding: 8px 0;
   }
   .death-dot {
-    width: 36px;
-    height: 36px;
+    width: 56px;
+    height: 56px;
     border-radius: 50%;
-    border: 2px solid #555;
+    border: 3px solid #555;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    font-size: 18px;
-    font-weight: 700;
+    font-size: 28px;
+    font-weight: 900;
     color: transparent;
-    transition: all .15s;
+    transition: all .25s cubic-bezier(.34,1.56,.64,1);
+    background: #1e1e24;
   }
   .death-dot.marked {
     border-color: #e24b4a;
     color: #e24b4a;
+    background: rgba(226,75,74,0.15);
+    transform: scale(1.15);
+    box-shadow: 0 0 14px rgba(226,75,74,0.6);
   }
   #deathMsg {
-    font-size: 12px;
+    font-size: 13px;
+    font-weight: 700;
     color: #e24b4a;
-    margin: 8px 0 0;
+    margin: 4px 0 0;
     visibility: hidden;
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 1px;
   }
   button {
     background: #6c8cff;
@@ -191,6 +210,7 @@
   .attr-box {
     background: #1e1e24;
     border: 1px solid #444;
+    border-left: 4px solid var(--attr-color, #444);
     border-radius: 8px;
     padding: 10px;
     text-align: center;
@@ -206,7 +226,14 @@
     text-align: center;
     font-size: 18px;
     font-weight: 700;
+    color: var(--attr-color, #f0f0f0);
   }
+  .attr-box.attr-for { --attr-color: var(--c-for); }
+  .attr-box.attr-des { --attr-color: var(--c-des); }
+  .attr-box.attr-con { --attr-color: var(--c-con); }
+  .attr-box.attr-sab { --attr-color: var(--c-sab); }
+  .attr-box.attr-int { --attr-color: var(--c-int); }
+  .attr-box.attr-car { --attr-color: var(--c-car); }
 
   /* Combate base */
   .combat-grid {
@@ -257,7 +284,7 @@
   }
   .skill-header, .skill-row {
     display: grid;
-    grid-template-columns: 1.6fr 0.7fr 1.3fr 0.6fr 0.6fr 0.6fr;
+    grid-template-columns: 0.6fr 1.5fr 0.9fr 1.2fr 0.6fr 0.6fr;
     gap: 6px;
     align-items: center;
     font-size: 12px;
@@ -269,48 +296,82 @@
     border-bottom: 1px solid #444;
     padding-bottom: 4px;
   }
-  .skill-row { padding: 4px 0; border-bottom: 1px solid #333; }
+  .skill-row {
+    padding: 4px 6px;
+    border-bottom: 1px solid #333;
+    border-left: 3px solid var(--skill-color, #444);
+    border-radius: 4px;
+  }
   .skill-name { font-size: 13px; }
-  .skill-attr { color: #888; font-size: 11px; }
+  .skill-attr-select { width: 100%; padding: 4px 6px; font-size: 12px; }
   .skill-row select, .skill-row input { width: 100%; padding: 4px 6px; font-size: 12px; }
   .skill-total {
     font-weight: 700;
     text-align: center;
-    color: #9fb4ff;
-    font-size: 14px;
+    font-size: 16px;
+    color: var(--skill-color, #9fb4ff);
   }
 
   /* Defesas */
   .def-table {
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: 10px;
   }
-  .def-header, .def-row {
-    display: grid;
-    grid-template-columns: 1fr 1.2fr 0.6fr 0.9fr 0.7fr 0.6fr;
-    gap: 6px;
+  .def-card {
+    background: #1e1e24;
+    border: 1px solid #444;
+    border-left: 4px solid var(--def-color, #6c8cff);
+    border-radius: 8px;
+    padding: 10px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .def-card-top {
+    display: flex;
     align-items: center;
-    font-size: 12px;
+    justify-content: space-between;
+    gap: 10px;
   }
-  .def-header {
-    color: #999;
-    font-size: 10px;
-    text-transform: uppercase;
-    border-bottom: 1px solid #444;
-    padding-bottom: 4px;
-  }
-  .def-row { padding: 4px 0; border-bottom: 1px solid #333; }
-  .def-name { font-size: 13px; font-weight: 600; }
-  .def-attr { color: #888; font-size: 11px; text-align: center; }
-  .def-fixed { color: #888; font-size: 11px; }
-  .def-row select, .def-row input { width: 100%; padding: 4px 6px; font-size: 12px; }
-  .def-total {
-    font-weight: 700;
-    text-align: center;
-    color: #9fb4ff;
+  .def-name {
     font-size: 14px;
+    font-weight: 700;
   }
+  .def-total-box {
+    font-weight: 900;
+    font-size: 26px;
+    color: var(--def-color, #9fb4ff);
+    background: rgba(255,255,255,0.04);
+    border-radius: 8px;
+    padding: 2px 14px;
+    min-width: 60px;
+    text-align: center;
+  }
+  .def-order-btns {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .def-order-btns button {
+    background: transparent;
+    border: 1px solid #555;
+    color: #999;
+    border-radius: 4px;
+    padding: 2px 6px;
+    font-size: 10px;
+    cursor: pointer;
+    align-self: stretch;
+  }
+  .def-fields {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+    font-size: 11px;
+    color: #999;
+  }
+  .def-fields .field label { display: block; margin-bottom: 4px; }
+  .def-fields select, .def-fields input { width: 100%; padding: 4px 6px; font-size: 12px; }
   .def-armor-input {
     display: flex;
     align-items: center;
@@ -318,7 +379,6 @@
     gap: 8px;
     font-size: 11px;
     color: #999;
-    padding: 2px 0 6px;
   }
   .def-armor-input input { width: 70px; padding: 4px 6px; font-size: 12px; }
   .dmg-limit-box {
@@ -356,12 +416,21 @@
     font-weight: 600;
     cursor: pointer;
     white-space: nowrap;
-    border-bottom: 2px solid transparent;
+    border-bottom: 3px solid transparent;
     border-radius: 0;
+    display: flex;
+    align-items: center;
+    gap: 6px;
   }
+  .tab-btn .tab-icon { font-size: 15px; }
+  .tab-btn[data-tab="principal"] { --tab-color: #6c8cff; }
+  .tab-btn[data-tab="habilidades"] { --tab-color: #ff9f43; }
+  .tab-btn[data-tab="tecnicas"] { --tab-color: #4dd0e1; }
+  .tab-btn[data-tab="inventario"] { --tab-color: #7ed957; }
+  .tab-btn[data-tab="perfil"] { --tab-color: #d4c026; }
   .tab-btn.active {
-    color: #9fb4ff;
-    border-bottom: 2px solid #6c8cff;
+    color: var(--tab-color, #9fb4ff);
+    border-bottom: 3px solid var(--tab-color, #6c8cff);
   }
   .tab-content { display: none; flex-direction: column; gap: 20px; }
   .tab-content.active { display: flex; }
@@ -457,43 +526,23 @@
 <div class="card">
 
   <div class="tabs">
-    <button class="tab-btn active" data-tab="principal">Principal</button>
-    <button class="tab-btn" data-tab="habilidades">Habilidades</button>
-    <button class="tab-btn" data-tab="tecnicas">Técnicas</button>
-    <button class="tab-btn" data-tab="inventario">Inventário</button>
-    <button class="tab-btn" data-tab="anotacoes">Anotações</button>
+    <button class="tab-btn active" data-tab="principal"><span class="tab-icon">⚔️</span>Principal</button>
+    <button class="tab-btn" data-tab="habilidades"><span class="tab-icon">✨</span>Habilidades</button>
+    <button class="tab-btn" data-tab="tecnicas"><span class="tab-icon">🌀</span>Técnicas</button>
+    <button class="tab-btn" data-tab="inventario"><span class="tab-icon">🎒</span>Inventário</button>
+    <button class="tab-btn" data-tab="perfil"><span class="tab-icon">📜</span>Perfil</button>
   </div>
 
   <div class="tab-content active" data-tab="principal">
 
-  <h2>Identidade</h2>
-  <div class="id-grid">
-    <div class="field full">
-      <label>Nome do personagem</label>
-      <input type="text" id="charName">
-    </div>
-    <div class="field">
-      <label>Jogador</label>
-      <input type="text" id="playerName">
-    </div>
-    <div class="field">
-      <label>Classe</label>
-      <input type="text" id="charClass">
-    </div>
-    <div class="field">
-      <label>Nível</label>
-      <input type="number" id="charLevel" value="1" min="0">
-    </div>
-  </div>
-
   <h2>Atributos</h2>
   <div class="attr-grid">
-    <div class="attr-box"><label>Força</label><input type="number" id="attrFOR" value="0"></div>
-    <div class="attr-box"><label>Destreza</label><input type="number" id="attrDES" value="0"></div>
-    <div class="attr-box"><label>Constituição</label><input type="number" id="attrCON" value="0"></div>
-    <div class="attr-box"><label>Sabedoria</label><input type="number" id="attrSAB" value="0"></div>
-    <div class="attr-box"><label>Inteligência</label><input type="number" id="attrINT" value="0"></div>
-    <div class="attr-box"><label>Carisma</label><input type="number" id="attrCAR" value="0"></div>
+    <div class="attr-box attr-for"><label>Força</label><input type="number" id="attrFOR" value="0"></div>
+    <div class="attr-box attr-des"><label>Destreza</label><input type="number" id="attrDES" value="0"></div>
+    <div class="attr-box attr-con"><label>Constituição</label><input type="number" id="attrCON" value="0"></div>
+    <div class="attr-box attr-sab"><label>Sabedoria</label><input type="number" id="attrSAB" value="0"></div>
+    <div class="attr-box attr-int"><label>Inteligência</label><input type="number" id="attrINT" value="0"></div>
+    <div class="attr-box attr-car"><label>Carisma</label><input type="number" id="attrCAR" value="0"></div>
   </div>
 
   <h2>Combate</h2>
@@ -511,52 +560,126 @@
 
   <h2>Defesas</h2>
   <div class="def-table" id="defTable">
-    <div class="def-header">
-      <span>Defesa</span>
-      <span>Nível/Armadura</span>
-      <span>Atributo</span>
-      <span>Bônus de classe</span>
-      <span>Outros</span>
-      <span>Total</span>
+
+    <div class="def-card" data-def="reflexos">
+      <div class="def-card-top">
+        <span class="def-name">Reflexos</span>
+        <div class="def-order-btns">
+          <button class="def-up" title="Mover para cima">▲</button>
+          <button class="def-down" title="Mover para baixo">▼</button>
+        </div>
+        <div class="def-total-box def-total">0</div>
+      </div>
+      <div class="def-fields">
+        <div class="field">
+          <label>Base</label>
+          <select class="def-mode">
+            <option value="level">Metade do nível</option>
+            <option value="armor">Bônus de armadura</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Atributo</label>
+          <select class="def-attr-select">
+            <option value="FOR">Força</option>
+            <option value="DES" selected>Destreza</option>
+            <option value="CON">Constituição</option>
+            <option value="SAB">Sabedoria</option>
+            <option value="INT">Inteligência</option>
+            <option value="CAR">Carisma</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Bônus de classe</label>
+          <input type="number" class="def-class" value="0">
+        </div>
+        <div class="field">
+          <label>Outros</label>
+          <input type="number" class="def-other" value="0">
+        </div>
+      </div>
+      <div class="def-armor-input" data-for="reflexos">
+        <label>Bônus de armadura (Reflexos)</label>
+        <input type="number" class="armor-bonus" value="0">
+      </div>
     </div>
 
-    <div class="def-row" data-def="reflexos">
-      <span class="def-name">Reflexos</span>
-      <select class="def-mode">
-        <option value="level">Metade do nível</option>
-        <option value="armor">Bônus de armadura</option>
-      </select>
-      <span class="def-attr">DES</span>
-      <input type="number" class="def-class" value="0">
-      <input type="number" class="def-other" value="0">
-      <span class="def-total">0</span>
-    </div>
-    <div class="def-armor-input" data-for="reflexos">
-      <label>Bônus de armadura (Reflexos)</label>
-      <input type="number" class="armor-bonus" value="0">
+    <div class="def-card" data-def="fortitude">
+      <div class="def-card-top">
+        <span class="def-name">Fortitude</span>
+        <div class="def-order-btns">
+          <button class="def-up" title="Mover para cima">▲</button>
+          <button class="def-down" title="Mover para baixo">▼</button>
+        </div>
+        <div class="def-total-box def-total">0</div>
+      </div>
+      <div class="def-fields">
+        <div class="field">
+          <label>Base</label>
+          <span style="display:block; padding:4px 0; color:#999; font-size:11px;">Nível ÷ 2 + armadura</span>
+        </div>
+        <div class="field">
+          <label>Atributo</label>
+          <select class="def-attr-select">
+            <option value="FOR">Força</option>
+            <option value="DES">Destreza</option>
+            <option value="CON" selected>Constituição</option>
+            <option value="SAB">Sabedoria</option>
+            <option value="INT">Inteligência</option>
+            <option value="CAR">Carisma</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Bônus de classe</label>
+          <input type="number" class="def-class" value="0">
+        </div>
+        <div class="field">
+          <label>Outros</label>
+          <input type="number" class="def-other" value="0">
+        </div>
+      </div>
+      <div class="def-armor-input" data-for="fortitude">
+        <label>Bônus de armadura (Fortitude)</label>
+        <input type="number" class="armor-bonus" value="0">
+      </div>
     </div>
 
-    <div class="def-row" data-def="fortitude">
-      <span class="def-name">Fortitude</span>
-      <span class="def-fixed">Nível ÷ 2 + armadura</span>
-      <span class="def-attr">CON</span>
-      <input type="number" class="def-class" value="0">
-      <input type="number" class="def-other" value="0">
-      <span class="def-total">0</span>
-    </div>
-    <div class="def-armor-input" data-for="fortitude">
-      <label>Bônus de armadura (Fortitude)</label>
-      <input type="number" class="armor-bonus" value="0">
+    <div class="def-card" data-def="vontade">
+      <div class="def-card-top">
+        <span class="def-name">Vontade</span>
+        <div class="def-order-btns">
+          <button class="def-up" title="Mover para cima">▲</button>
+          <button class="def-down" title="Mover para baixo">▼</button>
+        </div>
+        <div class="def-total-box def-total">0</div>
+      </div>
+      <div class="def-fields">
+        <div class="field">
+          <label>Base</label>
+          <span style="display:block; padding:4px 0; color:#999; font-size:11px;">Nível ÷ 2</span>
+        </div>
+        <div class="field">
+          <label>Atributo</label>
+          <select class="def-attr-select">
+            <option value="FOR">Força</option>
+            <option value="DES">Destreza</option>
+            <option value="CON">Constituição</option>
+            <option value="SAB" selected>Sabedoria</option>
+            <option value="INT">Inteligência</option>
+            <option value="CAR">Carisma</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Bônus de classe</label>
+          <input type="number" class="def-class" value="0">
+        </div>
+        <div class="field">
+          <label>Outros</label>
+          <input type="number" class="def-other" value="0">
+        </div>
+      </div>
     </div>
 
-    <div class="def-row" data-def="vontade">
-      <span class="def-name">Vontade</span>
-      <span class="def-fixed">Nível ÷ 2</span>
-      <span class="def-attr">SAB</span>
-      <input type="number" class="def-class" value="0">
-      <input type="number" class="def-other" value="0">
-      <span class="def-total">0</span>
-    </div>
   </div>
 
   <div class="dmg-limit-box">
@@ -646,16 +769,16 @@
   <h2>Perícias</h2>
   <div class="skill-table" id="skillTable">
     <div class="skill-header">
+      <span>Total</span>
       <span>Perícia</span>
       <span>Atrib.</span>
       <span>Treino</span>
       <span>Aprim.</span>
       <span>Outros</span>
-      <span>Total</span>
     </div>
   </div>
 
-  <h2>Notas / inventário</h2>
+  <h2>Notas</h2>
   <textarea id="notes" rows="5"></textarea>
 
   </div>
@@ -723,7 +846,27 @@
 
   </div>
 
-  <div class="tab-content" data-tab="anotacoes">
+  <div class="tab-content" data-tab="perfil">
+
+    <h2>Identidade</h2>
+    <div class="id-grid">
+      <div class="field full">
+        <label>Nome do personagem</label>
+        <input type="text" id="charName">
+      </div>
+      <div class="field">
+        <label>Jogador</label>
+        <input type="text" id="playerName">
+      </div>
+      <div class="field">
+        <label>Classe</label>
+        <input type="text" id="charClass">
+      </div>
+      <div class="field">
+        <label>Nível</label>
+        <input type="number" id="charLevel" value="1" min="0">
+      </div>
+    </div>
 
     <h2>Fama</h2>
     <div class="field">
@@ -826,6 +969,7 @@ const skills = [
 
 const attrIds = { FOR:"attrFOR", DES:"attrDES", CON:"attrCON", SAB:"attrSAB", INT:"attrINT", CAR:"attrCAR" };
 const attrLabels = { FOR:"FOR", DES:"DES", CON:"CON", SAB:"SAB", INT:"INT", CAR:"CAR", NONE:"-" };
+const attrColors = { FOR:"var(--c-for)", DES:"var(--c-des)", CON:"var(--c-con)", SAB:"var(--c-sab)", INT:"var(--c-int)", CAR:"var(--c-car)", NONE:"#666" };
 
 function getAttrMod(key){
   if(key === "NONE") return 0;
@@ -847,35 +991,38 @@ function trainingBonus(level, tier){
 
 function buildSkillTable(){
   const table = $('skillTable');
+  const attrOptions = ["FOR","DES","CON","SAB","INT","CAR","NONE"];
+  const attrOptLabels = { FOR:"Força", DES:"Destreza", CON:"Constituição", SAB:"Sabedoria", INT:"Inteligência", CAR:"Carisma", NONE:"Nenhum" };
+
   skills.forEach((skill, idx) => {
     const row = document.createElement('div');
     row.className = 'skill-row';
     row.dataset.idx = idx;
 
-    // Nome + atributo (ou seletor de atributo p/ Ofício)
+    // Total (primeira coluna)
+    const totalCell = document.createElement('div');
+    totalCell.className = 'skill-total';
+    totalCell.textContent = '0';
+    row.appendChild(totalCell);
+
+    // Nome
     const nameCell = document.createElement('div');
-    if(skill.attr === "CHOICE"){
-      nameCell.innerHTML = '<span class="skill-name">' + skill.name + '</span>';
-    } else {
-      nameCell.innerHTML = '<span class="skill-name">' + skill.name + '</span>';
-    }
+    nameCell.innerHTML = '<span class="skill-name">' + skill.name + '</span>';
     row.appendChild(nameCell);
 
-    // Coluna atributo
+    // Atributo (sempre editável)
     const attrCell = document.createElement('div');
-    attrCell.className = 'skill-attr';
-    if(skill.attr === "CHOICE"){
-      const sel = document.createElement('select');
-      sel.className = 'attr-choice';
-      ["FOR","DES","CON","SAB","INT","CAR"].forEach(a => {
-        const opt = document.createElement('option');
-        opt.value = a; opt.textContent = a;
-        sel.appendChild(opt);
-      });
-      attrCell.appendChild(sel);
-    } else {
-      attrCell.textContent = attrLabels[skill.attr];
-    }
+    const attrSel = document.createElement('select');
+    attrSel.className = 'skill-attr-select';
+    attrOptions.forEach(a => {
+      const opt = document.createElement('option');
+      opt.value = a; opt.textContent = attrOptLabels[a];
+      if(skill.attr === a || (skill.attr === "CHOICE" && a === "FOR")){
+        opt.selected = true;
+      }
+      attrSel.appendChild(opt);
+    });
+    attrCell.appendChild(attrSel);
     row.appendChild(attrCell);
 
     // Treino (select)
@@ -914,12 +1061,6 @@ function buildSkillTable(){
     otherCell.appendChild(otherInput);
     row.appendChild(otherCell);
 
-    // Total
-    const totalCell = document.createElement('div');
-    totalCell.className = 'skill-total';
-    totalCell.textContent = '0';
-    row.appendChild(totalCell);
-
     table.appendChild(row);
 
     // Listeners para recalcular
@@ -927,9 +1068,7 @@ function buildSkillTable(){
     trainSel.addEventListener('change', recalc);
     aprimInput.addEventListener('input', recalc);
     otherInput.addEventListener('input', recalc);
-    if(skill.attr === "CHOICE"){
-      attrCell.querySelector('select').addEventListener('change', recalc);
-    }
+    attrSel.addEventListener('change', recalc);
   });
 
   // Recalcular tudo quando atributos mudarem ou nível mudar
@@ -945,12 +1084,12 @@ function calcSkillTotal(row, skill){
   const aprimInput = row.querySelector('.aprim-input');
   const otherInput = row.querySelector('.other-input');
   const totalCell = row.querySelector('.skill-total');
+  const attrSel = row.querySelector('.skill-attr-select');
 
-  let attrKey = skill.attr;
-  if(attrKey === "CHOICE"){
-    attrKey = row.querySelector('.attr-choice').value;
-  }
+  const attrKey = attrSel.value;
   const attrMod = getAttrMod(attrKey);
+
+  row.style.setProperty('--skill-color', attrColors[attrKey] || '#444');
 
   const tierBase = parseInt(trainSel.value);
   const aprimLevels = parseInt(aprimInput.value) || 0;
@@ -981,45 +1120,47 @@ function calcDefenses(){
   const level = parseInt($('charLevel').value) || 0;
   const half = Math.floor(level / 2);
 
-  // Reflexos
-  const refRow = document.querySelector('.def-row[data-def="reflexos"]');
-  const refMode = refRow.querySelector('.def-mode').value;
-  const refArmorInput = document.querySelector('.def-armor-input[data-for="reflexos"] .armor-bonus');
-  const refBase = (refMode === 'armor') ? (parseInt(refArmorInput.value) || 0) : half;
-  const refDex = getAttrMod('DES');
-  const refClass = parseInt(refRow.querySelector('.def-class').value) || 0;
-  const refOther = parseInt(refRow.querySelector('.def-other').value) || 0;
-  const refTotal = Math.floor(refBase + refDex + refClass + refOther + 10);
-  refRow.querySelector('.def-total').textContent = refTotal;
+  document.querySelectorAll('.def-card').forEach(card => {
+    const def = card.dataset.def;
+    const attrSel = card.querySelector('.def-attr-select');
+    const attrKey = attrSel.value;
+    const attrMod = getAttrMod(attrKey);
+    const defClass = parseInt(card.querySelector('.def-class').value) || 0;
+    const defOther = parseInt(card.querySelector('.def-other').value) || 0;
+    const totalCell = card.querySelector('.def-total');
 
-  document.querySelector('.def-armor-input[data-for="reflexos"]').style.display =
-    (refMode === 'armor') ? 'flex' : 'none';
+    card.style.setProperty('--def-color', attrColors[attrKey] || '#6c8cff');
 
-  // Fortitude
-  const fortRow = document.querySelector('.def-row[data-def="fortitude"]');
-  const fortArmorInput = document.querySelector('.def-armor-input[data-for="fortitude"] .armor-bonus');
-  const fortArmor = parseInt(fortArmorInput.value) || 0;
-  const fortCon = getAttrMod('CON');
-  const fortClass = parseInt(fortRow.querySelector('.def-class').value) || 0;
-  const fortOther = parseInt(fortRow.querySelector('.def-other').value) || 0;
-  const fortTotal = Math.floor(half + fortArmor + fortCon + fortClass + fortOther + 10);
-  fortRow.querySelector('.def-total').textContent = fortTotal;
+    let base;
+    if(def === 'reflexos'){
+      const refMode = card.querySelector('.def-mode').value;
+      const armorInput = card.querySelector('.def-armor-input .armor-bonus');
+      base = (refMode === 'armor') ? (parseInt(armorInput.value) || 0) : half;
+      card.querySelector('.def-armor-input').style.display = (refMode === 'armor') ? 'flex' : 'none';
+    } else if(def === 'fortitude'){
+      const armorInput = card.querySelector('.def-armor-input .armor-bonus');
+      const armor = parseInt(armorInput.value) || 0;
+      base = half + armor;
+    } else {
+      base = half;
+    }
 
-  // Vontade
-  const vonRow = document.querySelector('.def-row[data-def="vontade"]');
-  const vonSab = getAttrMod('SAB');
-  const vonClass = parseInt(vonRow.querySelector('.def-class').value) || 0;
-  const vonOther = parseInt(vonRow.querySelector('.def-other').value) || 0;
-  const vonTotal = Math.floor(half + vonSab + vonClass + vonOther + 10);
-  vonRow.querySelector('.def-total').textContent = vonTotal;
+    const total = Math.floor(base + attrMod + defClass + defOther + 10);
+    totalCell.textContent = total;
+    card.dataset.total = total;
+  });
 
   // Dano limite = Total de Fortitude + outros bônus exclusivos do dano limite
+  const fortCard = document.querySelector('.def-card[data-def="fortitude"]');
+  const fortTotal = parseInt(fortCard.dataset.total) || 0;
   const dmgLimitOther = parseInt($('dmgLimitOther').value) || 0;
   const dmgLimit = Math.floor(fortTotal + dmgLimitOther);
   $('dmgLimitOut').textContent = dmgLimit;
 }
 
-document.querySelector('.def-mode').addEventListener('change', calcDefenses);
+document.querySelectorAll('.def-mode, .def-attr-select').forEach(el => {
+  el.addEventListener('change', calcDefenses);
+});
 document.querySelectorAll('.def-class, .def-other, .armor-bonus').forEach(el => {
   el.addEventListener('input', calcDefenses);
 });
@@ -1028,6 +1169,22 @@ Object.values(attrIds).forEach(id => {
   $(id).addEventListener('input', calcDefenses);
 });
 $('charLevel').addEventListener('input', calcDefenses);
+
+/* ---------- Reordenar defesas ---------- */
+document.querySelectorAll('.def-up').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const card = btn.closest('.def-card');
+    const prev = card.previousElementSibling;
+    if(prev) card.parentNode.insertBefore(card, prev);
+  });
+});
+document.querySelectorAll('.def-down').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const card = btn.closest('.def-card');
+    const next = card.nextElementSibling;
+    if(next) card.parentNode.insertBefore(next, card);
+  });
+});
 
 calcDefenses();
 
@@ -1202,12 +1359,11 @@ calcLoad();
 function save(){
   const skillData = [];
   document.querySelectorAll('.skill-row').forEach(row => {
-    const attrChoice = row.querySelector('.attr-choice');
     skillData.push({
       train: row.querySelector('.train-select').value,
       aprim: row.querySelector('.aprim-input').value,
       other: row.querySelector('.other-input').value,
-      attrChoice: attrChoice ? attrChoice.value : null
+      attr: row.querySelector('.skill-attr-select').value
     });
   });
 
@@ -1222,17 +1378,14 @@ function save(){
     },
     atkBase: $('atkBase').value,
     moveSpeed: $('moveSpeed').value,
-    defenses: {
-      refMode: document.querySelector('.def-mode').value,
-      refArmor: document.querySelector('.def-armor-input[data-for="reflexos"] .armor-bonus').value,
-      refClass: document.querySelector('.def-row[data-def="reflexos"] .def-class').value,
-      refOther: document.querySelector('.def-row[data-def="reflexos"] .def-other').value,
-      fortArmor: document.querySelector('.def-armor-input[data-for="fortitude"] .armor-bonus').value,
-      fortClass: document.querySelector('.def-row[data-def="fortitude"] .def-class').value,
-      fortOther: document.querySelector('.def-row[data-def="fortitude"] .def-other').value,
-      vonClass: document.querySelector('.def-row[data-def="vontade"] .def-class').value,
-      vonOther: document.querySelector('.def-row[data-def="vontade"] .def-other').value
-    },
+    defenses: Array.from(document.querySelectorAll('.def-card')).map(card => ({
+      def: card.dataset.def,
+      attr: card.querySelector('.def-attr-select').value,
+      defClass: card.querySelector('.def-class').value,
+      defOther: card.querySelector('.def-other').value,
+      refMode: card.dataset.def === 'reflexos' ? card.querySelector('.def-mode').value : undefined,
+      armor: card.querySelector('.armor-bonus') ? card.querySelector('.armor-bonus').value : undefined
+    })),
     hp: $('hpSlider').value, hpMax: $('hpMax').value, hpDice: $('hpDice').value,
     sp: $('spSlider').value, spMax: $('spMax').value, spDice: $('spDice').value,
     cond: $('condSlider').value, emo: $('emoSlider').value, emoDesc: $('emoDesc').value,
@@ -1305,17 +1458,24 @@ function load(){
   $('atkBase').value = data.atkBase ?? 0;
   $('moveSpeed').value = data.moveSpeed ?? 6;
 
-  if(data.defenses){
-    const d = data.defenses;
-    document.querySelector('.def-mode').value = d.refMode ?? 'level';
-    document.querySelector('.def-armor-input[data-for="reflexos"] .armor-bonus').value = d.refArmor ?? 0;
-    document.querySelector('.def-row[data-def="reflexos"] .def-class').value = d.refClass ?? 0;
-    document.querySelector('.def-row[data-def="reflexos"] .def-other').value = d.refOther ?? 0;
-    document.querySelector('.def-armor-input[data-for="fortitude"] .armor-bonus').value = d.fortArmor ?? 0;
-    document.querySelector('.def-row[data-def="fortitude"] .def-class').value = d.fortClass ?? 0;
-    document.querySelector('.def-row[data-def="fortitude"] .def-other').value = d.fortOther ?? 0;
-    document.querySelector('.def-row[data-def="vontade"] .def-class').value = d.vonClass ?? 0;
-    document.querySelector('.def-row[data-def="vontade"] .def-other').value = d.vonOther ?? 0;
+  if(data.defenses && Array.isArray(data.defenses)){
+    const defContainer = $('defTable');
+    data.defenses.forEach(d => {
+      const card = document.querySelector('.def-card[data-def="'+d.def+'"]');
+      if(!card) return;
+      card.querySelector('.def-attr-select').value = d.attr ?? card.querySelector('.def-attr-select').value;
+      card.querySelector('.def-class').value = d.defClass ?? 0;
+      card.querySelector('.def-other').value = d.defOther ?? 0;
+      if(d.def === 'reflexos' && d.refMode !== undefined){
+        card.querySelector('.def-mode').value = d.refMode;
+      }
+      const armorInput = card.querySelector('.armor-bonus');
+      if(armorInput && d.armor !== undefined){
+        armorInput.value = d.armor;
+      }
+      // Reordenar conforme ordem salva
+      defContainer.appendChild(card);
+    });
   }
 
   $('hpMax').value = data.hpMax || 20;
@@ -1359,9 +1519,8 @@ function load(){
       row.querySelector('.train-select').value = sd.train ?? 0;
       row.querySelector('.aprim-input').value = sd.aprim ?? 0;
       row.querySelector('.other-input').value = sd.other ?? 0;
-      const attrChoice = row.querySelector('.attr-choice');
-      if(attrChoice && sd.attrChoice){
-        attrChoice.value = sd.attrChoice;
+      if(sd.attr){
+        row.querySelector('.skill-attr-select').value = sd.attr;
       }
     });
   }
