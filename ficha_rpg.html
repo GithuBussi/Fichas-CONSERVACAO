@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ficha de Personagem</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+    background: #1e1e24;
+    color: #f0f0f0;
+    margin: 0;
+    padding: 16px;
+    display: flex;
+    justify-content: center;
+  }
+  .card {
+    background: #2a2a32;
+    border-radius: 12px;
+    padding: 20px;
+    max-width: 480px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  input[type="text"], textarea, input[type="number"] {
+    background: #1e1e24;
+    border: 1px solid #444;
+    color: #f0f0f0;
+    border-radius: 8px;
+    padding: 8px 10px;
+    font-size: 16px;
+    font-family: inherit;
+  }
+  input[type="text"] { width: 100%; font-weight: 600; }
+  input[type="number"] { width: 80px; }
+  textarea {
+    width: 100%;
+    resize: vertical;
+    font-size: 14px;
+  }
+  label.title {
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    display: block;
+    color: #ccc;
+  }
+  input[type="range"] {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 6px;
+    border-radius: 4px;
+    background: #444;
+    outline: none;
+  }
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #6c8cff;
+    cursor: pointer;
+  }
+  input[type="range"]::-moz-range-thumb {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #6c8cff;
+    cursor: pointer;
+    border: none;
+  }
+  .row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .row input[type="range"] { flex: 1; }
+  .out {
+    min-width: 100px;
+    text-align: right;
+    font-weight: 600;
+    font-size: 14px;
+  }
+  .bar-bg {
+    height: 12px;
+    border-radius: 6px;
+    background: #1e1e24;
+    overflow: hidden;
+    margin-top: 8px;
+  }
+  .bar-fill {
+    height: 100%;
+    transition: width .15s;
+  }
+  .hp-fill { background: #4caf50; }
+  .sp-fill { background: #3aa0ff; }
+  .maxrow {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 6px;
+    font-size: 12px;
+    color: #999;
+  }
+  .death-row {
+    display: flex;
+    gap: 12px;
+  }
+  .death-dot {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: 2px solid #555;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 18px;
+    font-weight: 700;
+    color: transparent;
+    transition: all .15s;
+  }
+  .death-dot.marked {
+    border-color: #e24b4a;
+    color: #e24b4a;
+  }
+  #deathMsg {
+    font-size: 12px;
+    color: #e24b4a;
+    margin: 8px 0 0;
+    visibility: hidden;
+  }
+  button {
+    background: #6c8cff;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 12px 20px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    align-self: flex-start;
+  }
+  button:active { opacity: 0.8; }
+  .hint {
+    font-size: 12px;
+    color: #888;
+    margin: 0;
+  }
+</style>
+</head>
+<body>
+<div class="card">
+
+  <input type="text" id="charName" placeholder="Nome do personagem">
+
+  <div>
+    <label class="title">Vida (PV)</label>
+    <div class="row">
+      <input type="range" min="0" max="20" value="20" step="1" id="hpSlider">
+      <span class="out" id="hpOut">20 / 20</span>
+    </div>
+    <div class="bar-bg"><div class="bar-fill hp-fill" id="hpBar" style="width:100%"></div></div>
+    <div class="maxrow">
+      <input type="number" id="hpMax" value="20" min="1">
+      <span>PV máximo</span>
+    </div>
+  </div>
+
+  <div>
+    <label class="title">Stamina (PS)</label>
+    <div class="row">
+      <input type="range" min="0" max="20" value="20" step="1" id="spSlider">
+      <span class="out" id="spOut">20 / 20</span>
+    </div>
+    <div class="bar-bg"><div class="bar-fill sp-fill" id="spBar" style="width:100%"></div></div>
+    <div class="maxrow">
+      <input type="number" id="spMax" value="20" min="1">
+      <span>PS máximo</span>
+    </div>
+  </div>
+
+  <div>
+    <label class="title">Condição física (1-4)</label>
+    <div class="row">
+      <input type="range" min="1" max="4" value="1" step="1" id="condSlider">
+      <span class="out" id="condOut">1 - Saudável</span>
+    </div>
+  </div>
+
+  <div>
+    <label class="title">Estado emocional (1-4)</label>
+    <div class="row">
+      <input type="range" min="1" max="4" value="1" step="1" id="emoSlider">
+      <span class="out" id="emoOut">1 - Calmo</span>
+    </div>
+  </div>
+
+  <div>
+    <label class="title">Marcas de morte</label>
+    <div class="death-row">
+      <div class="death-dot" data-i="0">X</div>
+      <div class="death-dot" data-i="1">X</div>
+      <div class="death-dot" data-i="2">X</div>
+    </div>
+    <p id="deathMsg">Personagem morto</p>
+  </div>
+
+  <div>
+    <label class="title">Notas / inventário</label>
+    <textarea id="notes" rows="5"></textarea>
+  </div>
+
+  <button id="saveBtn">Salvar ficha</button>
+  <p class="hint">Os dados ficam salvos neste navegador (cada pessoa tem a sua própria ficha, salva localmente).</p>
+
+</div>
+
+<script>
+const condLabels = {1:"1 - Saudável", 2:"2 - Ferido", 3:"3 - Gravemente ferido", 4:"4 - Incapacitado"};
+const emoLabels = {1:"1 - Calmo", 2:"2 - Estressado", 3:"3 - Abalado", 4:"4 - Em pânico"};
+
+function $(id){ return document.getElementById(id); }
+
+function updateBar(slider, out, bar, maxInput){
+  const max = parseInt(maxInput.value) || 1;
+  if(parseInt(slider.max) !== max){ slider.max = max; }
+  let val = parseInt(slider.value);
+  if(val > max){ val = max; slider.value = max; }
+  out.textContent = val + " / " + max;
+  bar.style.width = Math.round((val/max)*100) + "%";
+}
+
+function refreshHP(){ updateBar($('hpSlider'), $('hpOut'), $('hpBar'), $('hpMax')); }
+function refreshSP(){ updateBar($('spSlider'), $('spOut'), $('spBar'), $('spMax')); }
+
+$('hpSlider').addEventListener('input', refreshHP);
+$('hpMax').addEventListener('input', refreshHP);
+$('spSlider').addEventListener('input', refreshSP);
+$('spMax').addEventListener('input', refreshSP);
+
+$('condSlider').addEventListener('input', e => { $('condOut').textContent = condLabels[e.target.value]; });
+$('emoSlider').addEventListener('input', e => { $('emoOut').textContent = emoLabels[e.target.value]; });
+
+let deathState = [false,false,false];
+document.querySelectorAll('.death-dot').forEach(dot => {
+  dot.addEventListener('click', () => {
+    const i = parseInt(dot.dataset.i);
+    deathState[i] = !deathState[i];
+    dot.classList.toggle('marked', deathState[i]);
+    $('deathMsg').style.visibility = deathState.every(Boolean) ? 'visible' : 'hidden';
+  });
+});
+
+function save(){
+  const data = {
+    name: $('charName').value,
+    hp: $('hpSlider').value, hpMax: $('hpMax').value,
+    sp: $('spSlider').value, spMax: $('spMax').value,
+    cond: $('condSlider').value, emo: $('emoSlider').value,
+    death: deathState, notes: $('notes').value
+  };
+  try {
+    localStorage.setItem('rpgSheet', JSON.stringify(data));
+    alert('Ficha salva!');
+  } catch(e){
+    alert('Não foi possível salvar (modo privado/sem permissão de armazenamento).');
+  }
+}
+
+function load(){
+  let data;
+  try { data = JSON.parse(localStorage.getItem('rpgSheet')); } catch(e){ return; }
+  if(!data) return;
+  $('charName').value = data.name || '';
+  $('hpMax').value = data.hpMax || 20;
+  $('hpSlider').max = data.hpMax || 20;
+  $('hpSlider').value = data.hp ?? 20;
+  $('spMax').value = data.spMax || 20;
+  $('spSlider').max = data.spMax || 20;
+  $('spSlider').value = data.sp ?? 20;
+  $('condSlider').value = data.cond || 1;
+  $('emoSlider').value = data.emo || 1;
+  $('notes').value = data.notes || '';
+  $('condOut').textContent = condLabels[$('condSlider').value];
+  $('emoOut').textContent = emoLabels[$('emoSlider').value];
+  if(data.death){
+    data.death.forEach((d,i) => {
+      if(d){
+        deathState[i] = true;
+        document.querySelector('.death-dot[data-i="'+i+'"]').classList.add('marked');
+      }
+    });
+    $('deathMsg').style.visibility = deathState.every(Boolean) ? 'visible' : 'hidden';
+  }
+}
+
+$('saveBtn').addEventListener('click', save);
+load();
+refreshHP();
+refreshSP();
+</script>
+</body>
+</html>
