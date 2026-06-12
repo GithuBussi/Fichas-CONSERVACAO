@@ -337,10 +337,134 @@
     font-size: 16px;
     color: #9fb4ff;
   }
+
+  /* Abas */
+  .tabs {
+    display: flex;
+    gap: 4px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    border-bottom: 1px solid #444;
+    padding-bottom: 0;
+  }
+  .tab-btn {
+    background: transparent;
+    border: none;
+    color: #999;
+    padding: 10px 12px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    border-bottom: 2px solid transparent;
+    border-radius: 0;
+  }
+  .tab-btn.active {
+    color: #9fb4ff;
+    border-bottom: 2px solid #6c8cff;
+  }
+  .tab-content { display: none; flex-direction: column; gap: 20px; }
+  .tab-content.active { display: flex; }
+
+  /* Habilidade especial */
+  .special-ability-box {
+    background: #1e1e24;
+    border: 2px solid #6c8cff;
+    border-radius: 10px;
+    padding: 14px;
+  }
+
+  /* Listas de itens (habilidades, técnicas, itens, contatos) */
+  .item-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .item-card {
+    background: #1e1e24;
+    border: 1px solid #444;
+    border-radius: 8px;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    position: relative;
+  }
+  .item-card .item-row {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .item-card .item-row > div {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    flex: 1;
+    min-width: 90px;
+  }
+  .item-card label.sub {
+    margin-bottom: 0;
+  }
+  .item-card textarea { min-height: 50px; }
+  .remove-btn {
+    background: transparent;
+    border: 1px solid #e24b4a;
+    color: #e24b4a;
+    border-radius: 6px;
+    padding: 4px 10px;
+    font-size: 12px;
+    cursor: pointer;
+    align-self: flex-end;
+  }
+  .add-btn {
+    background: transparent;
+    border: 1px dashed #6c8cff;
+    color: #9fb4ff;
+    border-radius: 8px;
+    padding: 10px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    align-self: stretch;
+    text-align: center;
+  }
+
+  /* Inventário - carga */
+  .load-box {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+  .load-box .field label { font-size: 11px; color: #999; margin-bottom: 4px; display: block; }
+  .load-readout {
+    display: block;
+    font-size: 18px;
+    font-weight: 700;
+    color: #9fb4ff;
+    background: #1e1e24;
+    border: 1px solid #444;
+    border-radius: 8px;
+    padding: 8px 10px;
+    text-align: center;
+  }
+  .load-readout.over {
+    color: #e24b4a;
+    border-color: #e24b4a;
+  }
 </style>
 </head>
 <body>
 <div class="card">
+
+  <div class="tabs">
+    <button class="tab-btn active" data-tab="principal">Principal</button>
+    <button class="tab-btn" data-tab="habilidades">Habilidades</button>
+    <button class="tab-btn" data-tab="tecnicas">Técnicas</button>
+    <button class="tab-btn" data-tab="inventario">Inventário</button>
+    <button class="tab-btn" data-tab="anotacoes">Anotações</button>
+  </div>
+
+  <div class="tab-content active" data-tab="principal">
 
   <h2>Identidade</h2>
   <div class="id-grid">
@@ -436,7 +560,8 @@
   </div>
 
   <div class="dmg-limit-box">
-    <label>Dano limite (Fortitude + Outros)</label>
+    <label>Dano limite (Fortitude + outros bônus do dano limite)</label>
+    <input type="number" id="dmgLimitOther" value="0" style="width:60px;">
     <span id="dmgLimitOut">0</span>
   </div>
 
@@ -533,6 +658,96 @@
   <h2>Notas / inventário</h2>
   <textarea id="notes" rows="5"></textarea>
 
+  </div>
+
+  <div class="tab-content" data-tab="habilidades">
+
+    <h2>Habilidade especial</h2>
+    <div class="special-ability-box">
+      <label class="sub">Nome</label>
+      <input type="text" id="specialAbilityName" placeholder="Nome da habilidade especial">
+      <label class="sub" style="margin-top:8px;">Descrição</label>
+      <textarea id="specialAbilityDesc" rows="3" placeholder="Descreva a habilidade especial..."></textarea>
+    </div>
+
+    <h2>Habilidades</h2>
+    <div id="abilityList" class="item-list"></div>
+    <button class="add-btn" id="addAbilityBtn">+ Adicionar habilidade</button>
+
+  </div>
+
+  <div class="tab-content" data-tab="tecnicas">
+
+    <h2>Perícia das técnicas</h2>
+    <div class="field">
+      <label>Perícia geral usada nas técnicas</label>
+      <select id="techSkill">
+        <option value="">- selecione -</option>
+      </select>
+    </div>
+
+    <h2>Técnicas</h2>
+    <div id="techList" class="item-list"></div>
+    <button class="add-btn" id="addTechBtn">+ Adicionar técnica</button>
+
+  </div>
+
+  <div class="tab-content" data-tab="inventario">
+
+    <h2>Limite de carga</h2>
+    <div class="load-box">
+      <div class="field">
+        <label>Atributo usado</label>
+        <select id="loadAttr">
+          <option value="FOR">Força</option>
+          <option value="CON">Constituição</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Multiplicador</label>
+        <input type="number" id="loadMult" value="2" step="0.5">
+      </div>
+      <div class="field">
+        <label>Limite total</label>
+        <span id="loadLimitOut" class="load-readout">0</span>
+      </div>
+      <div class="field">
+        <label>Carga atual</label>
+        <span id="loadCurrentOut" class="load-readout">0</span>
+      </div>
+    </div>
+
+    <h2>Itens</h2>
+    <div id="itemList" class="item-list"></div>
+    <button class="add-btn" id="addItemBtn">+ Adicionar item</button>
+
+  </div>
+
+  <div class="tab-content" data-tab="anotacoes">
+
+    <h2>Fama</h2>
+    <div class="field">
+      <label>Nível de fama</label>
+      <select id="famaLevel">
+        <option value="0">Quase inexistente</option>
+        <option value="1">Fora do radar</option>
+        <option value="2">Círculo social</option>
+        <option value="3">Bairro ou grupo</option>
+        <option value="4">Cidade ou região</option>
+        <option value="5">País inteiro</option>
+        <option value="6">Amplo conhecimento</option>
+      </select>
+    </div>
+
+    <h2>Contatos</h2>
+    <div id="contactList" class="item-list"></div>
+    <button class="add-btn" id="addContactBtn">+ Adicionar contato</button>
+
+    <h2>Anotações gerais</h2>
+    <textarea id="generalNotes" rows="6" placeholder="Anotações livres..."></textarea>
+
+  </div>
+
   <button id="saveBtn">Salvar ficha</button>
   <p class="hint">Os dados ficam salvos neste navegador (cada pessoa tem a sua própria ficha, salva localmente).</p>
 
@@ -540,6 +755,15 @@
 
 <script>
 function $(id){ return document.getElementById(id); }
+
+/* ---------- Abas ---------- */
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const tab = btn.dataset.tab;
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b === btn));
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.toggle('active', c.dataset.tab === tab));
+  });
+});
 
 /* ---------- Barras de vida/stamina ---------- */
 function updateBar(slider, out, bar, maxInput){
@@ -789,8 +1013,9 @@ function calcDefenses(){
   const vonTotal = Math.floor(half + vonSab + vonClass + vonOther + 10);
   vonRow.querySelector('.def-total').textContent = vonTotal;
 
-  // Dano limite = (half + bônus de armadura de Fortitude + CON + classe + outros), sem o +10
-  const dmgLimit = Math.floor(half + fortArmor + fortCon + fortClass + fortOther);
+  // Dano limite = Total de Fortitude + outros bônus exclusivos do dano limite
+  const dmgLimitOther = parseInt($('dmgLimitOther').value) || 0;
+  const dmgLimit = Math.floor(fortTotal + dmgLimitOther);
   $('dmgLimitOut').textContent = dmgLimit;
 }
 
@@ -798,12 +1023,180 @@ document.querySelector('.def-mode').addEventListener('change', calcDefenses);
 document.querySelectorAll('.def-class, .def-other, .armor-bonus').forEach(el => {
   el.addEventListener('input', calcDefenses);
 });
+$('dmgLimitOther').addEventListener('input', calcDefenses);
 Object.values(attrIds).forEach(id => {
   $(id).addEventListener('input', calcDefenses);
 });
 $('charLevel').addEventListener('input', calcDefenses);
 
 calcDefenses();
+
+/* ---------- Popular dropdown de perícia das técnicas ---------- */
+function populateTechSkillDropdown(){
+  const sel = $('techSkill');
+  skills.forEach(skill => {
+    const opt = document.createElement('option');
+    opt.value = skill.name;
+    opt.textContent = skill.name;
+    sel.appendChild(opt);
+  });
+}
+populateTechSkillDropdown();
+
+/* ---------- Listas dinâmicas: Habilidades ---------- */
+function createAbilityCard(data){
+  const card = document.createElement('div');
+  card.className = 'item-card';
+  card.innerHTML = `
+    <div class="item-row">
+      <div style="flex:2; min-width:140px;">
+        <label class="sub">Nome</label>
+        <input type="text" class="ab-name" value="${data?.name || ''}">
+      </div>
+      <div>
+        <label class="sub">Custo</label>
+        <input type="text" class="ab-cost" value="${data?.cost || ''}">
+      </div>
+      <div>
+        <label class="sub">Duração</label>
+        <input type="text" class="ab-duration" value="${data?.duration || ''}">
+      </div>
+      <div>
+        <label class="sub">Alcance</label>
+        <input type="text" class="ab-range" value="${data?.range || ''}">
+      </div>
+    </div>
+    <div>
+      <label class="sub">Mini descrição</label>
+      <textarea class="ab-desc">${data?.desc || ''}</textarea>
+    </div>
+    <button class="remove-btn">Remover</button>
+  `;
+  card.querySelector('.remove-btn').addEventListener('click', () => card.remove());
+  return card;
+}
+$('addAbilityBtn').addEventListener('click', () => $('abilityList').appendChild(createAbilityCard()));
+
+/* ---------- Listas dinâmicas: Técnicas ---------- */
+function createTechCard(data){
+  const card = document.createElement('div');
+  card.className = 'item-card';
+  card.innerHTML = `
+    <div class="item-row">
+      <div style="flex:2; min-width:140px;">
+        <label class="sub">Nome da técnica</label>
+        <input type="text" class="tech-name" value="${data?.name || ''}">
+      </div>
+      <div>
+        <label class="sub">Gasto de stamina</label>
+        <input type="text" class="tech-cost" value="${data?.cost || ''}">
+      </div>
+    </div>
+    <div>
+      <label class="sub">Mini descrição</label>
+      <textarea class="tech-desc">${data?.desc || ''}</textarea>
+    </div>
+    <button class="remove-btn">Remover</button>
+  `;
+  card.querySelector('.remove-btn').addEventListener('click', () => card.remove());
+  return card;
+}
+$('addTechBtn').addEventListener('click', () => $('techList').appendChild(createTechCard()));
+
+/* ---------- Listas dinâmicas: Itens (inventário) ---------- */
+const itemSizes = ["Minúsculo","Muito pequeno","Pequeno","Médio","Grande","Muito grande"];
+function createItemCard(data){
+  const card = document.createElement('div');
+  card.className = 'item-card';
+  let sizeOptions = itemSizes.map(s => `<option value="${s}" ${data?.size===s?'selected':''}>${s}</option>`).join('');
+  let rarityOptions = '';
+  for(let i=1; i<=6; i++){
+    rarityOptions += `<option value="${i}" ${data?.rarity==i?'selected':''}>${i}</option>`;
+  }
+  card.innerHTML = `
+    <div class="item-row">
+      <div style="flex:2; min-width:140px;">
+        <label class="sub">Nome</label>
+        <input type="text" class="item-name" value="${data?.name || ''}">
+      </div>
+      <div>
+        <label class="sub">Raridade (1-6)</label>
+        <select class="item-rarity">${rarityOptions}</select>
+      </div>
+      <div>
+        <label class="sub">Carga</label>
+        <input type="number" class="item-load" value="${data?.load ?? 0}" step="0.1">
+      </div>
+    </div>
+    <div class="item-row">
+      <div>
+        <label class="sub">Tamanho</label>
+        <select class="item-size">${sizeOptions}</select>
+      </div>
+    </div>
+    <div>
+      <label class="sub">Descrição</label>
+      <textarea class="item-desc">${data?.desc || ''}</textarea>
+    </div>
+    <button class="remove-btn">Remover</button>
+  `;
+  card.querySelector('.remove-btn').addEventListener('click', () => { card.remove(); calcLoad(); });
+  card.querySelector('.item-load').addEventListener('input', calcLoad);
+  return card;
+}
+$('addItemBtn').addEventListener('click', () => { $('itemList').appendChild(createItemCard()); calcLoad(); });
+
+/* ---------- Listas dinâmicas: Contatos ---------- */
+function createContactCard(data){
+  const card = document.createElement('div');
+  card.className = 'item-card';
+  const types = ["Contato","Rede","Organização"];
+  let typeOptions = types.map(t => `<option value="${t}" ${data?.type===t?'selected':''}>${t}</option>`).join('');
+  card.innerHTML = `
+    <div class="item-row">
+      <div style="flex:2; min-width:140px;">
+        <label class="sub">Nome</label>
+        <input type="text" class="contact-name" value="${data?.name || ''}">
+      </div>
+      <div>
+        <label class="sub">Tipo</label>
+        <select class="contact-type">${typeOptions}</select>
+      </div>
+    </div>
+    <div>
+      <label class="sub">Descrição</label>
+      <textarea class="contact-desc">${data?.desc || ''}</textarea>
+    </div>
+    <button class="remove-btn">Remover</button>
+  `;
+  card.querySelector('.remove-btn').addEventListener('click', () => card.remove());
+  return card;
+}
+$('addContactBtn').addEventListener('click', () => $('contactList').appendChild(createContactCard()));
+
+/* ---------- Cálculo de carga ---------- */
+function calcLoad(){
+  const attr = $('loadAttr').value;
+  const mult = parseFloat($('loadMult').value) || 0;
+  const attrMod = getAttrMod(attr);
+  const limit = Math.floor(attrMod * mult);
+  $('loadLimitOut').textContent = limit;
+
+  let total = 0;
+  document.querySelectorAll('.item-load').forEach(input => {
+    total += parseFloat(input.value) || 0;
+  });
+  total = Math.round(total * 100) / 100;
+  const currentOut = $('loadCurrentOut');
+  currentOut.textContent = total;
+  currentOut.classList.toggle('over', total > limit);
+}
+$('loadAttr').addEventListener('change', calcLoad);
+$('loadMult').addEventListener('input', calcLoad);
+Object.values(attrIds).forEach(id => {
+  $(id).addEventListener('input', calcLoad);
+});
+calcLoad();
 
 /* ---------- Salvar / Carregar ---------- */
 function save(){
@@ -846,7 +1239,41 @@ function save(){
     status: [$('status1').value, $('status2').value, $('status3').value],
     death: deathState,
     skills: skillData,
-    notes: $('notes').value
+    notes: $('notes').value,
+    dmgLimitOther: $('dmgLimitOther').value,
+    specialAbility: {
+      name: $('specialAbilityName').value,
+      desc: $('specialAbilityDesc').value
+    },
+    abilities: Array.from(document.querySelectorAll('#abilityList .item-card')).map(card => ({
+      name: card.querySelector('.ab-name').value,
+      cost: card.querySelector('.ab-cost').value,
+      duration: card.querySelector('.ab-duration').value,
+      range: card.querySelector('.ab-range').value,
+      desc: card.querySelector('.ab-desc').value
+    })),
+    techSkill: $('techSkill').value,
+    techniques: Array.from(document.querySelectorAll('#techList .item-card')).map(card => ({
+      name: card.querySelector('.tech-name').value,
+      cost: card.querySelector('.tech-cost').value,
+      desc: card.querySelector('.tech-desc').value
+    })),
+    loadAttr: $('loadAttr').value,
+    loadMult: $('loadMult').value,
+    items: Array.from(document.querySelectorAll('#itemList .item-card')).map(card => ({
+      name: card.querySelector('.item-name').value,
+      rarity: card.querySelector('.item-rarity').value,
+      load: card.querySelector('.item-load').value,
+      size: card.querySelector('.item-size').value,
+      desc: card.querySelector('.item-desc').value
+    })),
+    fama: $('famaLevel').value,
+    contacts: Array.from(document.querySelectorAll('#contactList .item-card')).map(card => ({
+      name: card.querySelector('.contact-name').value,
+      type: card.querySelector('.contact-type').value,
+      desc: card.querySelector('.contact-desc').value
+    })),
+    generalNotes: $('generalNotes').value
   };
   try {
     localStorage.setItem('rpgSheet', JSON.stringify(data));
@@ -941,6 +1368,37 @@ function load(){
 
   recalcAllSkills();
   calcDefenses();
+
+  $('dmgLimitOther').value = data.dmgLimitOther ?? 0;
+
+  if(data.specialAbility){
+    $('specialAbilityName').value = data.specialAbility.name || '';
+    $('specialAbilityDesc').value = data.specialAbility.desc || '';
+  }
+
+  if(data.abilities){
+    data.abilities.forEach(a => $('abilityList').appendChild(createAbilityCard(a)));
+  }
+
+  $('techSkill').value = data.techSkill || '';
+  if(data.techniques){
+    data.techniques.forEach(t => $('techList').appendChild(createTechCard(t)));
+  }
+
+  $('loadAttr').value = data.loadAttr || 'FOR';
+  $('loadMult').value = data.loadMult ?? 2;
+  if(data.items){
+    data.items.forEach(i => $('itemList').appendChild(createItemCard(i)));
+  }
+
+  $('famaLevel').value = data.fama ?? 0;
+  if(data.contacts){
+    data.contacts.forEach(c => $('contactList').appendChild(createContactCard(c)));
+  }
+  $('generalNotes').value = data.generalNotes || '';
+
+  calcDefenses();
+  calcLoad();
 }
 
 $('saveBtn').addEventListener('click', save);
