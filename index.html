@@ -334,6 +334,36 @@ input[type="range"]::-webkit-slider-thumb {
 }
 #dmgLimitOut { font-weight: 800; font-size: 18px; color: #9fb4ff; }
 
+/* RESISTENCIAS */
+.res-table { display: flex; flex-direction: column; gap: 4px; }
+.res-header {
+  display: grid; grid-template-columns: 1.4fr 0.7fr 1fr 36px;
+  gap: 6px; align-items: center; font-size: 9px; color: #666;
+  text-transform: uppercase; border-bottom: 1px solid #333; padding: 0 6px 4px;
+}
+.res-row {
+  display: grid; grid-template-columns: 1.4fr 0.7fr 1fr 36px;
+  gap: 6px; align-items: center; padding: 4px 6px;
+  background: #18181f; border: 1px solid #3a3a4a; border-radius: 6px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+}
+.res-row select, .res-row input { width: 100%; padding: 4px 6px; font-size: 12px; }
+.res-row .remove-btn { padding: 4px 6px; font-size: 11px; align-self: center; }
+
+/* DAMAGE CALC INFO */
+.dmg-calc-info {
+  font-size: 11px; color: #9fb4ff; margin-top: 6px; min-height: 14px;
+}
+
+/* OPEN WOUND */
+.open-wound-label {
+  display: flex; align-items: center; gap: 6px; margin-top: 8px;
+  font-size: 12px; color: #e24b4a; font-weight: 700; cursor: pointer;
+}
+.open-wound-label input[type="checkbox"] {
+  width: 18px; height: 18px; accent-color: #e24b4a; cursor: pointer;
+}
+
 /* SESSION TIMER */
 .session-box {
   background: #18181f; border: 1px solid #3a3a4a; border-radius: 8px;
@@ -583,6 +613,14 @@ button { cursor: pointer; }
   <span id="dmgLimitOut">0</span>
 </div>
 
+<h2><span class="ico">⛨</span>Resistências</h2>
+<div class="res-table" id="resTable">
+  <div class="res-header">
+    <span>Tipo</span><span>RD</span><span>Res./Vuln.</span><span></span>
+  </div>
+</div>
+<button class="add-btn" id="addResBtn">+ Adicionar resistência</button>
+
 <h2><span class="ico">♥</span>Vida &amp; Stamina</h2>
 <div id="hpSection">
   <label class="title">Vida (PV)</label>
@@ -594,10 +632,13 @@ button { cursor: pointer; }
   <div class="maxrow"><input type="number" id="hpMax" value="20" min="1"><span>PV máx</span><input type="text" id="hpDice" placeholder="dado ex: 1d10" style="width:100px;margin-left:8px"></div>
   <div class="quick-dmg">
     <label>Dano / Cura rápida</label>
+    <select id="hpDmgType"></select>
     <input type="number" id="hpQuick" value="0" min="0">
     <button class="q-btn dmg" id="hpDmgBtn">⚔ Dano</button>
     <button class="q-btn heal" id="hpHealBtn">✚ Cura</button>
   </div>
+  <div id="dmgCalcInfo" class="dmg-calc-info"></div>
+  <label class="open-wound-label"><input type="checkbox" id="openWound"> Ferida aberta</label>
 </div>
 <div id="spSection">
   <label class="title">Stamina (PS)</label>
@@ -819,6 +860,60 @@ function refreshSP(){
 $('hpSlider').addEventListener('input',refreshHP);$('hpMax').addEventListener('input',refreshHP);
 $('spSlider').addEventListener('input',refreshSP);$('spMax').addEventListener('input',refreshSP);
 
+/* ===== TIPOS DE DANO / RESISTÊNCIAS ===== */
+const damageTypes=['Cortante','Perfurante','Concussão','Aquático','Telúrico','Flamejante','Elétrico','Aéreo','Energético','Radiante','Mental','Necrótico','Especial'];
+
+function populateHpDmgType(){
+  const sel=$('hpDmgType');
+  sel.innerHTML='';
+  damageTypes.forEach(t=>{const o=document.createElement('option');o.value=t;o.textContent=t;sel.appendChild(o);});
+}
+populateHpDmgType();
+
+function createResRow(d){
+  const row=document.createElement('div');row.className='res-row';
+  const typeOpts=['Geral',...damageTypes].map(t=>`<option ${d?.type===t?'selected':''}>${t}</option>`).join('');
+  row.innerHTML=`
+    <select class="res-type">${typeOpts}</select>
+    <input type="number" class="res-rd" value="${d?.rd??0}" min="0">
+    <select class="res-rv">
+      <option value="-" ${(!d?.rv||d.rv==='-')?'selected':''}>—</option>
+      <option value="R" ${d?.rv==='R'?'selected':''}>Resistência (÷2)</option>
+      <option value="V" ${d?.rv==='V'?'selected':''}>Vulnerabilidade (×2)</option>
+    </select>
+    <button class="remove-btn">✕</button>`;
+  row.querySelector('.remove-btn').addEventListener('click',()=>row.remove());
+  return row;
+}
+$('addResBtn').addEventListener('click',()=>$('resTable').appendChild(createResRow({})));
+
+/* Calcula dano final aplicando RD (geral + específica, acumulável, min 1) e Resist/Vuln (geral e específica) */
+function calcFinalDamage(rawDmg,dmgType){
+  let generalRD=0,typeRD=0,generalRV=null,typeRV=null;
+  document.querySelectorAll('#resTable .res-row').forEach(row=>{
+    const type=row.querySelector('.res-type').value;
+    const rd=parseInt(row.querySelector('.res-rd').value)||0;
+    const rv=row.querySelector('.res-rv').value;
+    if(type==='Geral'){
+      generalRD+=rd;
+      if(rv==='R'||rv==='V')generalRV=rv;
+    } else if(type===dmgType){
+      typeRD+=rd;
+      if(rv==='R'||rv==='V')typeRV=rv;
+    }
+  });
+  let dmg=rawDmg-(generalRD+typeRD);
+  if(dmg<1)dmg=1;
+  // Aplica resistência/vulnerabilidade: específica tem prioridade, mas se ambas existirem, aplica as duas
+  if(generalRV==='R')dmg=Math.floor(dmg/2);
+  else if(generalRV==='V')dmg=dmg*2;
+  if(typeRV==='R')dmg=Math.floor(dmg/2);
+  else if(typeRV==='V')dmg=dmg*2;
+  if(dmg<1)dmg=1;
+  return {final:dmg,generalRD,typeRD,generalRV,typeRV};
+}
+
+
 /* Shake on damage */
 function shakeSection(id){const s=$(id);s.classList.remove('shake');void s.offsetWidth;s.classList.add('shake');s.addEventListener('animationend',()=>s.classList.remove('shake'),{once:true});}
 
@@ -826,13 +921,25 @@ function shakeSection(id){const s=$(id);s.classList.remove('shake');void s.offse
 function clampHP(v){const max=parseInt($('hpMax').value)||1;return Math.max(0,Math.min(max,v));}
 function clampSP(v){const max=parseInt($('spMax').value)||1;return Math.max(0,Math.min(max,v));}
 $('hpDmgBtn').addEventListener('click',()=>{
-  const q=parseInt($('hpQuick').value)||0;
-  $('hpSlider').value=clampHP(parseInt($('hpSlider').value)-q);
+  const raw=parseInt($('hpQuick').value)||0;
+  const dmgType=$('hpDmgType').value;
+  const {final,generalRD,typeRD,generalRV,typeRV}=calcFinalDamage(raw,dmgType);
+  $('hpSlider').value=clampHP(parseInt($('hpSlider').value)-final);
   refreshHP();shakeSection('hpSection');
+  let info='Dano bruto: '+raw+' → RD total: '+(generalRD+typeRD)+' (Geral '+generalRD+' + '+dmgType+' '+typeRD+')';
+  const rvParts=[];
+  if(generalRV==='R')rvParts.push('Resistência geral (÷2)');
+  if(generalRV==='V')rvParts.push('Vulnerabilidade geral (×2)');
+  if(typeRV==='R')rvParts.push('Resistência a '+dmgType+' (÷2)');
+  if(typeRV==='V')rvParts.push('Vulnerabilidade a '+dmgType+' (×2)');
+  if(rvParts.length)info+=' | '+rvParts.join(', ');
+  info+=' → Dano final: '+final;
+  $('dmgCalcInfo').textContent=info;
 });
 $('hpHealBtn').addEventListener('click',()=>{
   const q=parseInt($('hpQuick').value)||0;
   $('hpSlider').value=clampHP(parseInt($('hpSlider').value)+q);refreshHP();
+  $('dmgCalcInfo').textContent='';
 });
 $('spUseBtn').addEventListener('click',()=>{
   const q=parseInt($('spQuick').value)||0;
@@ -1331,7 +1438,8 @@ function getData(){
     atkBase:$('atkBase').value,moveSpeed:$('moveSpeed').value,
     defenses:Array.from(document.querySelectorAll('.def-card')).map(c=>({def:c.dataset.def,attr:c.querySelector('.def-attr-select').value,cls:c.querySelector('.def-class').value,other:c.querySelector('.def-other').value,refMode:c.dataset.def==='reflexos'?c.querySelector('.def-mode').value:undefined,armor:c.querySelector('.armor-bonus')?c.querySelector('.armor-bonus').value:undefined})),
     dmgLimitOther:$('dmgLimitOther').value,
-    hp:$('hpSlider').value,hpMax:$('hpMax').value,hpDice:$('hpDice').value,
+    resistances:Array.from(document.querySelectorAll('#resTable .res-row')).map(r=>({type:r.querySelector('.res-type').value,rd:r.querySelector('.res-rd').value,rv:r.querySelector('.res-rv').value})),
+    hp:$('hpSlider').value,hpMax:$('hpMax').value,hpDice:$('hpDice').value,openWound:$('openWound').checked,
     sp:$('spSlider').value,spMax:$('spMax').value,spDice:$('spDice').value,
     cond:$('condSlider').value,emo:$('emoSlider').value,emoDesc:$('emoDesc').value,
     status:[$('status1').value,$('status2').value,$('status3').value],
