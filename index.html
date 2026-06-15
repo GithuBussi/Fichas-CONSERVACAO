@@ -614,6 +614,13 @@ button { cursor: pointer; }
 </div>
 
 <h2><span class="ico">⛨</span>Resistências</h2>
+<datalist id="damageTypeList">
+  <option value="Geral"><option value="Cortante"><option value="Perfurante">
+  <option value="Concussão"><option value="Aquático"><option value="Telúrico">
+  <option value="Flamejante"><option value="Elétrico"><option value="Aéreo">
+  <option value="Energético"><option value="Radiante"><option value="Mental">
+  <option value="Necrótico"><option value="Especial">
+</datalist>
 <div class="res-table" id="resTable">
   <div class="res-header">
     <span>Tipo</span><span>RD</span><span>Res./Vuln.</span><span></span>
@@ -872,9 +879,8 @@ populateHpDmgType();
 
 function createResRow(d){
   const row=document.createElement('div');row.className='res-row';
-  const typeOpts=['Geral',...damageTypes].map(t=>`<option ${d?.type===t?'selected':''}>${t}</option>`).join('');
   row.innerHTML=`
-    <select class="res-type">${typeOpts}</select>
+    <input type="text" class="res-type" list="damageTypeList" value="${d?.type||''}" placeholder="Tipo (ex: Geral, Cortante...)">
     <input type="number" class="res-rd" value="${d?.rd??0}" min="0">
     <select class="res-rv">
       <option value="-" ${(!d?.rv||d.rv==='-')?'selected':''}>—</option>
@@ -890,14 +896,15 @@ $('addResBtn').addEventListener('click',()=>$('resTable').appendChild(createResR
 /* Calcula dano final aplicando RD (geral + específica, acumulável, min 1) e Resist/Vuln (geral e específica) */
 function calcFinalDamage(rawDmg,dmgType){
   let generalRD=0,typeRD=0,generalRV=null,typeRV=null;
+  const normDmgType=(dmgType||'').trim().toLowerCase();
   document.querySelectorAll('#resTable .res-row').forEach(row=>{
-    const type=row.querySelector('.res-type').value;
+    const type=row.querySelector('.res-type').value.trim().toLowerCase();
     const rd=parseInt(row.querySelector('.res-rd').value)||0;
     const rv=row.querySelector('.res-rv').value;
-    if(type==='Geral'){
+    if(type==='geral'){
       generalRD+=rd;
       if(rv==='R'||rv==='V')generalRV=rv;
-    } else if(type===dmgType){
+    } else if(type===normDmgType){
       typeRD+=rd;
       if(rv==='R'||rv==='V')typeRV=rv;
     }
@@ -1486,7 +1493,11 @@ function loadFromData(data){
     });
   }
   $('dmgLimitOther').value=data.dmgLimitOther??0;
+  $('resTable').querySelectorAll('.res-row').forEach(r=>r.remove());
+  if(data.resistances)data.resistances.forEach(r=>$('resTable').appendChild(createResRow(r)));
   $('hpMax').value=data.hpMax||20;$('hpSlider').max=data.hpMax||20;$('hpSlider').value=data.hp??20;$('hpDice').value=data.hpDice||'';
+  $('openWound').checked=!!data.openWound;
+  $('dmgCalcInfo').textContent='';
   $('spMax').value=data.spMax||20;$('spSlider').max=data.spMax||20;$('spSlider').value=data.sp??20;$('spDice').value=data.spDice||'';
   $('condSlider').value=data.cond??0;$('condOut').textContent=$('condSlider').value;
   $('emoSlider').value=data.emo??0;$('emoOut').textContent=$('emoSlider').value;$('emoDesc').value=data.emoDesc||'';
@@ -1583,6 +1594,14 @@ $('exportPdfBtn').addEventListener('click',()=>{
   hd('Combate');ln('Ataque base: '+(data.atkBase??0));ln('Deslocamento: '+(data.moveSpeed??0)+' quad.');y+=4;
   hd('Vida & Stamina');ln('PV: '+(data.hp??0)+' / '+(data.hpMax??0)+(data.hpDice?' ('+data.hpDice+')':''));ln('PS: '+(data.sp??0)+' / '+(data.spMax??0)+(data.spDice?' ('+data.spDice+')':''));y+=4;
   hd('Defesas');(data.defenses||[]).forEach(d=>{const lbl={reflexos:'Reflexos',fortitude:'Fortitude',vontade:'Vontade'}[d.def]||d.def;ln(lbl+' — '+attrNames[d.attr]+' | Classe: '+(d.cls||0)+' | Outros: '+(d.other||0)+(d.armor!=null?' | Armadura: '+d.armor:''));});y+=4;
+  hd('Resistências');
+  if((data.resistances||[]).length===0)ln('Nenhuma registrada.');
+  (data.resistances||[]).forEach(r=>{
+    const rvLabel={R:'Resistência (÷2)',V:'Vulnerabilidade (×2)','-':'-'}[r.rv]||'-';
+    ln(r.type+' — RD: '+(r.rd||0)+(rvLabel!=='-'?' | '+rvLabel:''));
+  });
+  ln('Ferida aberta: '+(data.openWound?'Sim':'Não'));
+  y+=4;
   hd('Perícias');const tn=['Nenhum','Treinado','Graduado','Mestrado'];(data.skills||[]).forEach((s,i)=>{const sk=skills[i];if(!sk)return;const lv=parseInt(data.level)||0;const ap=parseInt(s.aprim)||0;const et=ap>0?3+ap:parseInt(s.train)||0;const am=s.attr==='NONE'?0:parseInt(data.attrs?.[s.attr]??0);const tot=Math.floor(am+trainingBonus(lv,et)+(parseInt(s.other)||0));const tl=ap>0?'Apr.'+ap:(tn[parseInt(s.train)]||'Nenhum');if(tot!==0||parseInt(s.train)>0)ln(sk.name+': '+(tot>=0?'+':'')+tot+' ('+attrNames[s.attr||'NONE']+', '+tl+')');});y+=4;
   hd('Notas');ln(data.notes||'-');y+=4;
   doc.addPage();y=50;
