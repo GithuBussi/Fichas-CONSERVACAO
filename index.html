@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Ficha de Personagem</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.5.0/lz-string.min.js"></script>
 <style>
 :root {
   --c-for: #e25c5c; --c-des: #7ed957; --c-con: #ff9f43;
@@ -523,9 +524,101 @@ button { cursor: pointer; }
   z-index: 10000;
 }
 #toastBox.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* STICKY HEADER */
+#stickyHeader {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 8000;
+  background: rgba(20,20,24,0.95); backdrop-filter: blur(10px);
+  border-bottom: 1px solid #333; padding: 8px 16px;
+  display: none; align-items: center; gap: 10px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.5);
+}
+#stickyHeader.visible { display: flex; }
+#stickyName { font-size: 13px; font-weight: 800; color: #fff; white-space: nowrap; min-width: 60px; max-width: 110px; overflow: hidden; text-overflow: ellipsis; }
+.sticky-bar-group { display: flex; align-items: center; gap: 5px; flex: 1; }
+.sticky-label { font-size: 10px; color: #888; font-weight: 700; }
+.sticky-bar-bg { flex: 1; height: 8px; border-radius: 4px; background: #2a2a38; overflow: hidden; }
+.sticky-bar-fill { height: 100%; border-radius: 4px; transition: width .2s, background .3s; }
+.sticky-hp { background: linear-gradient(90deg, #4caf50, #8bc34a); }
+.sticky-hp.warn { background: linear-gradient(90deg, #c68f00, #ffd54f); }
+.sticky-hp.crit { background: linear-gradient(90deg, #a01010, #e24b4a); animation: glow-pulse 1.1s infinite; }
+.sticky-sp { background: linear-gradient(90deg, #6a28b0, var(--c-sp)); }
+.sticky-val { font-size: 10px; color: #aaa; font-weight: 700; white-space: nowrap; }
+.sticky-theme-btn { background: transparent; border: 1px solid #444; color: #aaa; border-radius: 6px; padding: 4px 8px; font-size: 14px; cursor: pointer; flex-shrink: 0; }
+body { padding-top: 12px; }
+body.sticky-active { padding-top: 52px; }
+
+/* LIGHT THEME */
+body.light { background: #f0f0f6; color: #1a1a2e; }
+body.light .card { background: #ffffff; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
+body.light h2 { color: #1a1a2e; border-color: rgba(0,0,0,0.12); text-shadow: none; }
+body.light input[type="text"], body.light textarea, body.light input[type="number"], body.light select { background: #e8e8f2; border-color: #ccc; color: #1a1a2e; }
+body.light .attr-box, body.light .combat-box, body.light .def-card, body.light .coll-card, body.light .special-box, body.light .session-box, body.light .fama-bar, body.light .diary-new, body.light .diary-entry, body.light .dmg-limit-box, body.light .res-row { background: #e8e8f2; border-color: #ccc; }
+body.light .bar-bg { background: #d4d4e0; }
+body.light .death-dot { background: #e0e0ee; border-color: #bbb; }
+body.light .tab-btn { color: #666; }
+body.light .add-btn { border-color: #bbb; color: #888; }
+body.light .secondary-btn { color: #4a6adf; }
+body.light #stickyHeader { background: rgba(240,240,246,0.97); border-color: #ddd; }
+body.light #stickyName { color: #1a1a2e; }
+body.light .sticky-bar-bg { background: #ccc; }
+body.light .passive-box { background: #e8e8f2; border-color: #ccc; }
+body.light .passive-value { color: #4a6adf; }
+body.light .passive-detail { color: #888; }
+body.light .cond-badge.cond-0 { background: rgba(76,175,80,0.15); }
+body.light .cond-badge.cond-1 { background: rgba(255,193,7,0.15); }
+body.light .cond-badge.cond-2 { background: rgba(255,159,67,0.15); }
+body.light .cond-badge.cond-3 { background: rgba(226,75,74,0.15); }
+
+/* VITALIDADE BADGE */
+.cond-badge {
+  font-size: 11px; font-weight: 800; padding: 3px 10px; border-radius: 12px;
+  text-transform: uppercase; letter-spacing: 0.5px; transition: background .3s, color .3s;
+}
+.cond-0 { background: rgba(76,175,80,0.2); color: #4caf50; }
+.cond-1 { background: rgba(255,193,7,0.2); color: #ffc107; }
+.cond-2 { background: rgba(255,159,67,0.2); color: #ff9f43; }
+.cond-3 { background: rgba(226,75,74,0.2); color: #e24b4a; }
+.cond-4 { background: rgba(139,0,0,0.3); color: #ff3333; animation: pulse-badge 1s infinite; }
+@keyframes pulse-badge { 0%,100%{box-shadow:0 0 0 0 rgba(255,51,51,0.4);}50%{box-shadow:0 0 0 6px rgba(255,51,51,0);} }
+
+/* VITALIDADE FLASH */
+#vitalFlash { position: fixed; inset: 0; pointer-events: none; z-index: 9998; }
+@keyframes vital-flash { 0%{background:rgba(200,0,0,0);}20%{background:rgba(200,0,0,0.45);}60%{background:rgba(200,0,0,0.2);}100%{background:rgba(200,0,0,0);} }
+#vitalFlash.flash { animation: vital-flash .8s ease forwards; }
+
+/* CURA FLASH */
+@keyframes heal-glow-anim { 0%{box-shadow:inset 0 0 0 0 rgba(76,175,80,0);}30%{box-shadow:inset 0 0 22px 6px rgba(76,175,80,0.5);}100%{box-shadow:inset 0 0 0 0 rgba(76,175,80,0);} }
+.heal-glow { animation: heal-glow-anim .6s ease forwards; }
+
+/* PASSIVAS */
+.passives-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.passive-box { background: #18181f; border: 1px solid #3a3a4a; border-radius: 9px; padding: 12px; display: flex; flex-direction: column; gap: 4px; box-shadow: 0 2px 8px rgba(0,0,0,0.3); }
+.passive-box > label { font-size: 11px; color: #888; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+.passive-value { font-size: 32px; font-weight: 900; color: #9fb4ff; line-height: 1.1; }
+.passive-detail { font-size: 11px; color: #666; }
 </style>
 </head>
 <body>
+<!-- Flash overlay para vitalidade 4 -->
+<div id="vitalFlash"></div>
+
+<!-- Cabeçalho fixo -->
+<div id="stickyHeader">
+  <div id="stickyName">—</div>
+  <div class="sticky-bar-group">
+    <span class="sticky-label">PV</span>
+    <div class="sticky-bar-bg"><div id="stickyHpBar" class="sticky-bar-fill sticky-hp"></div></div>
+    <span id="stickyHpVal" class="sticky-val">—</span>
+  </div>
+  <div class="sticky-bar-group">
+    <span class="sticky-label">PS</span>
+    <div class="sticky-bar-bg"><div id="stickySpBar" class="sticky-bar-fill sticky-sp"></div></div>
+    <span id="stickySpVal" class="sticky-val">—</span>
+  </div>
+  <button id="themeToggle" class="sticky-theme-btn" title="Alternar tema">☀</button>
+</div>
+
 <div id="deathOverlay">
   <div id="deathTitle">⚰ CAIU EM COMBATE ⚰</div>
   <div id="deathSubtitle" id="deathSubtitle"></div>
@@ -663,9 +756,12 @@ button { cursor: pointer; }
   </div>
 </div>
 
-<h2><span class="ico">◎</span>Condição &amp; Emoção</h2>
+<h2><span class="ico">◎</span>Vitalidade &amp; Emoção</h2>
 <div>
-  <label class="title">Condição física (0–4)</label>
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+    <label class="title" style="margin:0">Vitalidade (0–4)</label>
+    <span id="condBadge" class="cond-badge cond-0">Ileso</span>
+  </div>
   <div class="row"><input type="range" min="0" max="4" value="0" id="condSlider"><span class="out" id="condOut">0</span></div>
 </div>
 <div>
@@ -688,6 +784,28 @@ button { cursor: pointer; }
   <div class="death-dot" data-i="2">✕</div>
 </div>
 <p id="deathMsg">Personagem morto</p>
+
+<h2><span class="ico">◉</span>Passivas</h2>
+<div class="passives-grid">
+  <div class="passive-box">
+    <label>Percepção passiva</label>
+    <div class="passive-value" id="passivePerc">10</div>
+    <div class="passive-detail">10 + bônus Percepção <span id="passivePercBonus">(+0)</span></div>
+    <div style="display:flex;align-items:center;gap:6px;margin-top:6px">
+      <label class="sub" style="margin:0">Outros bônus</label>
+      <input type="number" id="passivePercOther" value="0" style="width:58px">
+    </div>
+  </div>
+  <div class="passive-box">
+    <label>Iniciativa passiva</label>
+    <div class="passive-value" id="passiveInit">10</div>
+    <div class="passive-detail">10 + bônus Iniciativa <span id="passiveInitBonus">(+0)</span></div>
+    <div style="display:flex;align-items:center;gap:6px;margin-top:6px">
+      <label class="sub" style="margin:0">Outros bônus</label>
+      <input type="number" id="passiveInitOther" value="0" style="width:58px">
+    </div>
+  </div>
+</div>
 
 <h2><span class="ico">◈</span>Perícias</h2>
 <div class="skill-table" id="skillTable">
@@ -779,6 +897,7 @@ button { cursor: pointer; }
 <button class="add-btn" id="removePhotoBtn" style="display:none">Remover foto</button>
 
 <h2><span class="ico">✎</span>Descrições</h2>
+<div class="desc-field"><label class="sub">Idiomas</label><input type="text" id="descIdiomas" placeholder="ex: Comum, Élfico, Anão..."></div>
 <div class="desc-field"><label class="sub">Aparência</label><textarea id="descAparencia" rows="3" placeholder="Como o personagem se parece..."></textarea></div>
 <div class="desc-field"><label class="sub">Personalidade</label><textarea id="descPersonalidade" rows="3" placeholder="Traços de personalidade..."></textarea></div>
 <div class="desc-field"><label class="sub">Medos</label><textarea id="descMedos" rows="2" placeholder="O que o personagem teme..."></textarea></div>
@@ -819,10 +938,12 @@ button { cursor: pointer; }
 
 
 <!-- ACTIONS -->
-<div class="action-buttons">
+<div class="action-buttons" id="action-buttons-row">
   <button class="primary-btn" id="saveBtn">◉ Salvar ficha</button>
   <button class="secondary-btn" id="exportPdfBtn">⬇ PDF</button>
   <button class="secondary-btn" id="exportJsonBtn">⬇ JSON</button>
+  <button class="secondary-btn" id="shareBtn">🔗 Compartilhar</button>
+  <label class="secondary-btn file-label">⬆ Importar<input type="file" id="importJsonInput" accept="application/json" style="display:none"></label>
   <label class="secondary-btn file-label">⬆ Importar<input type="file" id="importJsonInput" accept="application/json" style="display:none"></label>
 </div>
 <p class="hint">Dados salvos localmente neste navegador. Use Exportar JSON para backup.</p>
@@ -859,11 +980,12 @@ function updateBar(slider,out,bar,maxInput){
   else if(pct<=50)bar.classList.add('warn');
   return v;
 }
-function refreshHP(){updateBar($('hpSlider'),$('hpOut'),$('hpBar'),$('hpMax'));}
+function refreshHP(){updateBar($('hpSlider'),$('hpOut'),$('hpBar'),$('hpMax'));updateStickyHeader();}
 function refreshSP(){
   updateBar($('spSlider'),$('spOut'),$('spBar'),$('spMax'));
   const ind=$('techSpIndicator');
   if(ind)ind.textContent='PS: '+$('spSlider').value+'/'+$('spMax').value;
+  updateStickyHeader();
 }
 $('hpSlider').addEventListener('input',refreshHP);$('hpMax').addEventListener('input',refreshHP);
 $('spSlider').addEventListener('input',refreshSP);$('spMax').addEventListener('input',refreshSP);
@@ -948,6 +1070,7 @@ $('hpHealBtn').addEventListener('click',()=>{
   const q=parseInt($('hpQuick').value)||0;
   $('hpSlider').value=clampHP(parseInt($('hpSlider').value)+q);refreshHP();
   $('dmgCalcInfo').textContent='';
+  triggerHealGlow('hpBar');
 });
 $('spUseBtn').addEventListener('click',()=>{
   const q=parseInt($('spQuick').value)||0;
@@ -957,11 +1080,162 @@ $('spUseBtn').addEventListener('click',()=>{
 $('spHealBtn').addEventListener('click',()=>{
   const q=parseInt($('spQuick').value)||0;
   $('spSlider').value=clampSP(parseInt($('spSlider').value)+q);refreshSP();
+  triggerHealGlow('spBar');
 });
 
 /* ===== CONDITION ===== */
-$('condSlider').addEventListener('input',e=>{$('condOut').textContent=e.target.value;});
+/* ===== VITALIDADE ===== */
+const vitalLabels=['Ileso','Abalado','Ferido','Debilitado','À Beira da Morte'];
+const vitalClasses=['cond-0','cond-1','cond-2','cond-3','cond-4'];
+let prevCondVal=0;
+
+function updateCondBadge(val){
+  const badge=$('condBadge');
+  badge.textContent=vitalLabels[val]||val;
+  badge.className='cond-badge '+vitalClasses[val];
+  $('condOut').textContent=val;
+  // Flash vermelho + marca de morte automática ao chegar no 4
+  if(val===4 && prevCondVal<4){
+    const flash=$('vitalFlash');
+    flash.classList.remove('flash');
+    void flash.offsetWidth;
+    flash.classList.add('flash');
+    flash.addEventListener('animationend',()=>flash.classList.remove('flash'),{once:true});
+    // Adicionar primeira marca de morte disponível
+    const firstEmpty=deathState.findIndex(d=>!d);
+    if(firstEmpty!==-1){
+      deathState[firstEmpty]=true;
+      document.querySelector('.death-dot[data-i="'+firstEmpty+'"]').classList.add('marked');
+      $('deathMsg').style.visibility=deathState.every(Boolean)?'visible':'hidden';
+      updateDeathOverlay();
+    }
+  }
+  prevCondVal=val;
+}
+$('condSlider').addEventListener('input',e=>{updateCondBadge(parseInt(e.target.value));});
 $('emoSlider').addEventListener('input',e=>{$('emoOut').textContent=e.target.value;});
+
+/* ===== PASSIVAS ===== */
+function updatePassives(){
+  // Pegar total atual das perícias Percepção e Iniciativa
+  const percRow=Array.from(document.querySelectorAll('.skill-row')).find(r=>r.dataset.idx==13); // Percepção idx 13
+  const initRow=Array.from(document.querySelectorAll('.skill-row')).find(r=>r.dataset.idx==7);  // Iniciativa idx 7
+  const percTotal=percRow?parseInt(percRow.querySelector('.skill-total').textContent)||0:0;
+  const initTotal=initRow?parseInt(initRow.querySelector('.skill-total').textContent)||0:0;
+  const percOther=parseInt($('passivePercOther').value)||0;
+  const initOther=parseInt($('passiveInitOther').value)||0;
+  const percVal=10+percTotal+percOther;
+  const initVal=10+initTotal+initOther;
+  $('passivePerc').textContent=percVal;
+  $('passiveInit').textContent=initVal;
+  const percSign=percTotal>=0?'+':'-';
+  const initSign=initTotal>=0?'+':'-';
+  $('passivePercBonus').textContent='('+percSign+Math.abs(percTotal)+')';
+  $('passiveInitBonus').textContent='('+initSign+Math.abs(initTotal)+')';
+}
+$('passivePercOther').addEventListener('input',updatePassives);
+$('passiveInitOther').addEventListener('input',updatePassives);
+
+/* ===== STICKY HEADER ===== */
+function updateStickyHeader(){
+  const name=$('charName').value||'Personagem';
+  $('stickyName').textContent=name;
+  const hp=parseInt($('hpSlider').value)||0;
+  const hpMax=parseInt($('hpMax').value)||1;
+  const sp=parseInt($('spSlider').value)||0;
+  const spMax=parseInt($('spMax').value)||1;
+  const hpPct=Math.round((hp/hpMax)*100);
+  const spPct=Math.round((sp/spMax)*100);
+  const hpBar=$('stickyHpBar');
+  const spBar=$('stickySpBar');
+  hpBar.style.width=hpPct+'%';
+  hpBar.className='sticky-bar-fill sticky-hp'+(hpPct<=25?' crit':hpPct<=50?' warn':'');
+  spBar.style.width=spPct+'%';
+  $('stickyHpVal').textContent=hp+'/'+hpMax;
+  $('stickySpVal').textContent=sp+'/'+spMax;
+}
+function checkStickyScroll(){
+  const show=window.scrollY>80;
+  $('stickyHeader').classList.toggle('visible',show);
+  document.body.classList.toggle('sticky-active',show);
+}
+window.addEventListener('scroll',checkStickyScroll,{passive:true});
+$('charName').addEventListener('input',updateStickyHeader);
+
+/* ===== TEMA CLARO/ESCURO ===== */
+let lightTheme=false;
+function applyTheme(light){
+  lightTheme=light;
+  document.body.classList.toggle('light',light);
+  $('themeToggle').textContent=light?'🌙':'☀';
+  try{localStorage.setItem('rpgTheme',light?'light':'dark');}catch(e){}
+}
+$('themeToggle').addEventListener('click',()=>applyTheme(!lightTheme));
+try{if(localStorage.getItem('rpgTheme')==='light')applyTheme(true);}catch(e){}
+
+/* ===== ANIMAÇÃO DE CURA ===== */
+function triggerHealGlow(barId){
+  const bar=$(barId);
+  bar.classList.remove('heal-glow');
+  void bar.offsetWidth;
+  bar.classList.add('heal-glow');
+  bar.addEventListener('animationend',()=>bar.classList.remove('heal-glow'),{once:true});
+}
+
+/* ===== COMPARTILHAR VIA LINK ===== */
+// LZ-string compressor embutido (minificado)
+/* LZString loaded via CDN */
+/* Botão de compartilhar */
+function addShareButton(){
+  const ab=$('action-buttons-row');
+  if(!ab)return;
+  const btn=document.createElement('button');
+  btn.className='secondary-btn';btn.id='shareBtn';btn.textContent='🔗 Compartilhar';
+  ab.appendChild(btn);
+  btn.addEventListener('click',shareSheet);
+}
+function shareSheet(){
+  try{
+    const data=getData();
+    const json=JSON.stringify(data);
+    const compressed=LZString.compressToEncodedURIComponent(json);
+    const url=window.location.href.split('?')[0]+'?ficha='+compressed;
+    navigator.clipboard.writeText(url).then(()=>{
+      showToast('✓ Link copiado! Cole em outro navegador para abrir a ficha.');
+    }).catch(()=>{
+      prompt('Copie o link abaixo:',url);
+    });
+  }catch(e){showToast('Erro ao gerar link');}
+}
+function tryLoadFromURL(){
+  try{
+    const params=new URLSearchParams(window.location.search);
+    const ficha=params.get('ficha');
+    if(!ficha)return false;
+    const json=LZString.decompressFromEncodedURIComponent(ficha);
+    if(!json)return false;
+    const data=JSON.parse(json);
+    loadFromData(data);
+    showToast('✓ Ficha carregada do link!');
+    // limpar URL para não recarregar a cada refresh
+    history.replaceState(null,'',window.location.pathname);
+    return true;
+  }catch(e){return false;}
+}
+
+/* ===== AVISO AO FECHAR ===== */
+let unsavedChanges=false;
+document.addEventListener('input',()=>{unsavedChanges=true;});
+window.addEventListener('beforeunload',e=>{
+  if(unsavedChanges){
+    e.preventDefault();
+    e.returnValue='A ficha pode ter alterações não salvas. Salvar antes de sair?';
+    return e.returnValue;
+  }
+});
+// Após salvar, resetar flag
+const origSave=save;
+
 
 /* ===== DEATH ===== */
 let deathState=[false,false,false];
@@ -1211,6 +1485,10 @@ function techBodyHTML(d){return `
   <div><label class="sub">Nome</label><input type="text" class="f-name" value="${d?.name||''}"></div>
   <div><label class="sub">Gasto de PS</label><input type="text" class="f-cost" value="${d?.cost||''}"></div>
 </div>
+<div class="coll-row">
+  <div><label class="sub">Alcance</label><input type="text" class="f-range" value="${d?.range||''}"></div>
+  <div><label class="sub">Duração</label><input type="text" class="f-duration" value="${d?.duration||''}"></div>
+</div>
 <div><label class="sub" style="margin-top:6px">Descrição</label><textarea class="f-desc">${d?.desc||''}</textarea></div>`;}
 
 $('addTechBtn').addEventListener('click',()=>{
@@ -1442,6 +1720,7 @@ function getData(){
     name:$('charName').value,player:$('playerName').value,cls:$('charClass').value,level:$('charLevel').value,
     photo:$('charPhoto').src&&$('charPhoto').style.display!=='none'?$('charPhoto').src:'',
     descAparencia:$('descAparencia').value,descPersonalidade:$('descPersonalidade').value,
+    descIdiomas:$('descIdiomas').value,
     descMedos:$('descMedos').value,descSonhos:$('descSonhos').value,descPassado:$('descPassado').value,
     attrs:{FOR:$('attrFOR').value,DES:$('attrDES').value,CON:$('attrCON').value,SAB:$('attrSAB').value,INT:$('attrINT').value,CAR:$('attrCAR').value},
     atkBase:$('atkBase').value,moveSpeed:$('moveSpeed').value,
@@ -1451,12 +1730,13 @@ function getData(){
     hp:$('hpSlider').value,hpMax:$('hpMax').value,hpDice:$('hpDice').value,openWound:$('openWound').checked,
     sp:$('spSlider').value,spMax:$('spMax').value,spDice:$('spDice').value,
     cond:$('condSlider').value,emo:$('emoSlider').value,emoDesc:$('emoDesc').value,
+    passivePercOther:$('passivePercOther').value,passiveInitOther:$('passiveInitOther').value,
     status:[$('status1').value,$('status2').value,$('status3').value],
     death:deathState,skills:skillData,notes:$('notes').value,
     specialAbility:{name:$('specialAbilityName').value,desc:$('specialAbilityDesc').value},
     abilities:getCollData('abilityList',['name','cost','duration','range','desc']),
     techSkill:$('techSkill').value,
-    techniques:getCollData('techList',['name','cost','desc']),
+    techniques:getCollData('techList',['name','cost','range','duration','desc']),
     weapons:getCollData('weaponList',['name','load','dmg','range','ammo','target','desc']),
     armors:getCollData('armorList',['name','load','cost','armortype','desc']),
     items:getCollData('itemList',['name','load','rarity','size','desc']),
@@ -1502,6 +1782,10 @@ function loadFromData(data){
   $('dmgCalcInfo').textContent='';
   $('spMax').value=data.spMax||20;$('spSlider').max=data.spMax||20;$('spSlider').value=data.sp??20;$('spDice').value=data.spDice||'';
   $('condSlider').value=data.cond??0;$('condOut').textContent=$('condSlider').value;
+  prevCondVal=parseInt(data.cond??0);
+  updateCondBadge(parseInt(data.cond??0));
+  $('passivePercOther').value=data.passivePercOther??0;
+  $('passiveInitOther').value=data.passiveInitOther??0;
   $('emoSlider').value=data.emo??0;$('emoOut').textContent=$('emoSlider').value;$('emoDesc').value=data.emoDesc||'';
   if(data.status){$('status1').value=data.status[0]||'';$('status2').value=data.status[1]||'';$('status3').value=data.status[2]||'';}
   $('notes').value=data.notes||'';
@@ -1541,6 +1825,7 @@ function loadFromData(data){
     $('photoPlaceholder').style.display='block';$('removePhotoBtn').style.display='none';
   }
   $('descAparencia').value=data.descAparencia||'';
+  $('descIdiomas').value=data.descIdiomas||'';
   $('descPersonalidade').value=data.descPersonalidade||'';
   $('descMedos').value=data.descMedos||'';
   $('descSonhos').value=data.descSonhos||'';
@@ -1619,6 +1904,7 @@ $('exportPdfBtn').addEventListener('click',()=>{
   (data.items||[]).forEach(it=>{ln('• '+(it.name||'-')+' Car:'+(it.load||0)+' Rar:'+(it.rarity||'-')+' Tam:'+(it.size||'-'));if(it.desc)ln('  '+it.desc);y+=2;});
   hd('Perfil');
   ln('Fama: '+(famaLabels[parseInt(data.fama)]||'-'));
+  if(data.descIdiomas)ln('Idiomas: '+data.descIdiomas);
   if(data.descAparencia)ln('Aparência: '+data.descAparencia);
   if(data.descPersonalidade)ln('Personalidade: '+data.descPersonalidade);
   if(data.descMedos)ln('Medos: '+data.descMedos);
@@ -1636,7 +1922,30 @@ $('exportPdfBtn').addEventListener('click',()=>{
   doc.save(fn+'.pdf');
 });
 
-load();refreshHP();refreshSP();updateFama();
+load();
+if(!tryLoadFromURL()){/* localStorage already loaded */}
+refreshHP();refreshSP();updateFama();
+updateStickyHeader();
+updateCondBadge(parseInt($('condSlider').value)||0);
+updatePassives();
+
+// share button
+$('shareBtn').addEventListener('click',shareSheet);
+
+// reset unsaved flag após salvar
+$('saveBtn').addEventListener('click',()=>{unsavedChanges=false;},true);
+
+// recalcular passivas sempre que pericias mudarem
+const origRecalcAll=recalcAllSkills;
+function recalcAllSkillsAndPassives(){origRecalcAll();updatePassives();}
+// substituir chamadas futuras: listeners de atributos e nível já chamam recalcAllSkills
+// mas precisamos do hook nas pericias também
+document.querySelectorAll('.skill-row').forEach(row=>{
+  row.querySelectorAll('select,input').forEach(el=>{
+    el.addEventListener('input',updatePassives);
+    el.addEventListener('change',updatePassives);
+  });
+});
 </script>
 </body>
 </html>
