@@ -201,6 +201,11 @@ input[type="range"]::-webkit-slider-thumb {
 
 /* MAXROW / DICE */
 .maxrow { display: flex; align-items: center; gap: 8px; margin-top: 6px; font-size: 12px; color: #888; }
+.temp-row input[type="number"] { border-color: #4dd0e1; color: #4dd0e1; }
+.temp-hint { font-size: 11px; color: #666; margin-left: auto; }
+.temp-tag { color: #4dd0e1; font-size: 13px; margin-left: 3px; }
+body.light .temp-row input[type="number"] { border-color: #1a9fb0; color: #127a88; }
+body.light .temp-tag { color: #127a88; }
 .dice-row { display: flex; align-items: center; gap: 8px; margin-top: 6px; font-size: 12px; color: #888; }
 .dice-row input[type="text"] { width: 70px; padding: 5px 8px; font-size: 12px; }
 
@@ -443,6 +448,13 @@ input[type="range"]::-webkit-slider-thumb {
 }
 .load-readout.over { color: #e24b4a; border-color: #e24b4a; }
 
+/* DINHEIRO */
+.money-top { display: flex; align-items: center; gap: 10px; }
+.money-top label { font-size: 13px; font-weight: 600; color: #ccc; flex: 1; }
+.money-top input[type="number"] { width: 140px; font-size: 20px; font-weight: 800; color: #d4c026; }
+body.light .money-top label { color: #1a1a2e; }
+body.light .money-top input[type="number"] { color: #8a7a00; }
+
 /* PROFILE */
 .id-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 .id-grid .full { grid-column: 1/-1; }
@@ -503,6 +515,11 @@ input[type="range"]::-webkit-slider-thumb {
 /* BUTTONS */
 button { cursor: pointer; }
 .action-buttons { display: flex; flex-wrap: wrap; gap: 8px; }
+.autosave-row { display: flex; align-items: center; flex-wrap: wrap; gap: 4px 12px; margin-top: -8px; font-size: 12px; color: #888; }
+.autosave-label { display: flex; align-items: center; gap: 6px; cursor: pointer; }
+.autosave-label input[type="checkbox"] { width: 16px; height: 16px; accent-color: #6c8cff; cursor: pointer; }
+.autosave-status { font-size: 11px; color: #666; }
+.autosave-status.paused { color: #ff9f43; }
 .primary-btn {
   background: #6c8cff; color: #fff; border: none;
   border-radius: 8px; padding: 11px 18px; font-size: 14px; font-weight: 700;
@@ -730,6 +747,7 @@ body.light .cond-badge.cond-3 { background: rgba(226,75,74,0.15); }
   </div>
   <div class="bar-bg"><div class="bar-fill hp-fill" id="hpBar" style="width:100%"></div></div>
   <div class="maxrow"><input type="number" id="hpMax" value="20" min="1"><span>PV máx</span><input type="text" id="hpDice" placeholder="dado ex: 1d10" style="width:100px;margin-left:8px"></div>
+  <div class="maxrow temp-row"><input type="number" id="hpTemp" value="0" min="0"><span>PV temporário</span><span class="temp-hint">absorve o dano primeiro</span></div>
   <div class="quick-dmg">
     <label>Dano / Cura rápida</label>
     <select id="hpDmgType"></select>
@@ -748,6 +766,7 @@ body.light .cond-badge.cond-3 { background: rgba(226,75,74,0.15); }
   </div>
   <div class="bar-bg"><div class="bar-fill sp-fill" id="spBar" style="width:100%"></div></div>
   <div class="maxrow"><input type="number" id="spMax" value="20" min="1"><span>PS máx</span><input type="text" id="spDice" placeholder="dado ex: 1d6" style="width:100px;margin-left:8px"></div>
+  <div class="maxrow temp-row"><input type="number" id="spTemp" value="0" min="0"><span>PS temporário</span><span class="temp-hint">é gasto primeiro</span></div>
   <div class="quick-dmg">
     <label>Gastar / Recuperar PS</label>
     <input type="number" id="spQuick" value="0" min="0">
@@ -859,6 +878,20 @@ body.light .cond-badge.cond-3 { background: rgba(226,75,74,0.15); }
 
 <!-- ===== INVENTÁRIO ===== -->
 <div class="tab-content" data-tab="inventario">
+<h2><span class="ico">¤</span>Dinheiro</h2>
+<div class="money-box">
+  <div class="money-top">
+    <label for="money">Moedas</label>
+    <input type="number" id="money" value="0" min="0">
+  </div>
+  <div class="quick-dmg">
+    <label>Calcular</label>
+    <input type="number" id="moneyQuick" value="0" min="0">
+    <button class="q-btn heal" id="moneyAddBtn">+ Ganhar</button>
+    <button class="q-btn dmg" id="moneySubBtn">− Gastar</button>
+  </div>
+  <div id="moneyInfo" class="dmg-calc-info"></div>
+</div>
 <h2><span class="ico">⚖</span>Limite de carga</h2>
 <div class="load-box">
   <div class="field"><label>Atributo</label><select id="loadAttr"><option value="FOR">Força</option><option value="CON">Constituição</option></select></div>
@@ -946,6 +979,10 @@ body.light .cond-badge.cond-3 { background: rgba(226,75,74,0.15); }
   <label class="secondary-btn file-label">⬆ Importar<input type="file" id="importJsonInput" accept="application/json" style="display:none"></label>
   <label class="secondary-btn file-label">⬆ Importar<input type="file" id="importJsonInput" accept="application/json" style="display:none"></label>
 </div>
+<div class="autosave-row">
+  <label class="autosave-label"><input type="checkbox" id="autoSaveToggle" checked> Salvar automaticamente</label>
+  <span id="autoSaveStatus" class="autosave-status"></span>
+</div>
 <p class="hint">Dados salvos localmente neste navegador. Use Exportar JSON para backup.</p>
 
 </div><!-- /card -->
@@ -980,15 +1017,24 @@ function updateBar(slider,out,bar,maxInput){
   else if(pct<=50)bar.classList.add('warn');
   return v;
 }
-function refreshHP(){updateBar($('hpSlider'),$('hpOut'),$('hpBar'),$('hpMax'));updateStickyHeader();}
+/* Vida/stamina temporária: valor separado, não conta no máximo */
+function getTemp(id){return Math.max(0,parseInt($(id).value)||0);}
+function tempSuffix(id){const t=getTemp(id);return t>0?' +'+t:'';}
+function showTemp(out,id){
+  const t=getTemp(id);if(!t)return;
+  const tag=document.createElement('span');tag.className='temp-tag';tag.textContent='+'+t;
+  out.appendChild(tag);
+}
+function refreshHP(){updateBar($('hpSlider'),$('hpOut'),$('hpBar'),$('hpMax'));showTemp($('hpOut'),'hpTemp');updateStickyHeader();}
 function refreshSP(){
-  updateBar($('spSlider'),$('spOut'),$('spBar'),$('spMax'));
+  updateBar($('spSlider'),$('spOut'),$('spBar'),$('spMax'));showTemp($('spOut'),'spTemp');
   const ind=$('techSpIndicator');
-  if(ind)ind.textContent='PS: '+$('spSlider').value+'/'+$('spMax').value;
+  if(ind)ind.textContent='PS: '+$('spSlider').value+'/'+$('spMax').value+tempSuffix('spTemp');
   updateStickyHeader();
 }
 $('hpSlider').addEventListener('input',refreshHP);$('hpMax').addEventListener('input',refreshHP);
 $('spSlider').addEventListener('input',refreshSP);$('spMax').addEventListener('input',refreshSP);
+$('hpTemp').addEventListener('input',refreshHP);$('spTemp').addEventListener('input',refreshSP);
 
 /* ===== TIPOS DE DANO / RESISTÊNCIAS ===== */
 const damageTypes=['Cortante','Perfurante','Concussão','Aquático','Telúrico','Flamejante','Elétrico','Aéreo','Energético','Radiante','Mental','Necrótico','Especial'];
@@ -1054,7 +1100,9 @@ $('hpDmgBtn').addEventListener('click',()=>{
   const raw=parseInt($('hpQuick').value)||0;
   const dmgType=$('hpDmgType').value;
   const {final,generalRD,typeRD,generalRV,typeRV}=calcFinalDamage(raw,dmgType);
-  $('hpSlider').value=clampHP(parseInt($('hpSlider').value)-final);
+  const temp=getTemp('hpTemp');const absorbed=Math.min(temp,final);
+  $('hpTemp').value=temp-absorbed;
+  $('hpSlider').value=clampHP(parseInt($('hpSlider').value)-(final-absorbed));
   refreshHP();shakeSection('hpSection');
   let info='Dano bruto: '+raw+' → RD total: '+(generalRD+typeRD)+' (Geral '+generalRD+' + '+dmgType+' '+typeRD+')';
   const rvParts=[];
@@ -1064,6 +1112,7 @@ $('hpDmgBtn').addEventListener('click',()=>{
   if(typeRV==='V')rvParts.push('Vulnerabilidade a '+dmgType+' (×2)');
   if(rvParts.length)info+=' | '+rvParts.join(', ');
   info+=' → Dano final: '+final;
+  if(absorbed)info+=' ('+absorbed+' absorvido pelo PV temporário)';
   $('dmgCalcInfo').textContent=info;
 });
 $('hpHealBtn').addEventListener('click',()=>{
@@ -1074,7 +1123,9 @@ $('hpHealBtn').addEventListener('click',()=>{
 });
 $('spUseBtn').addEventListener('click',()=>{
   const q=parseInt($('spQuick').value)||0;
-  $('spSlider').value=clampSP(parseInt($('spSlider').value)-q);
+  const temp=getTemp('spTemp');const used=Math.min(temp,Math.max(0,q));
+  $('spTemp').value=temp-used;
+  $('spSlider').value=clampSP(parseInt($('spSlider').value)-(q-used));
   refreshSP();shakeSection('spSection');
 });
 $('spHealBtn').addEventListener('click',()=>{
@@ -1151,8 +1202,8 @@ function updateStickyHeader(){
   hpBar.style.width=hpPct+'%';
   hpBar.className='sticky-bar-fill sticky-hp'+(hpPct<=25?' crit':hpPct<=50?' warn':'');
   spBar.style.width=spPct+'%';
-  $('stickyHpVal').textContent=hp+'/'+hpMax;
-  $('stickySpVal').textContent=sp+'/'+spMax;
+  $('stickyHpVal').textContent=hp+'/'+hpMax+tempSuffix('hpTemp');
+  $('stickySpVal').textContent=sp+'/'+spMax+tempSuffix('spTemp');
 }
 function checkStickyScroll(){
   const show=window.scrollY>80;
@@ -1216,6 +1267,7 @@ function tryLoadFromURL(){
     if(!json)return false;
     const data=JSON.parse(json);
     loadFromData(data);
+    pauseAutoSave();
     showToast('✓ Ficha carregada do link!');
     // limpar URL para não recarregar a cada refresh
     history.replaceState(null,'',window.location.pathname);
@@ -1227,6 +1279,7 @@ function tryLoadFromURL(){
 let unsavedChanges=false;
 document.addEventListener('input',()=>{unsavedChanges=true;});
 window.addEventListener('beforeunload',e=>{
+  flushAutoSave();
   if(unsavedChanges){
     e.preventDefault();
     e.returnValue='A ficha pode ter alterações não salvas. Salvar antes de sair?';
@@ -1579,6 +1632,20 @@ $('loadAttr').addEventListener('change',calcLoad);$('loadMult').addEventListener
 Object.values(attrIds).forEach(id=>{$(id).addEventListener('input',calcLoad);});
 calcLoad();
 
+/* ===== DINHEIRO ===== */
+function changeMoney(sign){
+  const cur=parseInt($('money').value)||0;
+  const q=Math.abs(parseInt($('moneyQuick').value)||0);
+  if(!q)return;
+  if(sign<0&&q>cur){$('moneyInfo').textContent='Dinheiro insuficiente: faltam '+(q-cur)+' moedas';shakeSection('money');return;}
+  const nv=cur+sign*q;
+  $('money').value=nv;
+  $('moneyInfo').textContent=cur+(sign<0?' − ':' + ')+q+' = '+nv;
+  $('moneyQuick').value=0;
+}
+$('moneyAddBtn').addEventListener('click',()=>changeMoney(1));
+$('moneySubBtn').addEventListener('click',()=>changeMoney(-1));
+
 /* ===== CONTATOS ===== */
 function contactBodyHTML(d){
   const types=['Contato','Rede','Organização'];
@@ -1729,6 +1796,7 @@ function getData(){
     resistances:Array.from(document.querySelectorAll('#resTable .res-row')).map(r=>({type:r.querySelector('.res-type').value,rd:r.querySelector('.res-rd').value,rv:r.querySelector('.res-rv').value})),
     hp:$('hpSlider').value,hpMax:$('hpMax').value,hpDice:$('hpDice').value,openWound:$('openWound').checked,
     sp:$('spSlider').value,spMax:$('spMax').value,spDice:$('spDice').value,
+    hpTemp:$('hpTemp').value,spTemp:$('spTemp').value,
     cond:$('condSlider').value,emo:$('emoSlider').value,emoDesc:$('emoDesc').value,
     passivePercOther:$('passivePercOther').value,passiveInitOther:$('passiveInitOther').value,
     status:[$('status1').value,$('status2').value,$('status3').value],
@@ -1741,6 +1809,7 @@ function getData(){
     armors:getCollData('armorList',['name','load','cost','armortype','desc']),
     items:getCollData('itemList',['name','load','rarity','size','desc']),
     loadAttr:$('loadAttr').value,loadMult:$('loadMult').value,loadBonus:$('loadBonus').value,
+    money:$('money').value,
     fama:$('famaLevel').value,
     contacts:getContactData(),
     diary:getDiaryData()
@@ -1781,6 +1850,7 @@ function loadFromData(data){
   $('openWound').checked=!!data.openWound;
   $('dmgCalcInfo').textContent='';
   $('spMax').value=data.spMax||20;$('spSlider').max=data.spMax||20;$('spSlider').value=data.sp??20;$('spDice').value=data.spDice||'';
+  $('hpTemp').value=data.hpTemp??0;$('spTemp').value=data.spTemp??0;
   $('condSlider').value=data.cond??0;$('condOut').textContent=$('condSlider').value;
   prevCondVal=parseInt(data.cond??0);
   updateCondBadge(parseInt(data.cond??0));
@@ -1805,6 +1875,7 @@ function loadFromData(data){
   if(data.armors)restoreCollList('armorList',data.armors,armorBodyHTML,'armor-card',calcLoad);
   if(data.items)restoreCollList('itemList',data.items,itemBodyHTML,null,calcLoad);
   $('loadAttr').value=data.loadAttr||'FOR';$('loadMult').value=data.loadMult??2;$('loadBonus').value=data.loadBonus??0;calcLoad();
+  $('money').value=data.money??0;$('moneyQuick').value=0;$('moneyInfo').textContent='';
   $('famaLevel').value=data.fama??0;updateFama();
   if(data.contacts){
     data.contacts.forEach(c=>{
@@ -1848,12 +1919,57 @@ function showToast(msg){
 }
 
 function save(){
-  try{localStorage.setItem('rpgSheet',JSON.stringify(getData()));showToast('✓ Salvo na tela');}
+  clearTimeout(autoSaveTimer);autoSaveTimer=null;
+  try{localStorage.setItem('rpgSheet',JSON.stringify(getData()));showToast('✓ Salvo na tela');autoSavePaused=false;refreshAutoSaveStatus(true);}
   catch(e){showToast('Erro ao salvar (modo privado?)');}
 }
 function load(){let d;try{d=JSON.parse(localStorage.getItem('rpgSheet'));}catch(e){return;}if(d)loadFromData(d);}
 
 $('saveBtn').addEventListener('click',save);
+
+/* ===== SALVAMENTO AUTOMÁTICO ===== */
+// Só salva depois que o jogador mexe na ficha, nunca ao abrir a página.
+// Ficha aberta por link ou JSON pausa o automático até clicar em Salvar,
+// para não substituir a ficha que já está guardada neste navegador.
+let autoSaveOn=true,autoSavePaused=false,autoSaveTimer=null,autoSaveFailed=false;
+try{autoSaveOn=localStorage.getItem('rpgAutoSave')!=='off';}catch(e){}
+$('autoSaveToggle').checked=autoSaveOn;
+function refreshAutoSaveStatus(justSaved){
+  const st=$('autoSaveStatus');
+  st.classList.toggle('paused',autoSaveOn&&autoSavePaused);
+  if(!autoSaveOn)st.textContent='';
+  else if(autoSavePaused)st.textContent='Pausado: ficha aberta de link/arquivo. Clique em Salvar para guardá-la aqui.';
+  else if(justSaved)st.textContent='Salvo às '+new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+}
+function autoSaveNow(){
+  clearTimeout(autoSaveTimer);autoSaveTimer=null;
+  if(!autoSaveOn||autoSavePaused)return;
+  try{
+    localStorage.setItem('rpgSheet',JSON.stringify(getData()));
+    unsavedChanges=false;autoSaveFailed=false;refreshAutoSaveStatus(true);
+  }catch(e){
+    if(!autoSaveFailed)showToast('Erro no salvamento automático (espaço cheio ou modo privado?)');
+    autoSaveFailed=true;$('autoSaveStatus').textContent='Falha ao salvar automaticamente';
+  }
+}
+function scheduleAutoSave(){
+  if(!autoSaveOn||autoSavePaused)return;
+  clearTimeout(autoSaveTimer);autoSaveTimer=setTimeout(autoSaveNow,800);
+}
+function pauseAutoSave(){
+  clearTimeout(autoSaveTimer);autoSaveTimer=null;
+  autoSavePaused=true;refreshAutoSaveStatus();
+}
+function flushAutoSave(){if(autoSaveTimer)autoSaveNow();}
+['input','change','click','dragend'].forEach(ev=>document.addEventListener(ev,scheduleAutoSave));
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden')flushAutoSave();});
+window.addEventListener('pagehide',flushAutoSave);
+$('autoSaveToggle').addEventListener('change',()=>{
+  autoSaveOn=$('autoSaveToggle').checked;
+  try{localStorage.setItem('rpgAutoSave',autoSaveOn?'on':'off');}catch(e){}
+  refreshAutoSaveStatus();
+  if(autoSaveOn)autoSaveNow();
+});
 
 /* JSON export/import */
 $('exportJsonBtn').addEventListener('click',()=>{
@@ -1862,7 +1978,7 @@ $('exportJsonBtn').addEventListener('click',()=>{
 });
 $('importJsonInput').addEventListener('change',e=>{
   const f=e.target.files[0];if(!f)return;
-  const r=new FileReader();r.onload=ev=>{try{loadFromData(JSON.parse(ev.target.result));showToast('✓ Ficha importada');}catch(err){showToast('Arquivo inválido');}};
+  const r=new FileReader();r.onload=ev=>{try{loadFromData(JSON.parse(ev.target.result));pauseAutoSave();showToast('✓ Ficha importada');}catch(err){showToast('Arquivo inválido');}};
   r.readAsText(f);e.target.value='';
 });
 
@@ -1879,7 +1995,7 @@ $('exportPdfBtn').addEventListener('click',()=>{
   hd('Identidade');ln('Jogador: '+(data.player||'-'));ln('Classe: '+(data.cls||'-'));ln('Nível: '+(data.level||'-'));y+=4;
   hd('Atributos');Object.keys(attrNames).filter(k=>k!=='NONE').forEach(k=>ln(attrNames[k]+': '+(data.attrs?.[k]??0)));y+=4;
   hd('Combate');ln('Ataque base: '+(data.atkBase??0));ln('Deslocamento: '+(data.moveSpeed??0)+' quad.');y+=4;
-  hd('Vida & Stamina');ln('PV: '+(data.hp??0)+' / '+(data.hpMax??0)+(data.hpDice?' ('+data.hpDice+')':''));ln('PS: '+(data.sp??0)+' / '+(data.spMax??0)+(data.spDice?' ('+data.spDice+')':''));y+=4;
+  hd('Vida & Stamina');ln('PV: '+(data.hp??0)+' / '+(data.hpMax??0)+(data.hpDice?' ('+data.hpDice+')':'')+(parseInt(data.hpTemp)>0?' | Temporário: '+data.hpTemp:''));ln('PS: '+(data.sp??0)+' / '+(data.spMax??0)+(data.spDice?' ('+data.spDice+')':'')+(parseInt(data.spTemp)>0?' | Temporário: '+data.spTemp:''));y+=4;
   hd('Defesas');(data.defenses||[]).forEach(d=>{const lbl={reflexos:'Reflexos',fortitude:'Fortitude',vontade:'Vontade'}[d.def]||d.def;ln(lbl+' — '+attrNames[d.attr]+' | Classe: '+(d.cls||0)+' | Outros: '+(d.other||0)+(d.armor!=null?' | Armadura: '+d.armor:''));});y+=4;
   hd('Resistências');
   if((data.resistances||[]).length===0)ln('Nenhuma registrada.');
@@ -1900,6 +2016,7 @@ $('exportPdfBtn').addEventListener('click',()=>{
   hd('Armaduras');(data.armors||[]).forEach(a=>{ln('• '+(a.name||'-')+' Bônus:'+(a.cost||'-')+' Tipo:'+(a.armortype||'-'));if(a.desc)ln('  '+a.desc);y+=2;});
   hd('Itens');
   const limCarga=Math.floor((parseInt(data.attrs?.[data.loadAttr]||0))*(parseFloat(data.loadMult)||0))+(parseFloat(data.loadBonus)||0);
+  ln('Dinheiro: '+(data.money??0)+' moedas');
   ln('Limite de carga: '+limCarga+' ('+(attrNames[data.loadAttr]||data.loadAttr||'-')+' x'+(data.loadMult??2)+' + bônus '+(data.loadBonus??0)+')');
   (data.items||[]).forEach(it=>{ln('• '+(it.name||'-')+' Car:'+(it.load||0)+' Rar:'+(it.rarity||'-')+' Tam:'+(it.size||'-'));if(it.desc)ln('  '+it.desc);y+=2;});
   hd('Perfil');
