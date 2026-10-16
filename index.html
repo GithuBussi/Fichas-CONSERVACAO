@@ -907,6 +907,23 @@ body.light .char-menu { background: #e8e8f2; border-color: #ccc; }
 body.light .modal-box { background: #fff; border-color: #ddd; }
 body.light .modal-box p { color: #555; }
 
+/* LEVEZA: transições curtas para nada "pular" na tela */
+/* Troca de tema: durante ~0,4s todas as cores mudam em degradê (classe posta só nesse momento) */
+html.theme-fade *, html.theme-fade *::before, html.theme-fade *::after {
+  transition: background-color .35s ease, color .35s ease, border-color .35s ease, box-shadow .35s ease,
+    fill .35s ease, stroke .35s ease, opacity .35s ease !important;
+}
+.theme-btn.spin { animation: theme-spin .45s cubic-bezier(.2,.8,.2,1); }
+@keyframes theme-spin { 0% { transform: rotate(-90deg) scale(.7); opacity: .4; } 100% { transform: none; opacity: 1; } }
+/* Trocar de aba e abrir uma seção: o conteúdo surge rápido, sem corte seco */
+.tab-content.active { animation: soft-in .22s ease-out; }
+.section-body:not([hidden]) { animation: soft-in .2s ease-out; }
+@keyframes soft-in { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) {
+  html.theme-fade *, html.theme-fade *::before, html.theme-fade *::after { transition: none !important; }
+  .theme-btn.spin, .tab-content.active, .section-body:not([hidden]) { animation: none; }
+}
+
 /* ESPAÇAMENTO por proximidade: o que é do mesmo bloco fica junto, blocos diferentes se
    afastam. Título → conteúdo 12px; entre blocos da seção 14px; entre seções 30px. */
 .tab-content.active { gap: 12px; }
@@ -1887,13 +1904,21 @@ $('charName').addEventListener('input',updateStickyHeader);
 
 /* ===== TEMA CLARO/ESCURO ===== */
 let lightTheme=false;
-function applyTheme(light){
+// animate=true (clique no botão): as cores mudam num degradê rápido em vez de um corte seco.
+// Na abertura da página o tema entra direto, sem animação.
+let themeFadeT=null;
+function applyTheme(light,animate){
   lightTheme=light;
+  if(animate&&!window.matchMedia('(prefers-reduced-motion: reduce)').matches){
+    const root=document.documentElement;root.classList.add('theme-fade');
+    clearTimeout(themeFadeT);themeFadeT=setTimeout(()=>root.classList.remove('theme-fade'),450);
+    const b=$('themeToggle');b.classList.remove('spin');void b.offsetWidth;b.classList.add('spin');
+  }
   document.body.classList.toggle('light',light);
   $('themeToggle').textContent=light?'🌙':'☀';
   try{localStorage.setItem('rpgTheme',light?'light':'dark');}catch(e){}
 }
-$('themeToggle').addEventListener('click',()=>applyTheme(!lightTheme));
+$('themeToggle').addEventListener('click',()=>applyTheme(!lightTheme,true));
 try{if(localStorage.getItem('rpgTheme')==='light')applyTheme(true);}catch(e){}
 
 /* ===== ANIMAÇÃO DE CURA ===== */
