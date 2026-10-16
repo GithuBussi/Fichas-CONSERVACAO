@@ -1089,6 +1089,85 @@ body.hide-floaters .trash-fab, body.hide-floaters .vitals-hud.show { opacity: 0;
 .diary-book { scrollbar-width: none; }
 .diary-book::-webkit-scrollbar { display: none; }
 
+/* CLASSE: valores fixos do livro, no Perfil */
+.class-info { margin: 10px 0 4px; padding: 12px 14px; border-radius: 12px; border: 1px solid var(--border); background: color-mix(in srgb, var(--tab-perfil, #d4c026) 6%, transparent); }
+.class-info[hidden] { display: none; }
+.ci-head { display: flex; flex-direction: column; gap: 2px; margin-bottom: 10px; }
+.ci-head strong { font-size: 15px; }
+.ci-head span { font-size: 12.5px; color: var(--text-2); }
+.ci-tag { display: inline-block; margin-left: 6px; padding: 1px 7px; border-radius: 9px; font-size: 10.5px; font-weight: 700; color: #b7791f; border: 1px solid currentColor; vertical-align: 2px; }
+.ci-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(125px, 1fr)); gap: 8px 14px; margin: 0; }
+.ci-grid > div { min-width: 0; }
+.ci-grid .wide { grid-column: 1 / -1; }
+.ci-grid dt { font-size: 10.5px; font-weight: 700; letter-spacing: .4px; text-transform: uppercase; color: var(--muted); }
+.ci-grid dd { margin: 1px 0 0; font-size: 13.5px; font-weight: 600; overflow-wrap: anywhere; }
+.ci-grid dd small { font-weight: 400; color: var(--text-2); }
+.ci-note { margin: 10px 0 8px; font-size: 11.5px; color: var(--muted); line-height: 1.45; }
+.ci-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.ci-actions .s-btn { padding: 7px 12px; font-size: 12.5px; }
+.ci-actions .s-btn[hidden] { display: none; }
+.ci-msg { margin-top: 6px; font-size: 12px; color: var(--ok); min-height: 0; }
+#confirmText { white-space: pre-line; }
+
+/* MESA DE DADOS (RollDDie): gaveta no celular, painel ao lado no computador */
+.dice-fab {
+  position: fixed; right: 14px; bottom: 14px; z-index: 8600; width: 44px; height: 44px; border-radius: 50%;
+  background: var(--frame); border: 1px solid var(--border); color: var(--text); font-size: 21px; line-height: 1;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.35); cursor: pointer; transition: opacity .2s ease, transform .2s ease, border-color .2s ease;
+}
+.dice-fab:hover { border-color: var(--accent); transform: scale(1.06); }
+.dice-fab[aria-expanded="true"] { border-color: var(--accent); }
+.vitals-hud { right: 68px; }
+body.hide-floaters .dice-fab { opacity: 0; transform: translateY(16px); pointer-events: none; }
+.dice-btn {
+  display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; padding: 0; margin-left: 6px;
+  border-radius: 8px; border: 1px solid var(--border); background: transparent; color: var(--text-2); font-size: 14px; line-height: 1;
+  cursor: pointer; vertical-align: middle; transition: border-color .15s ease, transform .1s ease;
+}
+.dice-btn:hover { border-color: var(--accent); }
+.dice-btn:active { transform: scale(.94); }
+label .dice-btn { width: 22px; height: 22px; font-size: 12px; margin-left: 4px; border-radius: 6px; }
+.skill-total, #techSkillTotal { cursor: pointer; border-radius: 6px; transition: background-color .15s ease, box-shadow .15s ease; }
+.skill-total:hover, #techSkillTotal:hover { box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--sc, var(--accent)) 60%, transparent); }
+.skill-total:focus-visible, #techSkillTotal:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.dice-panel {
+  position: fixed; z-index: 8700; display: flex; flex-direction: column; background: var(--frame); color: var(--text);
+  border: 1px solid var(--border); box-shadow: 0 10px 40px rgba(0,0,0,0.45);
+  visibility: hidden; transition: transform .28s ease, visibility 0s linear .28s;
+}
+.dice-panel.open { visibility: visible; transform: none; transition: transform .28s ease; }
+.dice-head { display: flex; align-items: center; gap: 10px; padding: 10px 12px 8px; touch-action: none; }
+.dice-grip { display: none; }
+.dice-title { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.dice-title strong { font-size: 14px; }
+.dice-title span { font-size: 12px; color: var(--text-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.dice-close { width: 32px; height: 32px; border-radius: 50%; border: 1px solid var(--border); background: transparent; color: var(--text-2); font-size: 14px; cursor: pointer; }
+.dice-close:hover { border-color: var(--accent); color: var(--text); }
+.dice-quick { display: flex; flex-wrap: wrap; gap: 6px; padding: 0 12px 10px; }
+.dice-quick button { padding: 5px 10px; border-radius: 14px; border: 1px solid var(--border); background: transparent; color: var(--text-2); font: inherit; font-size: 12px; font-weight: 600; cursor: pointer; }
+.dice-quick button:hover { border-color: var(--accent); color: var(--text); }
+.dice-stage { position: relative; flex: 1; min-height: 0; margin: 0 10px; border-radius: 14px; overflow: hidden; background: #000; }
+.dice-stage iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; opacity: 0; transition: opacity .3s ease; }
+.dice-stage.ready iframe { opacity: 1; }
+.dice-loading { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 13px; color: #aaa; text-align: center; padding: 20px; }
+.dice-stage.ready .dice-loading { display: none; }
+.dice-foot { padding: 8px 12px 10px; font-size: 11px; color: var(--muted); }
+.dice-foot a { color: inherit; }
+@media (min-width: 1000px) {
+  .dice-panel { top: 0; right: 0; bottom: 0; width: 400px; border-width: 0 0 0 1px; transform: translateX(100%); }
+  body { transition: padding-right .28s ease; }
+  body.dice-open { padding-right: 412px; }
+  body.dice-open .dice-fab, body.dice-open .vitals-hud { right: 426px; }
+  body.dice-open .vitals-hud { right: 480px; }
+}
+@media (max-width: 999px) {
+  .dice-panel { left: 0; right: 0; bottom: 0; height: min(88vh, 720px); border-radius: 18px 18px 0 0; border-width: 1px 0 0; transform: translateY(100%); padding-bottom: env(safe-area-inset-bottom); }
+  .dice-grip { display: block; position: absolute; top: 5px; left: 50%; width: 38px; height: 4px; margin-left: -19px; border-radius: 2px; background: var(--border); }
+  .dice-head { padding-top: 16px; }
+  body.dice-open .dice-fab, body.dice-open .vitals-hud { opacity: 0; pointer-events: none; }
+}
+@media (prefers-reduced-motion: reduce) { .dice-panel, .dice-panel.open, body { transition: none; } }
+
 /* DESCANSO E JORNADA */
 .rest-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 4px; }
 .rest-row .s-btn { flex: 1; min-width: 130px; padding: 8px 12px; font-size: 13px; }
@@ -1207,7 +1286,7 @@ textarea.autogrow { resize: none; overflow: hidden; }
 
 <h2><span class="ico">⚡</span>Combate</h2>
 <div class="combat-grid">
-  <div class="combat-box"><label>Ataque base</label><input type="number" id="atkBase" value="0" style="width:60px"></div>
+  <div class="combat-box"><label>Ataque base<button type="button" class="dice-btn" data-roll="atk" title="Rolar o ataque (1d20 + ataque base) na mesa" aria-label="Rolar o ataque na mesa">🎲</button></label><input type="number" id="atkBase" value="0" style="width:60px"></div>
   <div class="combat-box"><label>Deslocamento</label><input type="number" id="moveSpeed" value="6" style="width:55px"><span class="unit">quad.</span></div>
 </div>
 
@@ -1284,7 +1363,7 @@ textarea.autogrow { resize: none; overflow: hidden; }
     <span class="out" id="hpOut">20 / 20</span>
   </div>
   <div class="bar-bg"><div class="bar-fill hp-fill" id="hpBar" style="width:100%"></div></div>
-  <div class="maxrow"><input type="number" id="hpMax" value="20" min="1"><span>PV máx</span><input type="text" id="hpDice" placeholder="ex: 1d10" style="width:100px;margin-left:8px"></div>
+  <div class="maxrow"><input type="number" id="hpMax" value="20" min="1"><span>PV máx</span><input type="text" id="hpDice" placeholder="ex: 1d10" style="width:100px;margin-left:8px" aria-label="Dado de vida"><button type="button" class="dice-btn" data-roll="hpDice" title="Rolar o dado de vida na mesa" aria-label="Rolar o dado de vida na mesa">🎲</button></div>
   <div class="maxrow temp-row"><input type="number" id="hpTemp" value="0" min="0"><span>PV temporário</span><span class="temp-hint">absorve o dano primeiro</span></div>
   <div class="quick-dmg">
     <label>Dano / Cura rápida</label>
@@ -1303,7 +1382,7 @@ textarea.autogrow { resize: none; overflow: hidden; }
     <span class="out" id="spOut">20 / 20</span>
   </div>
   <div class="bar-bg"><div class="bar-fill sp-fill" id="spBar" style="width:100%"></div></div>
-  <div class="maxrow"><input type="number" id="spMax" value="20" min="1"><span>PS máx</span><input type="text" id="spDice" placeholder="ex: 1d6" style="width:100px;margin-left:8px"></div>
+  <div class="maxrow"><input type="number" id="spMax" value="20" min="1"><span>PS máx</span><input type="text" id="spDice" placeholder="ex: 1d6" style="width:100px;margin-left:8px" aria-label="Dado de stamina"><button type="button" class="dice-btn" data-roll="spDice" title="Rolar o dado de stamina na mesa" aria-label="Rolar o dado de stamina na mesa">🎲</button></div>
   <div class="maxrow temp-row"><input type="number" id="spTemp" value="0" min="0"><span>PS temporário</span><span class="temp-hint">é gasto primeiro</span></div>
   <div class="quick-dmg">
     <label>Gastar / Recuperar PS</label>
@@ -1476,11 +1555,12 @@ textarea.autogrow { resize: none; overflow: hidden; }
   <div class="id-grid" style="flex:1">
     <div class="field full"><label>Nome do personagem</label><input type="text" id="charName"></div>
     <div class="field"><label>Jogador</label><input type="text" id="playerName"></div>
-    <div class="field"><label>Classe</label><input type="text" id="charClass"></div>
+    <div class="field"><label for="charClass">Classe</label><input type="text" id="charClass" list="classOptions" autocomplete="off" placeholder="escolha ou escreva"><datalist id="classOptions"></datalist></div>
     <div class="field"><label>Nível</label><input type="number" id="charLevel" value="1" min="0"></div>
   </div>
 </div>
 <button class="add-btn" id="removePhotoBtn" style="display:none">Remover foto</button>
+<section class="class-info" id="classInfo" aria-live="polite" hidden></section>
 
 <h2><span class="ico">✎</span>Descrições</h2>
 <div class="desc-field"><label class="sub">Idiomas</label><input type="text" id="descIdiomas" placeholder="ex: Comum, Élfico, Anão..."></div>
@@ -1552,6 +1632,24 @@ textarea.autogrow { resize: none; overflow: hidden; }
   <span class="hud-ring hp" id="hudHp"><svg viewBox="0 0 36 36" aria-hidden="true"><circle class="hud-track" cx="18" cy="18" r="15.915"/><circle class="hud-fill" id="hudHpFill" cx="18" cy="18" r="15.915"/></svg><span class="hud-val" id="hudHpVal">20</span><span class="hud-temp" id="hudHpTemp"></span><span class="hud-lbl">PV</span></span>
   <span class="hud-ring sp" id="hudSp"><svg viewBox="0 0 36 36" aria-hidden="true"><circle class="hud-track" cx="18" cy="18" r="15.915"/><circle class="hud-fill" id="hudSpFill" cx="18" cy="18" r="15.915"/></svg><span class="hud-val" id="hudSpVal">20</span><span class="hud-temp" id="hudSpTemp"></span><span class="hud-lbl">PS</span></span>
 </button>
+
+<!-- Mesa de dados do RollDDie: só carrega quando o jogador abre pela primeira vez -->
+<button type="button" class="dice-fab" id="diceFab" aria-expanded="false" aria-controls="dicePanel" title="Mesa de dados (RollDDie)" aria-label="Abrir a mesa de dados">🎲</button>
+<aside class="dice-panel" id="dicePanel" aria-label="Mesa de dados" aria-hidden="true" inert>
+  <div class="dice-head" id="diceHead">
+    <span class="dice-grip" aria-hidden="true"></span>
+    <div class="dice-title"><strong>🎲 Mesa de dados</strong><span id="diceLabel">1d20</span></div>
+    <button type="button" class="dice-close" id="diceClose" title="Fechar a mesa" aria-label="Fechar a mesa de dados">✕</button>
+  </div>
+  <div class="dice-quick" id="diceQuick">
+    <button type="button" data-f="1d20">1d20</button>
+    <button type="button" data-f="1d100">1d100</button>
+    <button type="button" data-f="hpDice" id="diceQuickHp" hidden>Dado de vida</button>
+    <button type="button" data-f="spDice" id="diceQuickSp" hidden>Dado de stamina</button>
+  </div>
+  <div class="dice-stage" id="diceStage"><div class="dice-loading">Carregando a mesa…</div></div>
+  <p class="dice-foot">Arraste o dado na mesa, ou abra o ⚙ e toque em <b>Rolar</b>. Mesa do <a href="https://rollddie.com.br" target="_blank" rel="noopener">RollDDie</a>; precisa de internet.</p>
+</aside>
 
 <!-- Aviso único da migração para a versão nova -->
 <div class="modal" id="migraModal" role="dialog" aria-modal="true" aria-labelledby="migraTitle" aria-describedby="migraText" hidden>
@@ -2055,8 +2153,10 @@ function updateIdBanner(){
   const ph=$('idPhoto'),img=$('charPhoto');
   if(img.style.display!=='none'&&img.src){ph.style.backgroundImage='url("'+img.src+'")';ph.textContent='';}
   else{ph.style.backgroundImage='';ph.textContent=(name||'?').split(/\s+/).map(p=>p[0]).slice(0,2).join('').toUpperCase();}
+  renderClassInfo();
 }
 ['charClass','charLevel','playerName'].forEach(id=>$(id).addEventListener('input',updateIdBanner));
+$('attrCON').addEventListener('input',renderClassInfo);
 $('charPhoto').addEventListener('load',updateIdBanner);
 // No celular, a lixeira e os anéis se escondem ao rolar para baixo e voltam ao rolar para cima
 let lastScrollY=window.scrollY;
@@ -2524,7 +2624,7 @@ function weaponBodyHTML(d){return `
   <div><label class="sub">Carga</label><input type="number" class="f-load" value="${esc(d?.load||0)}" step="0.1"></div>
 </div>
 <div class="coll-row">
-  <div><label class="sub">Dano</label><input type="text" class="f-dmg" value="${esc(d?.dmg)}"></div>
+  <div><label class="sub">Dano<button type="button" class="dice-btn" data-roll="dmg" title="Rolar o dano na mesa" aria-label="Rolar o dano na mesa">🎲</button></label><input type="text" class="f-dmg" value="${esc(d?.dmg)}"></div>
   <div><label class="sub">Alcance</label><input type="text" class="f-range" value="${esc(d?.range)}"></div>
 </div>
 <div class="coll-row">
@@ -2902,6 +3002,7 @@ function loadFromData(data){
   data=fillMissing(data);
   deathDismissed=false;
   ['abilityList','techList','weaponList','armorList','itemList','contactList','diaryList'].forEach(id=>$(id).innerHTML='');
+  classUndo=null;classInfoKey=''; // o Desfazer da classe valia para a ficha anterior
   $('charName').value=data.name||'';$('playerName').value=data.player||'';$('charClass').value=data.cls||'';$('charLevel').value=data.level||1;
   if(data.attrs){Object.keys(attrIds).forEach(k=>{$(attrIds[k]).value=data.attrs[k]??0;});}
   $('atkBase').value=data.atkBase??0;$('moveSpeed').value=data.moveSpeed??6;
@@ -3446,6 +3547,194 @@ function closeConfirm(){closeModal('confirmModal');confirmCb=null;}
 $('confirmOkBtn').addEventListener('click',()=>{const cb=confirmCb;closeConfirm();if(cb)cb();});
 $('confirmCancelBtn').addEventListener('click',closeConfirm);
 
+/* ===== CLASSES ===== */
+// Só o que é fixo na classe (livro, capítulo "Classes"): muda apenas com o mestre. Habilidades por
+// nível ficam no livro. A ficha continua salvando a classe como texto livre, no mesmo campo de antes.
+const PROF_A=['Armaduras médias','Rifles de assalto','Armas pesadas','Armas de alcance','Escudo','Escopetas'];
+const PROF_B=['Armas de longo alcance','Armas leves','Pistolas','Mantos','Rifles leves','Rifles de precisão','Escopetas','Armaduras leves'];
+const PROF_C=['Mantos','Armadura leve','Escudos','Armas leves','Armas de alcance','Escopetas','Arremesso','Pistolas'];
+const CLASSES=[
+  {n:'Bárbaro',r:'Fúria canalizada. Luta pelo instinto, pelo impacto e pela sobrevivência bruta.',pv:30,dv:'1d12',ps:12,psN:1,ds:'1d4',pc:'1 + Inteligência',prof:'Armas pesadas',esc:3,lista:['Armadura leve','Escudos','Armas de alcance','Escopetas','Arremesso','Pistolas'],hab:'Instinto Primitivo'},
+  {n:'Protetor',r:'Existe para manter-se em pé: posicionamento, defesa e resistência.',pv:28,dv:'1d12',ps:14,psN:1,ds:'1d4',pc:'1',prof:'Armaduras leves',esc:3,lista:PROF_A,hab:'Bloqueio'},
+  {n:'Titã',r:'Uma presença esmagadora, que controla o espaço e impõe o ritmo do combate.',pv:30,dv:'1d12',ps:12,psN:1,ds:'1d4',pc:'1',prof:'Armas pesadas',esc:3,lista:['Armaduras leves','Armaduras médias','Manto','Rifles de assalto','Armas de alcance','Escudo','Escopetas'],hab:'Monstruosidade Corpórea, Bala de Canhão e Aura Devastadora'},
+  {n:'Flagelo',r:'Punição em movimento: dano consistente que enfraquece os adversários.',pv:28,dv:'1d12',ps:14,psN:1,ds:'1d4',pc:'1',prof:'Armaduras leves',esc:3,lista:PROF_A,hab:''},
+  {n:'Guerreiro',r:'A versatilidade treinada, equilibrada entre ataque e defesa.',pv:24,dv:'1d10',ps:16,psN:2,ds:'1d6',pc:'2',prof:'Armaduras leves',esc:3,lista:PROF_A,hab:'Surto de Ação e Recuperar Fôlego'},
+  {n:'Monge',r:'Transforma o próprio corpo em arma: velocidade, foco e controle.',pv:20,dv:'1d10',ps:20,psN:2,ds:'1d6',pc:'2',prof:'Mantos',esc:3,lista:PROF_A,hab:'Ki'},
+  {n:'Assassino',r:'A precisão letal: ataques surpresa, infiltração e eliminação rápida.',pv:20,dv:'1d8',ps:16,psN:3,ds:'1d8',pc:'3',prof:'Armas leves',esc:3,lista:['Armas de longo alcance','Arremesso','Pistolas','Mantos','Rifles leves','Rifles pesados'],hab:'Ataque Furtivo'},
+  {n:'Caçador',r:'',pv:20,dv:'1d8',ps:16,psN:3,ds:'1d8',pc:'3',prof:'Armas de arremesso',esc:3,lista:PROF_B,hab:'Arte da Caça'},
+  {n:'Ás',r:'Excelência em ser único: um generalista que sempre tem um trunfo.',pv:18,dv:'1d8',ps:18,psN:3,ds:'1d8',pc:'3',prof:'Armas de arremesso',esc:3,lista:PROF_B,hab:'Incógnita e Trunfo do Destino'},
+  {n:'Elementalista',r:'Manipula forças primordiais e faz da natureza uma arma.',pv:16,dv:'1d8',ps:20,psN:3,ds:'1d8',pc:'3',prof:'',esc:4,lista:['Armas de alcance','Armas leves','Pistolas','Mantos','Rifles leves','Arremesso','Arma maleável','Arma pesada','Rifles de precisão','Escopetas','Armaduras leves'],hab:'Dobra Elemental'},
+  {n:'Quimerista',r:'Mistura, adapta e transforma, na fronteira entre biologia e modificação.',pv:20,dv:'1d8',ps:16,psN:3,ds:'1d8',pc:'3',prof:'',esc:4,lista:PROF_B,hab:'Forma Selvagem'},
+  {n:'Nobre',r:'Comanda pelo nome: influencia, negocia e move estruturas sociais.',pv:16,dv:'1d6',ps:18,psN:4,ds:'1d10',pc:'4',prof:'',esc:4,lista:PROF_C,hab:'Conexões'},
+  {n:'Malandro',r:'Sobrevive pela astúcia, pelo improviso e pela manipulação social.',pv:16,dv:'1d6',ps:18,psN:4,ds:'1d10',pc:'4',prof:'',esc:4,lista:PROF_C,hab:'Viver no Limite'},
+  {n:'Psique',r:'Domina a mente. Não quebra corpos, quebra convicções.',pv:16,dv:'1d6',ps:18,psN:4,ds:'1d10',pc:'4',prof:'',esc:4,lista:PROF_C,hab:'Semente da Percepção'},
+  {n:'Cientista',r:'Ciência aplicada ao extremo: estuda, analisa e inventa.',pv:14,dv:'1d6',ps:22,psN:4,ds:'1d12',pc:'4',prof:'',esc:4,lista:PROF_C,hab:'Inventar e Portátil'},
+  {n:'Sábio',r:'Conhecimento profundo: antecipação, análise e percepção estratégica.',pv:14,dv:'1d6',ps:22,psN:4,ds:'1d12',pc:'4',prof:'',esc:4,lista:PROF_C,hab:'Conhecimento é Poder e Um passo à frente'},
+  {n:'Alquimista',r:'Transforma matéria em possibilidade: poções, compostos e reações.',pv:14,dv:'1d6',ps:22,psN:4,ds:'1d12',pc:'4',prof:'',esc:4,lista:PROF_C,hab:'Alquimia (Pedra Filosofal, Seletor Natural e Elementos Químicos)',wip:true}
+];
+const normName=t=>String(t||'').normalize('NFD').replace(/[̀-ͯ]/g,'').trim().toLowerCase();
+function findClass(t){const k=normName(t);return k?CLASSES.find(c=>normName(c.n)===k)||null:null;}
+$('classOptions').innerHTML=CLASSES.map(c=>'<option value="'+esc(c.n)+'"></option>').join('');
+// Valores que a classe dá para o nível atual. Vida só no nível 1: depois ela é rolada a cada nível.
+function classTargets(c){
+  const lvl=Math.max(1,parseInt($('charLevel').value)||1),con=conMod();
+  return {lvl,con,pv:c.pv+con,ps:c.ps+c.psN*(lvl-1)};
+}
+const sgn=n=>(n<0?'− ':'+ ')+Math.abs(n);
+var classInfoKey='',classUndo=null,CLASSES_OK=true; // var: a ficha chama renderClassInfo antes deste trecho rodar
+function renderClassInfo(){
+  const box=$('classInfo');if(!box||!CLASSES_OK)return;
+  const c=findClass($('charClass').value);
+  if(!c){if(!box.hidden){box.hidden=true;box.innerHTML='';}classInfoKey='';return;}
+  const t=classTargets(c);
+  const key=[c.n,t.lvl,t.con,!!classUndo].join('|');
+  if(key===classInfoKey)return;
+  classInfoKey=key;
+  const profTxt=(c.prof?esc(c.prof)+' <small>e</small> ':'')+'<small>escolha '+c.esc+' entre:</small> '+c.lista.map(esc).join(', ');
+  box.innerHTML='<div class="ci-head"><strong>'+esc(c.n)+(c.wip?'<span class="ci-tag" title="No livro, esta classe ainda está em construção">em construção</span>':'')+'</strong>'
+    +(c.r?'<span>'+esc(c.r)+'</span>':'')+'</div>'
+    +'<dl class="ci-grid">'
+    +'<div><dt>Vida no nível 1</dt><dd>'+c.pv+' '+sgn(t.con)+' <small>(Con)</small> = '+t.pv+'</dd></div>'
+    +'<div><dt>Dado de vida</dt><dd>'+c.dv+' <small>+ Con</small></dd></div>'
+    +'<div><dt>Stamina</dt><dd>'+c.ps+' <small>+'+c.psN+' por nível</small>'+(t.lvl>1?' <small>→</small> '+t.ps+' <small>no nível '+t.lvl+'</small>':'')+'</dd></div>'
+    +'<div><dt>Dado de stamina</dt><dd>'+c.ds+'</dd></div>'
+    +'<div><dt>Conhecimento por nível</dt><dd>'+esc(c.pc)+'</dd></div>'
+    +(c.hab?'<div><dt>Habilidade especial</dt><dd>'+esc(c.hab)+'</dd></div>':'')
+    +'<div class="wide"><dt>Proficiências</dt><dd>'+profTxt+'</dd></div>'
+    +'</dl>'
+    +'<p class="ci-note">Valores fixos da classe, segundo o livro; só mudam com o mestre. A vida dos níveis seguintes é rolada (dado de vida + Con) e as habilidades de cada nível estão no livro.</p>'
+    +'<div class="ci-actions"><button type="button" class="s-btn" id="ciApply" title="Põe vida, stamina e dados da classe na ficha. Mostra o que muda antes">Preencher a ficha com a classe</button>'
+    +'<button type="button" class="s-btn" id="ciUndo"'+(classUndo?'':' hidden')+' title="Volta os valores de antes do preenchimento">↶ Desfazer</button></div>'
+    +'<div class="ci-msg" id="ciMsg"></div>';
+  box.hidden=false;
+}
+// Muda o máximo de vida ou stamina: se a barra estava cheia, continua cheia; se não, mantém o atual
+function setMaxKeep(maxId,sliderId,v,refresh){
+  const m=$(maxId),sl=$(sliderId),full=parseInt(sl.value)>=parseInt(sl.max);
+  m.value=v;sl.max=v;sl.value=full?v:Math.min(parseInt(sl.value)||0,v);refresh();
+}
+function classSnapshot(){return {hpMax:$('hpMax').value,hp:$('hpSlider').value,hpDice:$('hpDice').value,spMax:$('spMax').value,sp:$('spSlider').value,spDice:$('spDice').value,hab:$('specialAbilityName').value};}
+$('classInfo').addEventListener('click',e=>{
+  if(e.target.id==='ciApply'){
+    const c=findClass($('charClass').value);if(!c)return;
+    const t=classTargets(c),ch=[],plan={};
+    if(t.lvl===1&&String(t.pv)!==$('hpMax').value){ch.push('PV máx: '+$('hpMax').value+' → '+t.pv);plan.hpMax=t.pv;}
+    if($('hpDice').value.trim()!==c.dv){ch.push('Dado de vida: '+($('hpDice').value.trim()||'vazio')+' → '+c.dv);plan.hpDice=c.dv;}
+    if(String(t.ps)!==$('spMax').value){ch.push('PS máx: '+$('spMax').value+' → '+t.ps);plan.spMax=t.ps;}
+    if($('spDice').value.trim()!==c.ds){ch.push('Dado de stamina: '+($('spDice').value.trim()||'vazio')+' → '+c.ds);plan.spDice=c.ds;}
+    if(c.hab&&!$('specialAbilityName').value.trim()){ch.push('Habilidade especial: '+c.hab);plan.hab=c.hab;}
+    const skipHp=t.lvl>1?'\n\nA vida máxima não muda: a partir do nível 2 ela depende das rolagens de cada nível.':'';
+    if(!ch.length){$('ciMsg').textContent='A ficha já está com os valores da classe.'+(t.lvl>1?' A vida máxima fica como está, porque depende das rolagens.':'');return;}
+    confirmBox('Preencher com '+c.n+'?',ch.join('\n')+skipHp,'Preencher',()=>{
+      classUndo=classSnapshot();
+      if(plan.hpMax!=null)setMaxKeep('hpMax','hpSlider',plan.hpMax,refreshHP);
+      if(plan.hpDice)$('hpDice').value=plan.hpDice;
+      if(plan.spMax!=null)setMaxKeep('spMax','spSlider',plan.spMax,refreshSP);
+      if(plan.spDice)$('spDice').value=plan.spDice;
+      if(plan.hab)$('specialAbilityName').value=plan.hab;
+      classInfoKey='';renderClassInfo();$('ciMsg').textContent='✓ Ficha preenchida com '+c.n+'.';
+      unsavedChanges=true;scheduleAutoSave();
+    });
+  }else if(e.target.id==='ciUndo'&&classUndo){
+    const u=classUndo;classUndo=null;
+    setMaxKeep('hpMax','hpSlider',parseInt(u.hpMax)||1,refreshHP);$('hpSlider').value=u.hp;refreshHP();
+    setMaxKeep('spMax','spSlider',parseInt(u.spMax)||1,refreshSP);$('spSlider').value=u.sp;refreshSP();
+    $('hpDice').value=u.hpDice;$('spDice').value=u.spDice;$('specialAbilityName').value=u.hab;
+    classInfoKey='';renderClassInfo();$('ciMsg').textContent='Valores de antes restaurados.';
+    unsavedChanges=true;scheduleAutoSave();
+  }
+});
+// Mudar a classe à mão também limpa o "Desfazer"
+$('charClass').addEventListener('input',()=>{if(classUndo){classUndo=null;classInfoKey='';renderClassInfo();}});
+
+/* ===== MESA DE DADOS (RollDDie) ===== */
+// Usa o embed público do RollDDie (rollddie.com.br/embed?d=fórmula). O jogador rola dentro da mesa;
+// o resultado ainda não volta para a ficha. O iframe (~1,4 MB) só é criado na primeira abertura.
+const ROLLDDIE_EMBED='https://rollddie.com.br/embed';
+let diceFrame=null,diceSrc='',diceOpener=null;
+// Aceita só a notação do RollDDie (ex.: 1d20+6, 2d6, 4d6kh3); pega a primeira fórmula de um texto como "1d8+2 cortante"
+function cleanFormula(t){
+  const m=String(t||'').replace(/\s+/g,'').match(/\d*d\d+(?:(?:kh|kl|dh|dl)\d*|!|r\d*)?(?:[+-](?:\d*d\d+|\d+))*/i);
+  return m?m[0].toLowerCase():'';
+}
+const withBonus=(f,n)=>n?f+(n>0?'+':'')+n:f;
+function openDice(formula,label,opener){
+  const f=cleanFormula(formula)||'1d20',p=$('dicePanel'),stage=$('diceStage');
+  $('diceLabel').textContent=label?label+' · '+f:f;
+  const hd=cleanFormula($('hpDice').value),sd=cleanFormula($('spDice').value);
+  $('diceQuickHp').hidden=!hd;$('diceQuickHp').textContent='Vida '+hd;
+  $('diceQuickSp').hidden=!sd;$('diceQuickSp').textContent='Stamina '+sd;
+  if(!diceFrame){
+    diceFrame=document.createElement('iframe');
+    diceFrame.title="Mesa de dados do RollDDie";diceFrame.allow='autoplay';diceFrame.referrerPolicy='no-referrer';
+    diceFrame.addEventListener('load',()=>stage.classList.add('ready'));
+    stage.appendChild(diceFrame);
+  }
+  const src=ROLLDDIE_EMBED+'?d='+encodeURIComponent(f);
+  if(src!==diceSrc){stage.classList.remove('ready');diceFrame.src=src;diceSrc=src;}
+  diceOpener=opener||document.activeElement;
+  p.removeAttribute('inert');p.setAttribute('aria-hidden','false');p.classList.add('open');
+  document.body.classList.add('dice-open');$('diceFab').setAttribute('aria-expanded','true');
+  setTimeout(()=>$('diceClose').focus({preventScroll:true}),30);
+}
+function closeDice(){
+  const p=$('dicePanel');if(!p.classList.contains('open'))return;
+  p.classList.remove('open');p.setAttribute('aria-hidden','true');p.setAttribute('inert','');
+  document.body.classList.remove('dice-open');$('diceFab').setAttribute('aria-expanded','false');
+  if(diceOpener&&document.contains(diceOpener))try{diceOpener.focus({preventScroll:true});}catch(e){}
+  diceOpener=null;
+}
+$('diceFab').addEventListener('click',()=>{if($('dicePanel').classList.contains('open'))closeDice();else openDice('1d20','',$('diceFab'));});
+$('diceClose').addEventListener('click',closeDice);
+$('diceQuick').addEventListener('click',e=>{
+  const b=e.target.closest('button');if(!b)return;
+  const f=b.dataset.f;
+  if(f==='hpDice')openDice($('hpDice').value,'Dado de vida');
+  else if(f==='spDice')openDice($('spDice').value,'Dado de stamina');
+  else openDice(f,'');
+});
+// Arrastar a gaveta para baixo fecha (celular)
+(()=>{let y0=null;const h=$('diceHead');
+  h.addEventListener('touchstart',e=>{y0=e.touches[0].clientY;},{passive:true});
+  h.addEventListener('touchmove',e=>{if(y0!=null&&e.touches[0].clientY-y0>60){y0=null;closeDice();}},{passive:true});
+  h.addEventListener('touchend',()=>{y0=null;});
+})();
+function skillDice(el){
+  const row=el.closest('.skill-row'),n=parseInt(el.textContent)||0;
+  const name=row?row.querySelector('.skill-name').textContent:$('techSkill').value||'Perícia';
+  openDice(withBonus('1d20',n),name,el);
+}
+// Pontos de partida: total da perícia, total da perícia das técnicas, botões 🎲 (vida, stamina, ataque, dano)
+document.addEventListener('click',e=>{
+  const st=e.target.closest('.skill-total, #techSkillTotal');
+  if(st){skillDice(st);return;}
+  const b=e.target.closest('.dice-btn');if(!b)return;
+  e.preventDefault();
+  const r=b.dataset.roll;
+  if(r==='hpDice'||r==='spDice'){
+    const v=$(r).value;
+    if(!cleanFormula(v)){showToast('Escreva o dado primeiro (ex.: 1d10)');$(r).focus();return;}
+    openDice(v,r==='hpDice'?'Dado de vida':'Dado de stamina',b);
+  }else if(r==='atk')openDice(withBonus('1d20',parseInt($('atkBase').value)||0),'Ataque',b);
+  else if(r==='dmg'){
+    const card=b.closest('.coll-card')||b.closest('.coll-body')||b.parentElement.parentElement;
+    const inp=card.querySelector('.f-dmg'),nm=(card.querySelector('.f-name')||{}).value||'Arma';
+    if(!cleanFormula(inp.value)){showToast('Escreva o dano como dado (ex.: 1d8+2)');inp.focus();return;}
+    openDice(inp.value,'Dano · '+nm,b);
+  }
+});
+document.addEventListener('keydown',e=>{
+  if((e.key==='Enter'||e.key===' ')&&e.target.matches&&e.target.matches('.skill-total, #techSkillTotal')){e.preventDefault();skillDice(e.target);}
+});
+function decorateSkillTotals(){
+  document.querySelectorAll('.skill-row').forEach(r=>{
+    const t=r.querySelector('.skill-total'),nm=r.querySelector('.skill-name').textContent;
+    t.tabIndex=0;t.setAttribute('role','button');t.title='Rolar 1d20 + '+nm+' na mesa';t.setAttribute('aria-label','Rolar '+nm+' na mesa de dados');
+  });
+  const tt=$('techSkillTotal');tt.tabIndex=0;tt.setAttribute('role','button');tt.title='Rolar 1d20 + esta perícia na mesa';
+}
+decorateSkillTotals();
+
 /* ===== DESCANSO E JORNADA ===== */
 // Descanso segue a tabela do livro (seção "Descanso", níveis de Horrível a Excelente). Quem diz o
 // nível final é o mestre; a ficha não calcula fome, sede ou temperatura. Modificador: Constituição.
@@ -3822,6 +4111,7 @@ document.addEventListener('keydown',e=>{
   else if(!$('restModal').hidden)closeModal('restModal');
   else if(!$('migraModal').hidden)$('migraOk').click();
   else if($('deathOverlay').classList.contains('d3'))dismissDeath();
+  else if($('dicePanel').classList.contains('open'))closeDice();
   else if(selectedChars.size){selectedChars.clear();renderChars();}
   else closeCharMenu();
 });
