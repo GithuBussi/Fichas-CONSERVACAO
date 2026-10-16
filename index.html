@@ -661,6 +661,21 @@ body.light .skill-row { background: color-mix(in srgb, var(--sc, #444) 10%, tran
 body.light .coll-card.weapon-card { background: color-mix(in srgb, var(--c-for) 9%, #fff); border-color: color-mix(in srgb, var(--c-for) 35%, #ddd); }
 body.light .coll-card.armor-card { background: color-mix(in srgb, var(--c-sab) 9%, #fff); border-color: color-mix(in srgb, var(--c-sab) 35%, #ddd); }
 
+/* ORGANIZAR PERÍCIAS */
+.skill-sort { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; font-size: 11px; color: #888; margin-bottom: -8px; }
+.skill-sort > span { margin-right: 2px; }
+.skill-sort-btn {
+  background: transparent; border: 1px solid #444; color: #aaa; border-radius: 14px;
+  padding: 4px 11px; font-size: 11px; font-weight: 700;
+}
+.skill-sort-btn.active { border-color: #6c8cff; color: #9fb4ff; background: rgba(108,140,255,0.12); }
+.skill-group {
+  font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.6px;
+  color: var(--sc, #888); padding: 8px 6px 2px;
+}
+body.light .skill-sort-btn { border-color: #ccc; color: #666; }
+body.light .skill-sort-btn.active { border-color: #4a6adf; color: #4a6adf; background: rgba(74,106,223,0.1); }
+
 /* CAIXAS DE TEXTO crescem com o conteúdo */
 textarea.autogrow { resize: none; overflow: hidden; }
 </style>
@@ -876,6 +891,13 @@ textarea.autogrow { resize: none; overflow: hidden; }
 </div>
 
 <h2><span class="ico">◈</span>Perícias</h2>
+<div class="skill-sort" role="group" aria-label="Organizar perícias">
+  <span>Organizar por</span>
+  <button class="skill-sort-btn" data-sort="alpha">A–Z</button>
+  <button class="skill-sort-btn" data-sort="attr">Atributo</button>
+  <button class="skill-sort-btn" data-sort="total">Total</button>
+  <button class="skill-sort-btn" data-sort="train">Treino</button>
+</div>
 <div class="skill-table" id="skillTable">
   <div class="skill-header">
     <span>Total</span><span>Perícia</span><span>Atrib.</span>
@@ -1483,18 +1505,61 @@ function calcSkill(row){
 }
 function recalcAllSkills(){document.querySelectorAll('.skill-row').forEach(r=>calcSkill(r));updateTechSkillTotal();}
 buildSkillTable();recalcAllSkills();
+// Linhas na ordem fixa da lista `skills` (data-idx), não na ordem da tela. O salvamento
+// usa essa ordem, então a tela pode ser reorganizada sem trocar os valores de perícia.
+function skillRowsByIdx(){return Array.from(document.querySelectorAll('.skill-row')).sort((a,b)=>a.dataset.idx-b.dataset.idx);}
 
 function updateTechSkillTotal(){
   const el=$('techSkillTotal');if(!el)return;
   const skillName=$('techSkill').value;
   const idx=skills.findIndex(s=>s.name===skillName);
   if(idx===-1){el.textContent='+0';el.style.color='#4dd0e1';return;}
-  const row=document.querySelectorAll('.skill-row')[idx];
+  const row=document.querySelector('.skill-row[data-idx="'+idx+'"]');
   el.textContent=row.querySelector('.skill-total').textContent;
   const attrKey=row.querySelector('.skill-attr-select').value;
   el.style.color=attrColors[attrKey]||'#4dd0e1';
 }
 $('techSkill').addEventListener('change',updateTechSkillTotal);
+
+/* ===== ORGANIZAR PERÍCIAS ===== */
+// Muda só a ordem na tela; o salvamento usa skillRowsByIdx. A escolha fica neste navegador.
+// "A–Z" é a ordem original da lista (Ofício por último, como no livro).
+const skillAttrOrder=['FOR','DES','CON','SAB','INT','CAR','NONE'];
+let skillSort='alpha';
+try{skillSort=localStorage.getItem('rpgSkillSort')||'alpha';}catch(e){}
+function skillTier(r){
+  const ap=parseInt(r.querySelector('.aprim-input').value)||0;
+  return ap>0?3+ap:(parseInt(r.querySelector('.train-select').value)||0);
+}
+function sortSkills(mode){
+  if(mode){skillSort=mode;try{localStorage.setItem('rpgSkillSort',mode);}catch(e){}}
+  const tbl=$('skillTable');
+  tbl.querySelectorAll('.skill-group').forEach(g=>g.remove());
+  const rows=Array.from(tbl.querySelectorAll('.skill-row')).map(r=>({r,idx:+r.dataset.idx,
+    attr:r.querySelector('.skill-attr-select').value,
+    total:parseInt(r.querySelector('.skill-total').textContent)||0,tier:skillTier(r)}));
+  const cmp={
+    alpha:(a,b)=>a.idx-b.idx,
+    attr:(a,b)=>skillAttrOrder.indexOf(a.attr)-skillAttrOrder.indexOf(b.attr)||a.idx-b.idx,
+    total:(a,b)=>b.total-a.total||a.idx-b.idx,
+    train:(a,b)=>b.tier-a.tier||a.idx-b.idx
+  }[skillSort]||((a,b)=>a.idx-b.idx);
+  rows.sort(cmp);
+  let lastAttr=null;
+  rows.forEach(x=>{
+    if(skillSort==='attr'&&x.attr!==lastAttr){
+      lastAttr=x.attr;
+      const g=document.createElement('div');g.className='skill-group';
+      g.textContent=attrOptLabels[x.attr];g.style.setProperty('--sc',attrColors[x.attr]);
+      tbl.appendChild(g);
+    }
+    tbl.appendChild(x.r);
+  });
+  document.querySelectorAll('.skill-sort-btn').forEach(b=>b.classList.toggle('active',b.dataset.sort===skillSort));
+}
+document.querySelectorAll('.skill-sort-btn').forEach(b=>b.addEventListener('click',()=>sortSkills(b.dataset.sort)));
+// No modo por atributo, trocar o atributo de uma perícia a leva para o grupo certo
+document.querySelectorAll('.skill-attr-select').forEach(s=>s.addEventListener('change',()=>{if(skillSort==='attr')sortSkills();}));
 
 /* ===== DEFESAS ===== */
 function calcDefenses(){
@@ -1911,7 +1976,7 @@ function getDiaryData(){
 }
 function getData(){
   const skillData=[];
-  document.querySelectorAll('.skill-row').forEach(r=>{
+  skillRowsByIdx().forEach(r=>{
     skillData.push({attr:r.querySelector('.skill-attr-select').value,train:r.querySelector('.train-select').value,aprim:r.querySelector('.aprim-input').value,other:r.querySelector('.other-input').value});
   });
   return {
@@ -1995,7 +2060,7 @@ function loadFromData(data){
   if(data.death)data.death.forEach((d,i)=>{if(d){deathState[i]=true;document.querySelector('.death-dot[data-i="'+i+'"]').classList.add('marked');}});
   $('deathMsg').style.visibility=deathState.every(Boolean)?'visible':'hidden';
   updateDeathOverlay();
-  if(data.skills)document.querySelectorAll('.skill-row').forEach((r,i)=>{const s=data.skills[i];if(!s)return;r.querySelector('.skill-attr-select').value=s.attr||r.querySelector('.skill-attr-select').value;r.querySelector('.train-select').value=s.train??0;r.querySelector('.aprim-input').value=s.aprim??0;r.querySelector('.other-input').value=s.other??0;});
+  if(data.skills)skillRowsByIdx().forEach((r,i)=>{const s=data.skills[i];if(!s)return;r.querySelector('.skill-attr-select').value=s.attr||r.querySelector('.skill-attr-select').value;r.querySelector('.train-select').value=s.train??0;r.querySelector('.aprim-input').value=s.aprim??0;r.querySelector('.other-input').value=s.other??0;});
   recalcAllSkills();calcDefenses();
   if(data.specialAbility){$('specialAbilityName').value=data.specialAbility.name||'';$('specialAbilityDesc').value=data.specialAbility.desc||'';}
   if(data.abilities)restoreCollList('abilityList',data.abilities,abilityBodyHTML,null,null);
@@ -2035,6 +2100,7 @@ function loadFromData(data){
   $('descSonhos').value=data.descSonhos||'';
   $('descPassado').value=data.descPassado||'';
   refreshHP();refreshSP();
+  sortSkills();
   autoGrowAll();
 }
 
@@ -2179,6 +2245,7 @@ refreshHP();refreshSP();updateFama();
 updateStickyHeader();
 updateCondBadge(parseInt($('condSlider').value)||0);
 updatePassives();
+sortSkills();
 updateDiaryNav();
 autoGrowAll();
 
