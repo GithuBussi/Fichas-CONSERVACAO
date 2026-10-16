@@ -15,6 +15,9 @@
   --tab-diario: #e25ce0;
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
+/* Barra de rolagem sempre presente: a folha não muda de lugar entre abas curtas e longas
+   (scrollbar-gutter sozinho não segurou no teste; no celular a barra é sobreposta e nada muda) */
+html { overflow-y: scroll; }
 body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
   background: #141418;
@@ -716,6 +719,27 @@ body.light .def-card { background: color-mix(in srgb, var(--dc, #6c8cff) 10%, #f
 body.light .skill-row { background: color-mix(in srgb, var(--sc, #444) 10%, transparent); }
 body.light .coll-card.weapon-card { background: color-mix(in srgb, var(--c-for) 9%, #fff); border-color: color-mix(in srgb, var(--c-for) 35%, #ddd); }
 body.light .coll-card.armor-card { background: color-mix(in srgb, var(--c-sab) 9%, #fff); border-color: color-mix(in srgb, var(--c-sab) 35%, #ddd); }
+
+/* TELAS ESTREITAS: os blocos descem para a linha de baixo em vez de vazar da folha */
+.quick-dmg { flex-wrap: wrap; }
+.tabs { grid-template-columns: repeat(3, minmax(0,1fr)); }
+.session-box { flex-wrap: wrap; gap: 8px; }
+@media (max-width: 340px) {
+  .tab-btn { font-size: 10px; letter-spacing: 0; gap: 3px; padding: 8px 2px; }
+  .tab-btn .ti { font-size: 12px; }
+}
+@media (max-width: 480px) {
+  .combat-grid { grid-template-columns: 1fr; }
+  .quick-dmg label { flex-basis: 100%; }
+  .quick-dmg .q-btn { flex: 1; }
+}
+@media (max-width: 420px) {
+  .attr-grid { grid-template-columns: repeat(2,1fr); }
+  .status-grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 380px) {
+  .passives-grid { grid-template-columns: 1fr; }
+}
 
 /* SEÇÕES QUE ABREM E FECHAM */
 .section-body { display: flex; flex-direction: column; gap: 18px; }
