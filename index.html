@@ -1624,23 +1624,23 @@ function addShareButton(){
   ab.appendChild(btn);
   btn.addEventListener('click',shareSheet);
 }
+// O link leva a ficha sem a foto (a foto deixava o link enorme) e depois do "#": essa
+// parte não vai para o servidor, então não esbarra no limite de tamanho de endereço.
+// Links antigos com "?ficha=" continuam abrindo.
 function shareSheet(){
   try{
     const data=getData();
-    const json=JSON.stringify(data);
-    const compressed=LZString.compressToEncodedURIComponent(json);
-    const url=window.location.href.split('?')[0]+'?ficha='+compressed;
-    navigator.clipboard.writeText(url).then(()=>{
-      showToast('✓ Link copiado! Cole em outro navegador para abrir a ficha.');
-    }).catch(()=>{
-      prompt('Copie o link abaixo:',url);
-    });
+    const hadPhoto=!!data.photo;
+    data.photo='';delete data._charId;
+    const compressed=LZString.compressToEncodedURIComponent(JSON.stringify(data));
+    const url=window.location.href.split(/[?#]/)[0]+'#ficha='+compressed;
+    const msg=hadPhoto?'✓ Link copiado, sem a foto. Para enviar com a foto, use ⬇ JSON.':'✓ Link copiado! Cole em outro navegador para abrir a ficha.';
+    navigator.clipboard.writeText(url).then(()=>showToast(msg,hadPhoto?4500:1800)).catch(()=>{prompt('Copie o link abaixo:',url);});
   }catch(e){showToast('Erro ao gerar link');}
 }
 function tryLoadFromURL(){
   try{
-    const params=new URLSearchParams(window.location.search);
-    const ficha=params.get('ficha');
+    const ficha=new URLSearchParams(window.location.hash.slice(1)).get('ficha')||new URLSearchParams(window.location.search).get('ficha');
     if(!ficha)return false;
     const json=LZString.decompressFromEncodedURIComponent(ficha);
     if(!json)return false;
@@ -2447,7 +2447,7 @@ function loadFromData(data){
   autoGrowAll();
 }
 
-function showToast(msg){
+function showToast(msg,ms=1800){
   let t=$('toastBox');
   if(!t){
     t=document.createElement('div');t.id='toastBox';
@@ -2458,7 +2458,7 @@ function showToast(msg){
   void t.offsetWidth;
   t.classList.add('show');
   clearTimeout(t._hideTimer);
-  t._hideTimer=setTimeout(()=>t.classList.remove('show'),1800);
+  t._hideTimer=setTimeout(()=>t.classList.remove('show'),ms);
 }
 
 // Grava o personagem aberto (mesma chave de sempre) e atualiza a bolinha dele
@@ -2806,6 +2806,8 @@ document.addEventListener('keydown',e=>{if(e.key!=='Escape')return;if(!$('incomi
 
 initChars();
 if(!tryLoadFromURL()){/* localStorage already loaded */}
+// Link colado na mesma aba só troca o "#": a página não recarrega, então escuta a mudança
+window.addEventListener('hashchange',tryLoadFromURL);
 refreshHP();refreshSP();updateFama();
 updateStickyHeader();
 updateCondBadge(parseInt($('condSlider').value)||0);
