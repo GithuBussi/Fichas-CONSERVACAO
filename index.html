@@ -2115,9 +2115,9 @@ function buildSkillTable(){
     [{v:0,t:'Nenhum'},{v:1,t:'Treinado'},{v:2,t:'Graduado'},{v:3,t:'Mestrado'}].forEach(o=>{const op=document.createElement('option');op.value=o.v;op.textContent=o.t;tSel.appendChild(op);});
     tCell.appendChild(tSel);row.appendChild(tCell);
     // aprim
-    const apCell=document.createElement('div');const apIn=document.createElement('input');apIn.type='number';apIn.className='aprim-input';apIn.value=0;apIn.min=0;apCell.appendChild(apIn);row.appendChild(apCell);
+    const apCell=document.createElement('div');const apIn=document.createElement('input');apIn.type='number';apIn.className='aprim-input';apIn.defaultValue='0';apIn.value=0;apIn.min=0;apCell.appendChild(apIn);row.appendChild(apCell);
     // other
-    const otCell=document.createElement('div');const otIn=document.createElement('input');otIn.type='number';otIn.className='other-input';otIn.value=0;otCell.appendChild(otIn);row.appendChild(otCell);
+    const otCell=document.createElement('div');const otIn=document.createElement('input');otIn.type='number';otIn.className='other-input';otIn.defaultValue='0';otIn.value=0;otCell.appendChild(otIn);row.appendChild(otCell);
     tbl.appendChild(row);
     const recalc=()=>calcSkill(row);
     aSel.addEventListener('change',recalc);tSel.addEventListener('change',recalc);apIn.addEventListener('input',recalc);otIn.addEventListener('input',recalc);
@@ -2748,7 +2748,7 @@ function loadFromData(data){
   if(data.death)data.death.forEach((d,i)=>{if(d){deathState[i]=true;document.querySelector('.death-dot[data-i="'+i+'"]').classList.add('marked');}});
   $('deathMsg').style.visibility=deathState.every(Boolean)?'visible':'hidden';
   updateDeathOverlay();
-  if(data.skills)skillRowsByIdx().forEach((r,i)=>{const s=data.skills[i];if(!s)return;r.querySelector('.skill-attr-select').value=s.attr||r.querySelector('.skill-attr-select').value;r.querySelector('.train-select').value=s.train??0;r.querySelector('.aprim-input').value=s.aprim??0;r.querySelector('.other-input').value=s.other??0;});
+  if(data.skills)skillRowsByIdx().forEach((r,i)=>{const s=data.skills[i];if(!s)return;r.querySelector('.skill-attr-select').value=s.attr||r.querySelector('.skill-attr-select').value;r.querySelector('.train-select').value=s.train??0;r.querySelector('.aprim-input').value=(s.aprim===''||s.aprim==null)?0:s.aprim;r.querySelector('.other-input').value=(s.other===''||s.other==null)?0:s.other;});
   recalcAllSkills();calcDefenses();
   if(data.specialAbility){$('specialAbilityName').value=data.specialAbility.name||'';$('specialAbilityDesc').value=data.specialAbility.desc||'';}
   if(data.abilities)restoreCollList('abilityList',data.abilities,abilityBodyHTML,null,null);
