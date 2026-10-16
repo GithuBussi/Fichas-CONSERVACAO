@@ -271,7 +271,7 @@ body.light .temp-tag { color: #127a88; }
 #deathOverlay.d3 { background: rgba(0,0,0,0.88); pointer-events: all; }
 /* Texto e botão entram juntos, devagar e com zoom (depois da fumaça fechar), e saem rápido */
 #deathOverlay { transition: background .3s ease; }
-#deathOverlay.d3 { transition: background 1.4s ease 1.2s; }
+#deathOverlay.d3 { transition: background 3s ease 2s; }
 .death-content {
   width: 100%; display: flex; flex-direction: column; align-items: center; gap: 14px;
   padding: 34px 16px 30px; text-align: center;
@@ -281,7 +281,7 @@ body.light .temp-tag { color: #127a88; }
 }
 #deathOverlay.d3 .death-content {
   opacity: 1; transform: scale(1);
-  transition: opacity 1.6s ease 1.9s, transform 3.2s cubic-bezier(.16,.84,.3,1) 1.9s;
+  transition: opacity 4.5s cubic-bezier(.4,0,.2,1) 3s, transform 8s cubic-bezier(.12,.6,.25,1) 3s;
 }
 #deathTitle {
   font-family: Georgia, "Times New Roman", serif; font-size: 34px; font-weight: 400;
@@ -299,7 +299,7 @@ body.light .temp-tag { color: #127a88; }
 
 /* MARCAS DA MORTE: 2ª marca = bordas vermelhas se movendo; 3ª = a fumaça fecha em volta */
 #deathVignette, #deathClose { position: fixed; pointer-events: none; opacity: 0; }
-#deathVignette { inset: 0; z-index: 9500; transition: opacity 1.8s ease; overflow: hidden; }
+#deathVignette { inset: 0; z-index: 9500; transition: opacity .4s ease; overflow: hidden; }
 #deathVignette::before, #deathVignette::after {
   content: ''; position: absolute; inset: -12%;
   filter: blur(22px); will-change: transform;
@@ -330,18 +330,18 @@ body.light .temp-tag { color: #127a88; }
   50%  { transform: translate(-2%,1%) scale(0.98) rotate(-1.4deg); }
   100% { transform: translate(1.2%,-1.8%) scale(1.04) rotate(0.8deg); }
 }
-body.death-2 #deathVignette { opacity: 0.6; }
-body.death-3 #deathVignette { opacity: 1; }
+body.death-2 #deathVignette { opacity: 0.6; transition: opacity 2.5s ease; }
+body.death-3 #deathVignette { opacity: 1; transition: opacity 2.5s ease; }
 #deathClose {
   left: 50%; top: 50%; width: 220vmax; height: 220vmax; margin: -110vmax 0 0 -110vmax; z-index: 9600;
   background: radial-gradient(circle, transparent 0, transparent 14%, rgba(90,0,0,0.75) 26%, rgba(25,0,0,0.96) 40%);
   transform: scale(2.6); transition: transform .4s ease, opacity .4s ease;
 }
-body.death-3 #deathClose { opacity: 1; transform: scale(1); transition: transform 2.4s cubic-bezier(.55,0,.35,1), opacity 1s ease; }
+body.death-3 #deathClose { opacity: 1; transform: scale(1); transition: transform 3.5s cubic-bezier(.55,0,.35,1), opacity 1.5s ease; }
 /* Animação desligada: sem bordas nem fumaça; a tela final aparece sem zoom */
 body.no-death-anim #deathVignette, body.no-death-anim #deathClose { display: none; }
-body.no-death-anim #deathOverlay.d3 { transition: background .4s ease; }
-body.no-death-anim #deathOverlay.d3 .death-content { transform: none; transition: opacity .4s ease; }
+body.no-death-anim #deathOverlay.d3 { transition: background 2.5s ease; }
+body.no-death-anim #deathOverlay.d3 .death-content { transform: none; transition: opacity 4s cubic-bezier(.4,0,.2,1) .8s; }
 .death-anim-row { display: flex; justify-content: center; margin-top: -6px; }
 
 /* SKILLS */
@@ -1588,7 +1588,7 @@ function updateDeathOverlay(){
     const name=$('charName').value||'O personagem';
     $('deathTitle').textContent='⚰ '+name.toUpperCase()+' ⚰';
     $('deathSubtitle').textContent='caiu em combate';
-    setTimeout(()=>{if(overlay.classList.contains('d3'))$('deathUndoBtn').focus({preventScroll:true});},deathAnimOn?2000:400);
+    setTimeout(()=>{if(overlay.classList.contains('d3'))$('deathUndoBtn').focus({preventScroll:true});},deathAnimOn?3000:800);
   }
 }
 document.querySelectorAll('.death-dot').forEach(dot=>{
