@@ -2172,15 +2172,39 @@ $('addDiaryBtn').addEventListener('click',()=>{
 
 /* ===== FOTO ===== */
 $('photoBox').addEventListener('click',()=>$('photoInput').click());
+// A foto é reduzida (lado maior 480px, JPEG) antes de ir para a ficha. Uma foto de celular
+// tem vários MB e o navegador guarda só ~5MB por site; sem isso o salvamento pode falhar.
+const PHOTO_MAX_SIDE=480,PHOTO_QUALITY=0.82,PHOTO_LIMIT=150000;
+function compressPhoto(src){
+  return new Promise((resolve,reject)=>{
+    const img=new Image();
+    img.onload=()=>{
+      const k=Math.min(1,PHOTO_MAX_SIDE/Math.max(img.naturalWidth,img.naturalHeight));
+      const c=document.createElement('canvas');
+      c.width=Math.max(1,Math.round(img.naturalWidth*k));c.height=Math.max(1,Math.round(img.naturalHeight*k));
+      const ctx=c.getContext('2d');
+      ctx.fillStyle='#18181f';ctx.fillRect(0,0,c.width,c.height); // fundo para imagens com transparência
+      ctx.drawImage(img,0,0,c.width,c.height);
+      const out=c.toDataURL('image/jpeg',PHOTO_QUALITY);
+      resolve(out.length<src.length?out:src); // nunca troca por algo maior
+    };
+    img.onerror=reject;
+    img.src=src;
+  });
+}
+function showPhoto(src){
+  $('charPhoto').src=src;
+  $('charPhoto').style.display='block';
+  $('photoPlaceholder').style.display='none';
+  $('removePhotoBtn').style.display='block';
+}
 $('photoInput').addEventListener('change',e=>{
   const f=e.target.files[0];if(!f)return;
   const reader=new FileReader();
   reader.onload=ev=>{
-    $('charPhoto').src=ev.target.result;
-    $('charPhoto').style.display='block';
-    $('photoPlaceholder').style.display='none';
-    $('removePhotoBtn').style.display='block';
-    scheduleAutoSave();
+    compressPhoto(ev.target.result)
+      .then(src=>{showPhoto(src);scheduleAutoSave();})
+      .catch(()=>showToast('Não foi possível ler essa imagem. Tente JPG ou PNG.'));
   };
   reader.readAsDataURL(f);
 });
@@ -2330,8 +2354,13 @@ function loadFromData(data){
   diaryOpened=false;diaryIdx=0;updateDiaryNav();
   if(document.querySelector('.tab-content.active')?.dataset.tab==='diario'){diaryOpened=true;requestAnimationFrame(()=>diaryGoTo(Math.max(0,diaryPages().length-2),true));}
   if(data.photo){
-    $('charPhoto').src=data.photo;$('charPhoto').style.display='block';
-    $('photoPlaceholder').style.display='none';$('removePhotoBtn').style.display='block';
+    showPhoto(data.photo);
+    // Foto grande de antes desta versão: reduz só na tela. Ela vai para o armazenamento
+    // na próxima vez que o jogador salvar ou mexer na ficha (abrir a página nunca salva).
+    if(data.photo.length>PHOTO_LIMIT){
+      const original=data.photo;
+      compressPhoto(original).then(src=>{if($('charPhoto').src===original)$('charPhoto').src=src;}).catch(()=>{});
+    }
   } else {
     $('charPhoto').src='';$('charPhoto').style.display='none';
     $('photoPlaceholder').style.display='block';$('removePhotoBtn').style.display='none';
