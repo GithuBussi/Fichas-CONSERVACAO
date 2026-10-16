@@ -1089,6 +1089,45 @@ body.hide-floaters .trash-fab, body.hide-floaters .vitals-hud.show { opacity: 0;
 .diary-book { scrollbar-width: none; }
 .diary-book::-webkit-scrollbar { display: none; }
 
+/* DESCANSO E JORNADA */
+.rest-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 4px; }
+.rest-row .s-btn { flex: 1; min-width: 130px; padding: 8px 12px; font-size: 13px; }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.rest-box { max-width: 480px; gap: 14px; max-height: calc(100vh - 32px); overflow-y: auto; }
+.rest-tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.rest-tab { background: transparent; border: 1px solid var(--border); color: var(--muted); border-radius: 10px; padding: 9px; font-family: inherit; font-size: 14px; font-weight: 700; cursor: pointer; transition: border-color .2s, color .2s, background-color .2s; }
+.rest-tab.active { color: var(--accent); border-color: var(--accent); background: var(--accent-soft); }
+.rest-panel { display: flex; flex-direction: column; gap: 12px; }
+.rest-panel[hidden] { display: none; }
+.chips { border: none; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: 6px; }
+.chips[hidden] { display: none; }
+.chips legend { font-size: 12px; font-weight: 700; color: var(--muted); margin-bottom: 6px; padding: 0; }
+.chips legend small { font-weight: 400; }
+.chips label { cursor: pointer; }
+.chips input { position: absolute; opacity: 0; pointer-events: none; }
+.chips span { display: inline-block; border: 1px solid var(--border); border-radius: 999px; padding: 5px 12px; font-size: 13px; color: var(--text-2); transition: border-color .2s, color .2s, background-color .2s; }
+.chips input:checked + span { border-color: var(--accent); color: var(--accent); background: var(--accent-soft); font-weight: 700; }
+.chips input:focus-visible + span { outline: 2px solid var(--accent); outline-offset: 2px; }
+.rest-preview { font-size: 14px; color: var(--text); background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px; }
+.rest-warn { font-size: 13px; color: var(--danger); }
+.rest-note { font-size: 13px; color: var(--muted); }
+.rest-result { font-size: 13px; line-height: 1.6; border-radius: 10px; padding: 10px 12px; background: color-mix(in srgb, var(--ok) 10%, var(--surface)); border: 1px solid color-mix(in srgb, var(--ok) 40%, var(--border)); white-space: pre-line; animation: soft-in .25s ease-out; }
+.rest-result b { display: block; margin-bottom: 2px; }
+.j-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.j-field { display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: var(--muted); min-width: 0; }
+.j-field select, .j-field input { width: 100%; }
+.j-wide { grid-column: 1 / -1; }
+.j-roll { display: flex; align-items: center; gap: 8px; min-height: 34px; }
+.j-roll span { font-size: 13px; color: var(--text); font-variant-numeric: tabular-nums; }
+.j-items { display: flex; flex-direction: column; gap: 6px; }
+.j-label { font-size: 12px; font-weight: 700; color: var(--muted); }
+.j-item-list { display: flex; flex-direction: column; gap: 6px; }
+.j-item { display: grid; grid-template-columns: 1fr 64px 32px; gap: 6px; align-items: center; }
+.j-item input[type="number"] { width: 100%; }
+.j-item .remove-btn { align-self: stretch; padding: 0; }
+.j-money { max-width: 160px; }
+@media (max-width: 420px) { .j-grid { grid-template-columns: 1fr; } }
+
 /* CAIXAS DE TEXTO crescem com o conteúdo */
 textarea.autogrow { resize: none; overflow: hidden; }
 </style>
@@ -1272,6 +1311,10 @@ textarea.autogrow { resize: none; overflow: hidden; }
     <button class="q-btn sp-use" id="spUseBtn">◉ Gastar</button>
     <button class="q-btn sp-heal" id="spHealBtn">✦ Recuperar</button>
   </div>
+</div>
+<div class="rest-row">
+  <button type="button" class="s-btn" id="openRestBtn" title="Descanso curto ou longo: rola os dados de vida e de stamina conforme o nível do descanso">🌙 Descansar</button>
+  <button type="button" class="s-btn" id="openJourneyBtn" title="Jornada no lugar do descanso longo: registra o que foi feito, itens e moedas">🧭 Jornada</button>
 </div>
 
 <h2><span class="ico">◎</span>Vitalidade &amp; Emoção</h2>
@@ -1509,6 +1552,78 @@ textarea.autogrow { resize: none; overflow: hidden; }
   <span class="hud-ring hp" id="hudHp"><svg viewBox="0 0 36 36" aria-hidden="true"><circle class="hud-track" cx="18" cy="18" r="15.915"/><circle class="hud-fill" id="hudHpFill" cx="18" cy="18" r="15.915"/></svg><span class="hud-val" id="hudHpVal">20</span><span class="hud-temp" id="hudHpTemp"></span><span class="hud-lbl">PV</span></span>
   <span class="hud-ring sp" id="hudSp"><svg viewBox="0 0 36 36" aria-hidden="true"><circle class="hud-track" cx="18" cy="18" r="15.915"/><circle class="hud-fill" id="hudSpFill" cx="18" cy="18" r="15.915"/></svg><span class="hud-val" id="hudSpVal">20</span><span class="hud-temp" id="hudSpTemp"></span><span class="hud-lbl">PS</span></span>
 </button>
+
+<!-- Aviso único da migração para a versão nova -->
+<div class="modal" id="migraModal" role="dialog" aria-modal="true" aria-labelledby="migraTitle" aria-describedby="migraText" hidden>
+  <div class="modal-box">
+    <h3 id="migraTitle">Sua ficha foi atualizada</h3>
+    <p id="migraText">A ficha ganhou novidades: vários personagens, salvamento automático, dinheiro, descanso e mais. Seus dados continuam todos aqui. Guardamos também uma cópia da ficha como ela era antes, caso você queira baixar.</p>
+    <div class="modal-btns">
+      <button class="secondary-btn" id="migraDownload" title="Baixa um arquivo com a ficha como ela era antes da atualização">⬇ Baixar cópia</button>
+      <button class="primary-btn" id="migraOk">Entendi</button>
+    </div>
+  </div>
+</div>
+
+<!-- Descanso e jornada -->
+<div class="modal" id="restModal" role="dialog" aria-modal="true" aria-labelledby="restTitle" hidden>
+  <div class="modal-box rest-box">
+    <h3 id="restTitle" class="sr-only">Descanso e jornada</h3>
+    <div class="rest-tabs" role="tablist">
+      <button type="button" role="tab" id="tabRest" aria-selected="true" aria-controls="panelRest" class="rest-tab active">🌙 Descanso</button>
+      <button type="button" role="tab" id="tabJourney" aria-selected="false" aria-controls="panelJourney" class="rest-tab">🧭 Jornada</button>
+    </div>
+    <div id="panelRest" role="tabpanel" aria-labelledby="tabRest" class="rest-panel">
+      <fieldset class="chips"><legend>Tipo</legend>
+        <label><input type="radio" name="restType" value="curto"><span>Curto · 2 h</span></label>
+        <label><input type="radio" name="restType" value="longo" checked><span>Longo · 6 h</span></label>
+      </fieldset>
+      <fieldset class="chips"><legend>Nível do descanso <small>(quem diz é o mestre)</small></legend>
+        <label><input type="radio" name="restLevel" value="horrivel"><span>Horrível</span></label>
+        <label><input type="radio" name="restLevel" value="pessimo"><span>Péssimo</span></label>
+        <label><input type="radio" name="restLevel" value="ruim"><span>Ruim</span></label>
+        <label><input type="radio" name="restLevel" value="neutro" checked><span>Neutro</span></label>
+        <label><input type="radio" name="restLevel" value="bom"><span>Bom</span></label>
+        <label><input type="radio" name="restLevel" value="muitobom"><span>Muito Bom</span></label>
+        <label><input type="radio" name="restLevel" value="excelente"><span>Excelente</span></label>
+      </fieldset>
+      <fieldset class="chips" id="restChoiceSet" hidden><legend>Recuperar</legend>
+        <label><input type="radio" name="restChoice" value="sp" checked><span>Stamina</span></label>
+        <label><input type="radio" name="restChoice" value="hp"><span>Vida</span></label>
+      </fieldset>
+      <p class="rest-preview" id="restPreview"></p>
+      <p class="rest-warn" id="restWarn" hidden></p>
+      <div class="rest-result" id="restResult" hidden></div>
+      <div class="modal-btns">
+        <button class="primary-btn" id="restGo">🎲 Rolar e aplicar</button>
+        <button class="s-btn" id="restUndo" hidden>↩ Desfazer</button>
+        <button class="s-btn" id="restClose">Fechar</button>
+      </div>
+    </div>
+    <div id="panelJourney" role="tabpanel" aria-labelledby="tabJourney" class="rest-panel" hidden>
+      <p class="rest-note">A jornada ocupa o lugar do descanso longo: vida e stamina não mudam.</p>
+      <div class="j-grid">
+        <label class="j-field"><span>O que foi feito</span><select id="jKind"><option>Coleta</option><option>Missão</option><option>Viagem</option><option>Outra</option></select></label>
+        <label class="j-field j-wide"><span>Objetivo</span><input type="text" id="jGoal" placeholder="ex.: buscar ervas na mata do sul"></label>
+        <label class="j-field"><span>Perícia usada</span><select id="jSkill"><option value="">Nenhuma</option></select></label>
+        <div class="j-field"><span>Teste</span><div class="j-roll"><button type="button" class="s-btn" id="jRollBtn">🎲 Rolar 1d20</button><span id="jRollOut" aria-live="polite"></span></div></div>
+      </div>
+      <fieldset class="chips"><legend>Resultado</legend>
+        <label><input type="radio" name="jResult" value="Sucesso"><span>Sucesso</span></label>
+        <label><input type="radio" name="jResult" value="Falha"><span>Falha</span></label>
+        <label><input type="radio" name="jResult" value="" checked><span>Sem teste</span></label>
+      </fieldset>
+      <div class="j-items"><span class="j-label">Itens obtidos</span><div id="jItemList" class="j-item-list"></div><button type="button" class="add-btn" id="jAddItem">+ Adicionar item</button></div>
+      <label class="j-field j-money"><span>Moedas ganhas</span><input type="number" id="jMoney" value="0" min="0"></label>
+      <div class="rest-result" id="jResultBox" hidden></div>
+      <div class="modal-btns">
+        <button class="primary-btn" id="jGo">✓ Registrar jornada</button>
+        <button class="s-btn" id="jUndo" hidden>↩ Desfazer</button>
+        <button class="s-btn" id="jClose">Fechar</button>
+      </div>
+    </div>
+  </div>
+</div>
 
 <!-- Lixeira -->
 <button class="trash-fab" id="trashBtn" title="Lixeira" aria-label="Lixeira">🗑<span class="trash-count" id="trashCount" hidden></span></button>
@@ -3108,6 +3223,7 @@ function initChars(){
   blankSheet=JSON.parse(JSON.stringify(getData())); // cópia de verdade: nada da tela muda a ficha em branco depois
   const before=lsGet(CHARS_KEY);
   const idx=readJSON(CHARS_KEY);
+  const rawBefore=lsGet('rpgSheet'); // a ficha como estava antes desta abertura
   if(idx&&Array.isArray(idx.list))chars=idx;
   let sheet=readJSON('rpgSheet');
   // Aba antiga (versão anterior da ficha) gravou por cima: a chave principal tem uma ficha sem id
@@ -3147,7 +3263,28 @@ function initChars(){
   // aba não pode, sozinho, avisar a primeira de que a ficha foi alterada.
   if(JSON.stringify(chars)!==before)saveCharsIndex();
   renderChars();refreshTrashBtn();
+  // Primeira abertura da versão nova com uma ficha da versão anterior (sem id e sem lista de
+  // personagens): guarda uma cópia intocada e avisa uma vez, com a opção de baixar essa cópia
+  const legacy=!!(rawBefore&&!idx&&!(readJSONText(rawBefore)||{})._charId);
+  if(legacy)try{if(!lsGet('rpgSheetAntiga'))localStorage.setItem('rpgSheetAntiga',rawBefore);}catch(e){}
+  // O aviso volta a cada abertura até o jogador clicar em "Entendi"
+  if((legacy||lsGet('rpgSheetAntiga'))&&!lsGet('rpgAvisoMigracao')){
+    migrationRaw=legacy?rawBefore:null;
+    setTimeout(()=>openModal('migraModal','migraOk'),500);
+  }
 }
+function readJSONText(t){try{return JSON.parse(t);}catch(e){return null;}}
+let migrationRaw=null;
+$('migraDownload').addEventListener('click',()=>{
+  const raw=migrationRaw||lsGet('rpgSheetAntiga');if(!raw)return;
+  const d=readJSONText(raw)||{};
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([JSON.stringify(d,null,2)],{type:'application/json'}));
+  a.download=fileNameFor(d.name)+'_versao_anterior.json';a.click();
+  showToast('✓ Cópia baixada');
+});
+$('migraOk').addEventListener('click',()=>{try{localStorage.setItem('rpgAvisoMigracao','visto');}catch(e){}closeModal('migraModal');});
+
 /* Mais de uma aba: só uma pode gravar. Quando outra aba ou janela grava a ficha, esta
    para de salvar e pede para recarregar, em vez de gravar por cima do que a outra fez. */
 /* Janelas (modais): ao abrir, o resto da página fica inacessível (inert) e o Tab não sai da
@@ -3308,6 +3445,174 @@ function confirmBox(title,text,okLabel,cb){
 function closeConfirm(){closeModal('confirmModal');confirmCb=null;}
 $('confirmOkBtn').addEventListener('click',()=>{const cb=confirmCb;closeConfirm();if(cb)cb();});
 $('confirmCancelBtn').addEventListener('click',closeConfirm);
+
+/* ===== DESCANSO E JORNADA ===== */
+// Descanso segue a tabela do livro (seção "Descanso", níveis de Horrível a Excelente). Quem diz o
+// nível final é o mestre; a ficha não calcula fome, sede ou temperatura. Modificador: Constituição.
+const REST_LEVELS={horrivel:'Horrível',pessimo:'Péssimo',ruim:'Ruim',neutro:'Neutro',bom:'Bom',muitobom:'Muito Bom',excelente:'Excelente'};
+// sp/hp: quantos dados de stamina/vida; mod: quantas vezes soma o modificador; adv: com vantagem;
+// loseSp: dados de stamina perdidos; choice: n dados de vida OU de stamina, à escolha do jogador
+const REST_TABLE={
+  curto:{horrivel:{loseSp:3},pessimo:{},ruim:{sp:1},neutro:{sp:1},bom:{choice:1},muitobom:{sp:2},excelente:{choice:2}},
+  longo:{horrivel:{loseSp:3},pessimo:{},ruim:{sp:1},neutro:{sp:1,hp:1},bom:{sp:1,hp:1,mod:1},muitobom:{sp:2,hp:1,mod:2},excelente:{sp:2,hp:2,mod:2,adv:true}}
+};
+function rollDie(sides){const a=new Uint32Array(1);crypto.getRandomValues(a);return 1+(a[0]%sides);}
+function parseDice(t){const m=String(t||'').replace(/\s/g,'').match(/^(\d*)d(\d+)$/i);return m?{n:Math.max(1,parseInt(m[1]||'1')),s:parseInt(m[2])}:null;}
+// k "dados" de um campo como "1d10": rola a expressão k vezes; com vantagem, cada dado rola duas vezes e fica o maior
+function rollDice(expr,k,adv){
+  const d=parseDice(expr),rolls=[];let sum=0;
+  for(let i=0;i<k*d.n;i++){
+    const a=rollDie(d.s);
+    if(adv){const b=rollDie(d.s);sum+=Math.max(a,b);rolls.push(Math.max(a,b)+' ('+a+' e '+b+')');}
+    else{sum+=a;rolls.push(String(a));}
+  }
+  return {sum,rolls,label:(k*d.n)+'d'+d.s+(adv?' com vantagem':'')};
+}
+function conMod(){return parseInt($('attrCON').value)||0;}
+function restPlan(){
+  const type=document.querySelector('input[name="restType"]:checked').value;
+  const lvl=document.querySelector('input[name="restLevel"]:checked').value;
+  const rule={...REST_TABLE[type][lvl]};
+  if(rule.choice)rule[document.querySelector('input[name="restChoice"]:checked').value]=rule.choice;
+  return {type,lvl,rule};
+}
+function describeRest(){
+  const {type,lvl,rule}=restPlan(),mod=conMod()*(rule.mod||0),parts=[];
+  $('restChoiceSet').hidden=!REST_TABLE[type][lvl].choice;
+  if(rule.hp)parts.push(rule.hp+' dado'+(rule.hp>1?'s':'')+' de vida'+(rule.adv?' com vantagem':'')+(rule.mod?' '+(mod<0?'−':'+')+' '+Math.abs(mod)+' (Constituição'+(rule.mod>1?' em dobro':'')+')':''));
+  if(rule.sp)parts.push(rule.sp+' dado'+(rule.sp>1?'s':'')+' de stamina'+(rule.adv?' com vantagem':''));
+  if(rule.loseSp)parts.push('perde '+rule.loseSp+' dados de stamina');
+  $('restPreview').textContent=parts.length?'Vai rolar: '+parts.join(' · ')+'.':'Este descanso não recupera vida nem stamina.';
+  const miss=[];
+  if(rule.hp&&!parseDice($('hpDice').value))miss.push('o dado de vida');
+  if((rule.sp||rule.loseSp)&&!parseDice($('spDice').value))miss.push('o dado de stamina');
+  $('restWarn').hidden=!miss.length;
+  $('restWarn').textContent=miss.length?'Preencha '+miss.join(' e ')+' em Vida & Stamina (ex.: 1d10) para rolar.':'';
+  $('restGo').disabled=!!miss.length;
+  $('restGo').textContent=parts.length?'🎲 Rolar e aplicar':'✓ Registrar descanso';
+}
+document.querySelectorAll('input[name="restType"],input[name="restLevel"],input[name="restChoice"]').forEach(i=>i.addEventListener('change',describeRest));
+// Página no diário (descanso e jornada); devolve a página para poder desfazer
+function addDiaryPage(title,text){
+  const page=createDiaryEntry({title,text});
+  $('diaryList').appendChild(page);updateDiaryNav();autoGrowAll();
+  return page;
+}
+function showRestResult(boxId,title,lines){
+  const box=$(boxId);box.innerHTML='';
+  const b=document.createElement('b');b.textContent=title;box.appendChild(b);
+  box.appendChild(document.createTextNode(lines.join('\n')));
+  box.hidden=false;
+}
+let restUndo=null,journeyUndo=null;
+$('restGo').addEventListener('click',()=>{
+  const {type,lvl,rule}=restPlan();
+  const hp0=parseInt($('hpSlider').value)||0,sp0=parseInt($('spSlider').value)||0;
+  const hpMax=parseInt($('hpMax').value)||1,spMax=parseInt($('spMax').value)||1;
+  let hp=hp0,sp=sp0;const lines=[];
+  if(rule.hp){
+    const r=rollDice($('hpDice').value,rule.hp,rule.adv),mod=conMod()*(rule.mod||0),gain=Math.max(0,r.sum+mod);
+    hp=Math.min(hpMax,hp0+gain);
+    lines.push('Vida: '+r.label+' ['+r.rolls.join(', ')+']'+(mod?' '+(mod<0?'−':'+')+' '+Math.abs(mod):'')+' = +'+gain+' → '+hp+'/'+hpMax);
+  }
+  if(rule.sp){const r=rollDice($('spDice').value,rule.sp,rule.adv);sp=Math.min(spMax,sp0+r.sum);lines.push('Stamina: '+r.label+' ['+r.rolls.join(', ')+'] = +'+r.sum+' → '+sp+'/'+spMax);}
+  if(rule.loseSp){const r=rollDice($('spDice').value,rule.loseSp,false);sp=Math.max(0,sp0-r.sum);lines.push('Stamina: perde '+r.label+' ['+r.rolls.join(', ')+'] = −'+r.sum+' → '+sp+'/'+spMax);}
+  if(!lines.length)lines.push('Não recuperou vida nem stamina.');
+  $('hpSlider').value=hp;$('spSlider').value=sp;refreshHP();refreshSP();
+  if(hp>hp0)triggerHealGlow('hpBar');if(sp>sp0)triggerHealGlow('spBar');
+  const title='Descanso '+type+' · '+REST_LEVELS[lvl];
+  restUndo={hp0,sp0,page:addDiaryPage(title,lines.join('\n'))};
+  showRestResult('restResult',title,lines);
+  $('restGo').hidden=true;$('restUndo').hidden=false;$('restUndo').focus();
+  scheduleAutoSave();
+});
+$('restUndo').addEventListener('click',()=>{
+  if(!restUndo)return;
+  $('hpSlider').value=restUndo.hp0;$('spSlider').value=restUndo.sp0;refreshHP();refreshSP();
+  restUndo.page.remove();updateDiaryNav();restUndo=null;
+  $('restResult').hidden=true;$('restUndo').hidden=true;$('restGo').hidden=false;$('restGo').focus();
+  showToast('Descanso desfeito');scheduleAutoSave();
+});
+
+// Jornada: no lugar do descanso longo. Registra o que foi feito; itens vão para o Inventário e
+// moedas para o dinheiro. Vida e stamina não mudam.
+let journeyRoll='';
+function addJourneyItemRow(){
+  const row=document.createElement('div');row.className='j-item';
+  row.innerHTML='<input type="text" class="j-item-name" placeholder="Nome do item" aria-label="Nome do item"><input type="number" class="j-item-qty" value="1" min="1" aria-label="Quantidade"><button type="button" class="remove-btn" title="Tirar este item" aria-label="Tirar este item">✕</button>';
+  row.querySelector('.remove-btn').addEventListener('click',()=>row.remove());
+  $('jItemList').appendChild(row);row.querySelector('input').focus();
+}
+$('jAddItem').addEventListener('click',addJourneyItemRow);
+$('jSkill').addEventListener('change',()=>{journeyRoll='';$('jRollOut').textContent='';updateJourneyRollLabel();});
+function updateJourneyRollLabel(){
+  const i=$('jSkill').value,row=i===''?null:document.querySelector('.skill-row[data-idx="'+i+'"]');
+  const bonus=row?parseInt(row.querySelector('.skill-total').textContent)||0:0;
+  $('jRollBtn').textContent='🎲 Rolar 1d20'+(row?(bonus<0?' − ':' + ')+Math.abs(bonus):'');
+}
+$('jRollBtn').addEventListener('click',()=>{
+  const i=$('jSkill').value,row=i===''?null:document.querySelector('.skill-row[data-idx="'+i+'"]');
+  const bonus=row?parseInt(row.querySelector('.skill-total').textContent)||0:0,d=rollDie(20),tot=d+bonus;
+  journeyRoll=(row?skills[i].name+': ':'')+'1d20 ('+d+')'+(row?(bonus<0?' − ':' + ')+Math.abs(bonus):'')+' = '+tot;
+  $('jRollOut').textContent=(row?'1d20 ('+d+')'+(bonus<0?' − ':' + ')+Math.abs(bonus)+' = ':'')+tot+(d===20?' · 20 natural!':d===1?' · 1 natural':'');
+});
+$('jGo').addEventListener('click',()=>{
+  const kind=$('jKind').value,goal=$('jGoal').value.trim(),res=(document.querySelector('input[name="jResult"]:checked')||{}).value||'';
+  const items=[...document.querySelectorAll('#jItemList .j-item')].map(r=>({name:r.querySelector('.j-item-name').value.trim(),qty:Math.max(1,parseInt(r.querySelector('.j-item-qty').value)||1)})).filter(x=>x.name);
+  const coins=Math.max(0,parseInt($('jMoney').value)||0);
+  const money0=parseInt($('money').value)||0,cards=[];
+  items.forEach(it=>{
+    const d={name:it.qty>1?it.name+' (×'+it.qty+')':it.name,desc:'Obtido na jornada'+(goal?': '+goal:'')};
+    const card=makeCollCard({data:d,bodyHTML:itemBodyHTML(d),onRemove:calcLoad});
+    card.querySelector('.f-load').addEventListener('input',calcLoad);
+    $('itemList').appendChild(card);cards.push(card);
+  });
+  if(items.length)calcLoad();
+  if(coins)$('money').value=money0+coins;
+  const lines=[];
+  if(journeyRoll)lines.push('Teste: '+journeyRoll);
+  if(res)lines.push('Resultado: '+res);
+  if(items.length)lines.push('Itens: '+items.map(x=>x.name+(x.qty>1?' ×'+x.qty:'')).join(', '));
+  if(coins)lines.push('Moedas: +'+coins+' → '+(money0+coins));
+  lines.push('Vida e stamina não mudaram (jornada no lugar do descanso longo).');
+  const title='Jornada · '+kind+(goal?': '+goal:'');
+  journeyUndo={money0,cards,page:addDiaryPage(title,lines.join('\n'))};
+  showRestResult('jResultBox',title,lines);
+  $('jGo').hidden=true;$('jUndo').hidden=false;$('jUndo').focus();
+  scheduleAutoSave();
+});
+$('jUndo').addEventListener('click',()=>{
+  if(!journeyUndo)return;
+  journeyUndo.cards.forEach(c=>c.remove());calcLoad();
+  $('money').value=journeyUndo.money0;
+  journeyUndo.page.remove();updateDiaryNav();journeyUndo=null;
+  $('jResultBox').hidden=true;$('jUndo').hidden=true;$('jGo').hidden=false;$('jGo').focus();
+  showToast('Jornada desfeita');scheduleAutoSave();
+});
+function setRestTab(which){
+  const rest=which==='rest';
+  $('tabRest').classList.toggle('active',rest);$('tabRest').setAttribute('aria-selected',rest);
+  $('tabJourney').classList.toggle('active',!rest);$('tabJourney').setAttribute('aria-selected',!rest);
+  $('panelRest').hidden=!rest;$('panelJourney').hidden=rest;
+}
+$('tabRest').addEventListener('click',()=>setRestTab('rest'));
+$('tabJourney').addEventListener('click',()=>setRestTab('journey'));
+function openRest(which){
+  // Começa sempre limpo
+  restUndo=null;journeyUndo=null;journeyRoll='';
+  $('restResult').hidden=true;$('restUndo').hidden=true;$('restGo').hidden=false;
+  $('jResultBox').hidden=true;$('jUndo').hidden=true;$('jGo').hidden=false;
+  $('jGoal').value='';$('jMoney').value=0;$('jItemList').innerHTML='';$('jRollOut').textContent='';
+  document.querySelector('input[name="jResult"][value=""]').checked=true;
+  const sel=$('jSkill');sel.innerHTML='<option value="">Nenhuma</option>';
+  skills.forEach((sk,i)=>{const o=document.createElement('option');o.value=i;o.textContent=sk.name;sel.appendChild(o);});
+  updateJourneyRollLabel();describeRest();setRestTab(which);
+  openModal('restModal',which==='rest'?'tabRest':'tabJourney');
+}
+$('openRestBtn').addEventListener('click',()=>openRest('rest'));
+$('openJourneyBtn').addEventListener('click',()=>openRest('journey'));
+$('restClose').addEventListener('click',()=>closeModal('restModal'));
+$('jClose').addEventListener('click',()=>closeModal('restModal'));
 
 /* Personagem "em branco": criado e nunca preenchido. Comparação sem depender da ordem das chaves. */
 function stableJSON(o){return JSON.stringify(o,(k,v)=>v&&typeof v==='object'&&!Array.isArray(v)?Object.keys(v).sort().reduce((a,kk)=>(a[kk]=v[kk],a),{}):v);}
@@ -3514,6 +3819,8 @@ document.addEventListener('keydown',e=>{
   else if(!$('trashModal').hidden)closeModal('trashModal');
   else if(!$('incomingModal').hidden)closeIncoming();
   else if(!$('staleModal').hidden)closeModal('staleModal');
+  else if(!$('restModal').hidden)closeModal('restModal');
+  else if(!$('migraModal').hidden)$('migraOk').click();
   else if($('deathOverlay').classList.contains('d3'))dismissDeath();
   else if(selectedChars.size){selectedChars.clear();renderChars();}
   else closeCharMenu();
