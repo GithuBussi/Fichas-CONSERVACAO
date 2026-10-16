@@ -269,24 +269,80 @@ body.light .temp-tag { color: #127a88; }
   flex-direction: column; gap: 16px;
 }
 #deathOverlay.d3 { background: rgba(0,0,0,0.88); pointer-events: all; }
+/* Texto e botão entram juntos, devagar e com zoom (depois da fumaça fechar), e saem rápido */
+#deathOverlay { transition: background .3s ease; }
+#deathOverlay.d3 { transition: background 1.4s ease 1.2s; }
+.death-content {
+  width: 100%; display: flex; flex-direction: column; align-items: center; gap: 14px;
+  padding: 34px 16px 30px; text-align: center;
+  background: linear-gradient(to bottom, transparent, rgba(0,0,0,0.7) 22%, rgba(0,0,0,0.7) 78%, transparent);
+  opacity: 0; transform: scale(0.82);
+  transition: opacity .25s ease, transform .25s ease;
+}
+#deathOverlay.d3 .death-content {
+  opacity: 1; transform: scale(1);
+  transition: opacity 1.6s ease 1.9s, transform 3.2s cubic-bezier(.16,.84,.3,1) 1.9s;
+}
 #deathTitle {
-  font-size: 32px; font-weight: 900; color: #e24b4a; letter-spacing: 4px;
-  text-transform: uppercase; text-shadow: 0 0 30px rgba(226,75,74,0.8);
-  opacity: 0; transition: opacity 1s ease 0.5s; text-align: center;
+  font-family: Georgia, "Times New Roman", serif; font-size: 34px; font-weight: 400;
+  color: #b3201e; letter-spacing: 6px; text-transform: uppercase;
+  text-shadow: 0 0 24px rgba(179,32,30,0.55);
 }
-#deathOverlay.d3 #deathTitle { opacity: 1; }
-#deathSubtitle {
-  font-size: 16px; color: #aaa; letter-spacing: 2px;
-  opacity: 0; transition: opacity 1s ease 1s;
-}
-#deathOverlay.d3 #deathSubtitle { opacity: 1; }
+#deathSubtitle { font-family: Georgia, "Times New Roman", serif; font-size: 15px; color: #9a8f86; letter-spacing: 3px; }
 #deathUndoBtn {
-  background: #e24b4a; color: #fff; border: none;
-  border-radius: 8px; padding: 10px 20px; font-size: 14px; font-weight: 700;
-  cursor: pointer; opacity: 0; transition: opacity 1s ease 2s; pointer-events: none;
-  margin-top: 8px;
+  background: transparent; color: #d8cfc6; border: 1px solid rgba(216,207,198,0.5);
+  border-radius: 6px; padding: 9px 20px; font-size: 13px; font-weight: 700; letter-spacing: 1px;
+  cursor: pointer; pointer-events: none; margin-top: 6px;
 }
-#deathOverlay.d3 #deathUndoBtn { opacity: 1; pointer-events: all; }
+#deathUndoBtn:hover { border-color: #e24b4a; color: #fff; }
+#deathOverlay.d3 #deathUndoBtn { pointer-events: all; }
+
+/* MARCAS DA MORTE: 2ª marca = bordas vermelhas se movendo; 3ª = a fumaça fecha em volta */
+#deathVignette, #deathClose { position: fixed; pointer-events: none; opacity: 0; }
+#deathVignette { inset: 0; z-index: 9500; transition: opacity 1.8s ease; overflow: hidden; }
+#deathVignette::before, #deathVignette::after {
+  content: ''; position: absolute; inset: -12%;
+  filter: blur(22px); will-change: transform;
+}
+#deathVignette::before {
+  background:
+    radial-gradient(ellipse 22% 50% at 7% 45%, rgba(170,0,0,0.85), transparent 72%),
+    radial-gradient(ellipse 24% 46% at 93% 60%, rgba(170,0,0,0.8), transparent 72%),
+    radial-gradient(ellipse 50% 18% at 40% 7%, rgba(150,0,0,0.75), transparent 72%),
+    radial-gradient(ellipse 46% 20% at 62% 93%, rgba(160,0,0,0.8), transparent 72%);
+  animation: death-smoke-a 13s ease-in-out infinite alternate;
+}
+#deathVignette::after {
+  background:
+    radial-gradient(ellipse 20% 36% at 7% 85%, rgba(130,0,0,0.75), transparent 72%),
+    radial-gradient(ellipse 20% 38% at 93% 15%, rgba(130,0,0,0.75), transparent 72%),
+    radial-gradient(ellipse 30% 16% at 85% 7%, rgba(140,0,0,0.65), transparent 72%),
+    radial-gradient(ellipse 30% 16% at 15% 93%, rgba(140,0,0,0.65), transparent 72%);
+  animation: death-smoke-b 17s ease-in-out infinite alternate;
+}
+@keyframes death-smoke-a {
+  0%   { transform: translate(0,0) scale(1) rotate(0deg); }
+  50%  { transform: translate(1.8%,-1.2%) scale(1.05) rotate(1.2deg); }
+  100% { transform: translate(-1.4%,1.6%) scale(0.97) rotate(-1deg); }
+}
+@keyframes death-smoke-b {
+  0%   { transform: translate(0,0) scale(1.03) rotate(0deg); }
+  50%  { transform: translate(-2%,1%) scale(0.98) rotate(-1.4deg); }
+  100% { transform: translate(1.2%,-1.8%) scale(1.04) rotate(0.8deg); }
+}
+body.death-2 #deathVignette { opacity: 0.6; }
+body.death-3 #deathVignette { opacity: 1; }
+#deathClose {
+  left: 50%; top: 50%; width: 220vmax; height: 220vmax; margin: -110vmax 0 0 -110vmax; z-index: 9600;
+  background: radial-gradient(circle, transparent 0, transparent 14%, rgba(90,0,0,0.75) 26%, rgba(25,0,0,0.96) 40%);
+  transform: scale(2.6); transition: transform .4s ease, opacity .4s ease;
+}
+body.death-3 #deathClose { opacity: 1; transform: scale(1); transition: transform 2.4s cubic-bezier(.55,0,.35,1), opacity 1s ease; }
+/* Animação desligada: sem bordas nem fumaça; a tela final aparece sem zoom */
+body.no-death-anim #deathVignette, body.no-death-anim #deathClose { display: none; }
+body.no-death-anim #deathOverlay.d3 { transition: background .4s ease; }
+body.no-death-anim #deathOverlay.d3 .death-content { transform: none; transition: opacity .4s ease; }
+.death-anim-row { display: flex; justify-content: center; margin-top: -6px; }
 
 /* SKILLS */
 .skill-table { display: flex; flex-direction: column; gap: 4px; }
@@ -661,6 +717,18 @@ body.light .skill-row { background: color-mix(in srgb, var(--sc, #444) 10%, tran
 body.light .coll-card.weapon-card { background: color-mix(in srgb, var(--c-for) 9%, #fff); border-color: color-mix(in srgb, var(--c-for) 35%, #ddd); }
 body.light .coll-card.armor-card { background: color-mix(in srgb, var(--c-sab) 9%, #fff); border-color: color-mix(in srgb, var(--c-sab) 35%, #ddd); }
 
+/* SEÇÕES QUE ABREM E FECHAM */
+.section-body { display: flex; flex-direction: column; gap: 18px; }
+.section-body[hidden] { display: none; }
+h2.section-toggle { cursor: pointer; user-select: none; border-radius: 4px; }
+h2.section-toggle:hover { color: #9fb4ff; }
+h2.section-toggle:focus-visible { outline: 2px solid #6c8cff; outline-offset: 3px; }
+.section-chev { display: inline-block; margin-left: auto; font-size: 13px; opacity: .55; transition: transform .2s ease; }
+h2.collapsed .section-chev { transform: rotate(-90deg); }
+h2.collapsed { opacity: .75; }
+body.light h2.section-toggle:hover { color: #4a6adf; }
+.coll-header:focus-visible, .death-dot:focus-visible, .photo-box:focus-visible { outline: 2px solid #6c8cff; outline-offset: 2px; }
+
 /* ORGANIZAR PERÍCIAS */
 .skill-sort { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; font-size: 11px; color: #888; margin-bottom: -8px; }
 .skill-sort > span { margin-right: 2px; }
@@ -713,10 +781,16 @@ textarea.autogrow { resize: none; overflow: hidden; }
   <button id="themeToggle" class="sticky-theme-btn" title="Alternar tema">☀</button>
 </div>
 
-<div id="deathOverlay">
-  <div id="deathTitle">⚰ CAIU EM COMBATE ⚰</div>
-  <div id="deathSubtitle" id="deathSubtitle"></div>
-  <button id="deathUndoBtn">↩ Desfazer</button>
+<!-- Efeitos das marcas da morte -->
+<div id="deathVignette" aria-hidden="true"></div>
+<div id="deathClose" aria-hidden="true"></div>
+
+<div id="deathOverlay" role="alertdialog" aria-labelledby="deathTitle" aria-describedby="deathSubtitle">
+  <div class="death-content">
+    <div id="deathTitle">⚰ CAIU EM COMBATE ⚰</div>
+    <div id="deathSubtitle"></div>
+    <button id="deathUndoBtn" title="Apaga as 3 marcas de morte e volta para a ficha">↩ Desfazer</button>
+  </div>
 </div>
 
 <div class="card">
@@ -875,11 +949,14 @@ textarea.autogrow { resize: none; overflow: hidden; }
 
 <h2><span class="ico">☠</span>Marcas de morte</h2>
 <div class="death-row">
-  <div class="death-dot" data-i="0">✕</div>
-  <div class="death-dot" data-i="1">✕</div>
-  <div class="death-dot" data-i="2">✕</div>
+  <div class="death-dot" data-i="0" role="button" tabindex="0" aria-pressed="false" aria-label="1ª marca de morte" title="1ª marca de morte: clique para marcar ou desmarcar">✕</div>
+  <div class="death-dot" data-i="1" role="button" tabindex="0" aria-pressed="false" aria-label="2ª marca de morte" title="2ª marca de morte: as bordas da tela ficam vermelhas">✕</div>
+  <div class="death-dot" data-i="2" role="button" tabindex="0" aria-pressed="false" aria-label="3ª marca de morte" title="3ª marca de morte: o personagem cai em combate">✕</div>
 </div>
 <p id="deathMsg">Personagem morto</p>
+<div class="death-anim-row">
+  <button class="s-btn" id="deathAnimToggle" aria-pressed="true" title="Ativar ou desativar a animação das marcas de morte (bordas vermelhas e fumaça)">✦ Animação: ligada</button>
+</div>
 
 <h2><span class="ico">◉</span>Passivas</h2>
 <div class="passives-grid">
@@ -1097,6 +1174,104 @@ document.addEventListener('input',e=>{if(e.target.tagName==='TEXTAREA')autoGrow(
 document.addEventListener('click',()=>requestAnimationFrame(autoGrowAll));
 window.addEventListener('resize',()=>requestAnimationFrame(autoGrowAll));
 
+/* ===== DICAS E ACESSIBILIDADE ===== */
+// Explicação curta que aparece ao passar o mouse (title). Botões só com ícone também
+// ganham aria-label, para leitores de tela. Cards criados depois recebem dicas em makeCollCard.
+const hints={
+  '#themeToggle':['Alternar entre tema claro e escuro',true],
+  '.tab-btn[data-tab="principal"]':['Atributos, combate, vida, perícias e notas'],
+  '.tab-btn[data-tab="habilidades"]':['Habilidade especial e habilidades do personagem'],
+  '.tab-btn[data-tab="tecnicas"]':['Técnicas e a perícia usada nelas'],
+  '.tab-btn[data-tab="inventario"]':['Dinheiro, limite de carga, armas, armaduras e itens'],
+  '.tab-btn[data-tab="perfil"]':['Identidade, foto, descrições, fama e contatos'],
+  '.tab-btn[data-tab="diario"]':['Diário do jogador, em páginas'],
+  '.def-up':['Mover esta defesa para cima',true],
+  '.def-down':['Mover esta defesa para baixo',true],
+  '#addResBtn':['Adiciona uma resistência ou vulnerabilidade a um tipo de dano'],
+  '#hpSlider':['Vida atual: arraste para ajustar',true],
+  '#spSlider':['Stamina atual: arraste para ajustar',true],
+  '#hpTemp':['Vida temporária: absorve o dano antes da vida normal',true],
+  '#spTemp':['Stamina temporária: é gasta antes da stamina normal',true],
+  '#hpQuick':['Quantidade de dano ou de cura',true],
+  '#hpDmgType':['Tipo do dano, usado para aplicar RD e resistências',true],
+  '#hpDmgBtn':['Aplica o dano: desconta RD e resistências do tipo escolhido e consome primeiro a vida temporária'],
+  '#hpHealBtn':['Recupera essa quantidade de vida, sem passar do máximo'],
+  '#spQuick':['Quantidade de stamina para gastar ou recuperar',true],
+  '#spUseBtn':['Gasta essa quantidade de stamina, usando primeiro a temporária'],
+  '#spHealBtn':['Recupera essa quantidade de stamina, sem passar do máximo'],
+  '#condSlider':['Vitalidade: ao chegar em 4, uma marca de morte é adicionada',true],
+  '#emoSlider':['Estado emocional, de 0 a 4',true],
+  '.skill-sort-btn[data-sort="alpha"]':['Ordem original da lista de perícias'],
+  '.skill-sort-btn[data-sort="attr"]':['Agrupa as perícias pelo atributo que cada uma usa'],
+  '.skill-sort-btn[data-sort="total"]':['Do maior para o menor bônus total'],
+  '.skill-sort-btn[data-sort="train"]':['Do mais treinado para o menos treinado'],
+  '#sessionStartBtn':['Inicia ou pausa o cronômetro da sessão'],
+  '#sessionResetBtn':['Zera o cronômetro da sessão'],
+  '#addAbilityBtn':['Adiciona uma nova habilidade'],
+  '#addTechBtn':['Adiciona uma nova técnica'],
+  '#money':['Moedas que o personagem tem agora',true],
+  '#moneyQuick':['Valor para ganhar ou gastar',true],
+  '#moneyAddBtn':['Soma o valor às moedas'],
+  '#moneySubBtn':['Desconta o valor das moedas (não deixa ficar negativo)'],
+  '#addWeaponBtn':['Adiciona uma nova arma'],
+  '#addArmorBtn':['Adiciona uma nova armadura'],
+  '#addItemBtn':['Adiciona um novo item'],
+  '#photoBox':['Clique para escolher uma foto do personagem',true],
+  '#removePhotoBtn':['Remove a foto do personagem'],
+  '#addContactBtn':['Adiciona um novo contato'],
+  '#diaryPrev':['Página anterior do diário'],
+  '#diaryNext':['Próxima página do diário'],
+  '#addDiaryBtn':['Guarda o texto como uma nova página do diário'],
+  '#saveBtn':['Salva a ficha neste navegador'],
+  '#exportPdfBtn':['Baixa a ficha em PDF'],
+  '#exportJsonBtn':['Baixa um arquivo JSON com a ficha inteira, para backup'],
+  '#shareBtn':['Copia um link que abre esta ficha em outro navegador'],
+  '.file-label':['Abre um arquivo JSON exportado antes'],
+  '.autosave-label':['Salva sozinho alguns instantes depois de cada alteração']
+};
+function applyHints(){
+  Object.entries(hints).forEach(([sel,[text,aria]])=>{
+    document.querySelectorAll(sel).forEach(el=>{
+      if(!el.title)el.title=text;
+      if(aria&&!el.getAttribute('aria-label'))el.setAttribute('aria-label',text);
+    });
+  });
+}
+applyHints();
+// A caixa da foto funciona como botão também pelo teclado
+$('photoBox').setAttribute('role','button');$('photoBox').tabIndex=0;
+$('photoBox').addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();$('photoInput').click();}});
+
+/* ===== SEÇÕES QUE ABREM E FECHAM ===== */
+// Clicar no título (h2) mostra ou esconde tudo até o próximo título. Todas começam
+// abertas; as que o jogador fechou ficam lembradas neste navegador (não na ficha).
+let closedSections=[];
+try{closedSections=JSON.parse(localStorage.getItem('rpgClosedSections'))||[];}catch(e){}
+document.querySelectorAll('.tab-content').forEach(tab=>{
+  tab.querySelectorAll(':scope > h2').forEach((h,k)=>{
+    const label=Array.from(h.childNodes).filter(n=>!(n.classList&&n.classList.contains('ico'))).map(n=>n.textContent).join('').trim();
+    const key=tab.dataset.tab+':'+label;
+    const body=document.createElement('div');body.className='section-body';body.id='sec-'+tab.dataset.tab+'-'+k;
+    let n=h.nextElementSibling;
+    while(n&&n.tagName!=='H2'){const next=n.nextElementSibling;body.appendChild(n);n=next;}
+    h.after(body);
+    h.classList.add('section-toggle');h.setAttribute('role','button');h.tabIndex=0;h.setAttribute('aria-controls',body.id);
+    const chev=document.createElement('span');chev.className='section-chev';chev.setAttribute('aria-hidden','true');chev.textContent='▾';h.appendChild(chev);
+    const set=open=>{
+      h.classList.toggle('collapsed',!open);body.hidden=!open;h.setAttribute('aria-expanded',open?'true':'false');
+      h.title=(open?'Recolher':'Mostrar')+' a seção '+label;
+    };
+    set(!closedSections.includes(key));
+    const toggle=()=>{
+      const open=body.hidden;set(open);
+      closedSections=closedSections.filter(x=>x!==key);if(!open)closedSections.push(key);
+      try{localStorage.setItem('rpgClosedSections',JSON.stringify(closedSections));}catch(e){}
+    };
+    h.addEventListener('click',toggle);
+    h.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();toggle();}});
+  });
+});
+
 /* ===== TABS ===== */
 document.querySelectorAll('.tab-btn').forEach(btn=>{
   btn.addEventListener('click',()=>{
@@ -1164,7 +1339,7 @@ function createResRow(d){
       <option value="R" ${d?.rv==='R'?'selected':''}>Resistência (÷2)</option>
       <option value="V" ${d?.rv==='V'?'selected':''}>Vulnerabilidade (×2)</option>
     </select>
-    <button class="remove-btn">✕</button>`;
+    <button class="remove-btn" title="Remover esta resistência" aria-label="Remover esta resistência">✕</button>`;
   row.querySelector('.remove-btn').addEventListener('click',()=>row.remove());
   return row;
 }
@@ -1401,14 +1576,19 @@ const origSave=save;
 /* ===== DEATH ===== */
 let deathState=[false,false,false];
 const overlay=$('deathOverlay');
+// 1 marca: nada; 2 marcas: bordas vermelhas se movendo; 3 marcas: a fumaça fecha e aparece a tela final
 function updateDeathOverlay(){
   const n=deathState.filter(Boolean).length;
   overlay.classList.remove('d1','d2','d3');
+  document.body.classList.toggle('death-2',n===2);
+  document.body.classList.toggle('death-3',n===3);
+  document.querySelectorAll('.death-dot').forEach(d=>d.setAttribute('aria-pressed',deathState[d.dataset.i]?'true':'false'));
   if(n===3){
     overlay.classList.add('d3');
     const name=$('charName').value||'O personagem';
     $('deathTitle').textContent='⚰ '+name.toUpperCase()+' ⚰';
     $('deathSubtitle').textContent='caiu em combate';
+    setTimeout(()=>{if(overlay.classList.contains('d3'))$('deathUndoBtn').focus({preventScroll:true});},deathAnimOn?2000:400);
   }
 }
 document.querySelectorAll('.death-dot').forEach(dot=>{
@@ -1419,13 +1599,36 @@ document.querySelectorAll('.death-dot').forEach(dot=>{
     $('deathMsg').style.visibility=deathState.every(Boolean)?'visible':'hidden';
     updateDeathOverlay();
   });
+  dot.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();dot.click();}});
 });
 $('deathUndoBtn').addEventListener('click',()=>{
   deathState=[false,false,false];
   document.querySelectorAll('.death-dot').forEach(d=>d.classList.remove('marked'));
   $('deathMsg').style.visibility='hidden';
-  overlay.classList.remove('d1','d2','d3');
+  updateDeathOverlay();
 });
+
+/* Animação das marcas de morte: começa desligada no celular e quando o sistema pede menos movimento */
+let deathAnimOn=true;
+(function(){
+  let pref=null;try{pref=localStorage.getItem('rpgDeathAnim');}catch(e){}
+  const mobile=window.matchMedia('(pointer: coarse)').matches||window.innerWidth<768;
+  const reduce=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  deathAnimOn=pref?pref==='on':!(mobile||reduce);
+})();
+function applyDeathAnim(){
+  document.body.classList.toggle('no-death-anim',!deathAnimOn);
+  const b=$('deathAnimToggle');
+  b.textContent=deathAnimOn?'✦ Animação: ligada':'✧ Animação: desligada';
+  b.setAttribute('aria-pressed',deathAnimOn?'true':'false');
+  b.classList.toggle('active',deathAnimOn);
+}
+$('deathAnimToggle').addEventListener('click',()=>{
+  deathAnimOn=!deathAnimOn;
+  try{localStorage.setItem('rpgDeathAnim',deathAnimOn?'on':'off');}catch(e){}
+  applyDeathAnim();
+});
+applyDeathAnim();
 
 /* ===== FAMA ===== */
 const famaLabels=['Quase inexistente','Fora do radar','Círculo social','Bairro ou grupo','Cidade ou região','País inteiro','Amplo conhecimento'];
@@ -1632,7 +1835,10 @@ function makeCollCard(cfg){
 
   // header
   const hdr=document.createElement('div');hdr.className='coll-header';
+  hdr.title='Clique para abrir ou fechar';hdr.setAttribute('role','button');hdr.tabIndex=0;
+  hdr.addEventListener('keydown',e=>{if(e.target===hdr&&(e.key==='Enter'||e.key===' ')){e.preventDefault();card.classList.toggle('open');}});
   const handle=document.createElement('div');handle.className='drag-handle';handle.textContent='⠿';handle.draggable=false;
+  handle.title='Arraste para mudar a ordem';handle.setAttribute('aria-hidden','true');
   handle.addEventListener('mousedown',e=>e.stopPropagation());
   const chev=document.createElement('span');chev.className='coll-chevron';chev.textContent='▶';
   const nameEl=document.createElement('span');nameEl.className='coll-name';nameEl.textContent=cfg.data?.name||'Novo';
@@ -1658,7 +1864,7 @@ function makeCollCard(cfg){
   body.querySelectorAll('input,textarea,select').forEach(el=>el.addEventListener('input',liveUpdate));
 
   // remove
-  const rm=document.createElement('button');rm.className='remove-btn';rm.textContent='Remover';
+  const rm=document.createElement('button');rm.className='remove-btn';rm.textContent='Remover';rm.title='Remove este item da ficha';
   rm.addEventListener('click',()=>{card.remove();if(cfg.onRemove)cfg.onRemove();});
   body.appendChild(rm);
   card.appendChild(hdr);card.appendChild(body);
@@ -1869,7 +2075,7 @@ function createDiaryEntry(d){
   page.innerHTML=`
     <div class="diary-page-head">
       <span class="diary-entry-date"></span>
-      <button class="diary-remove" title="Remover página">✕</button>
+      <button class="diary-remove" title="Remover esta página (pede confirmação)" aria-label="Remover esta página">✕</button>
     </div>
     <input type="text" class="diary-entry-title" placeholder="Sem título">
     <textarea class="diary-entry-text" rows="8"></textarea>
