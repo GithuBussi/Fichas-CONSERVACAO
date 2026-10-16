@@ -1742,6 +1742,7 @@ $('photoInput').addEventListener('change',e=>{
     $('charPhoto').style.display='block';
     $('photoPlaceholder').style.display='none';
     $('removePhotoBtn').style.display='block';
+    scheduleAutoSave();
   };
   reader.readAsDataURL(f);
 });
