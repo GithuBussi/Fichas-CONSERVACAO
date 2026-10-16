@@ -777,6 +777,38 @@ body.light .coll-card.armor-card { background: color-mix(in srgb, var(--c-sab) 9
   .char-item:hover .char-del, .char-item:focus-within .char-del, .char-item.sel .char-del { opacity: 1; pointer-events: auto; }
 }
 @media (hover: none) { .char-item:not(.sel) .char-del { display: none; } }
+/* Vida e stamina em anéis no canto inferior direito (substitui a faixa fixa do topo) */
+#stickyHeader { display: none !important; }
+body.sticky-active { padding-top: 12px; }
+.vitals-hud {
+  position: fixed; right: 14px; bottom: 14px; z-index: 8500; display: flex; gap: 8px;
+  padding: 8px 12px 5px; border-radius: 22px; background: var(--frame); border: 1px solid var(--border);
+  box-shadow: 0 6px 22px rgba(0,0,0,0.45); color: var(--text);
+  opacity: 0; visibility: hidden; transform: translateY(14px);
+  transition: opacity .25s ease, transform .25s ease, visibility 0s linear .25s;
+}
+.vitals-hud.show { opacity: 1; visibility: visible; transform: none; transition: opacity .25s ease, transform .25s ease; }
+body.light .vitals-hud { box-shadow: 0 6px 22px rgba(30,30,80,0.18); }
+.hud-ring { position: relative; width: 44px; display: flex; flex-direction: column; align-items: center; }
+.hud-ring svg { width: 44px; height: 44px; transform: rotate(-90deg); }
+.hud-track { fill: none; stroke: var(--track); stroke-width: 3.4; }
+.hud-fill { fill: none; stroke-width: 3.4; stroke-linecap: round; stroke-dasharray: 100 100; transition: stroke-dasharray .4s ease, stroke .3s; }
+.hud-ring.hp .hud-fill { stroke: #5cbf60; }
+.hud-ring.hp.warn .hud-fill { stroke: #e0b020; }
+.hud-ring.sp .hud-fill { stroke: var(--sp); }
+.hud-ring.crit .hud-fill { stroke: var(--danger); }
+.hud-val { position: absolute; top: 0; left: 0; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 800; }
+.hud-temp { position: absolute; top: -4px; right: -6px; font-size: 9px; font-weight: 800; color: #4dd0e1; }
+body.light .hud-temp { color: #127a88; }
+.hud-lbl { font-size: 9px; font-weight: 700; letter-spacing: .5px; color: var(--muted); margin-top: -1px; }
+/* Botão de tema ao lado das bolinhas */
+.chars-top { display: flex; align-items: flex-start; gap: 8px; }
+.chars-top .chars-bar { flex: 1; min-width: 0; }
+.theme-btn {
+  flex: 0 0 auto; width: 36px; height: 36px; margin-top: 16px; border-radius: 50%; font-size: 15px; line-height: 1;
+  background: var(--frame); border: 1px solid var(--border); color: var(--text-2); cursor: pointer;
+}
+.theme-btn:hover { border-color: var(--accent); }
 /* Bolinhas fora da folha, logo acima dela, no fundo da página */
 .chars-wrap { width: 100%; max-width: 580px; display: flex; flex-direction: column; gap: 8px; margin-bottom: 10px; }
 .chars-wrap .chars-bar { margin: 0; padding: 6px 10px 2px; }
@@ -794,7 +826,7 @@ body.light .char-del { border-color: #fff; }
 }
 .trash-count[hidden] { display: none; }
 body.light .trash-fab { background: #fff; border-color: #ccc; color: #555; }
-body { padding-bottom: 64px; }
+body { padding-bottom: 84px; } /* espaço para a lixeira e os anéis de vida no canto */
 .trash-list { display: flex; flex-direction: column; gap: 10px; max-height: 55vh; overflow-y: auto; }
 .trash-row { display: flex; align-items: center; gap: 10px; }
 .trash-row .char-ring { width: 40px; height: 40px; flex: 0 0 auto; }
@@ -994,7 +1026,6 @@ textarea.autogrow { resize: none; overflow: hidden; }
     <div class="sticky-bar-bg"><div id="stickySpBar" class="sticky-bar-fill sticky-sp"></div></div>
     <span id="stickySpVal" class="sticky-val">—</span>
   </div>
-  <button id="themeToggle" class="sticky-theme-btn" title="Alternar tema">☀</button>
 </div>
 
 <!-- Efeitos das marcas da morte -->
@@ -1011,7 +1042,10 @@ textarea.autogrow { resize: none; overflow: hidden; }
 
 <!-- PERSONAGENS (bolinhas no estilo stories), fora da folha -->
 <div class="chars-wrap">
-  <div class="chars-bar" id="charsBar" aria-label="Seus personagens"></div>
+  <div class="chars-top">
+    <div class="chars-bar" id="charsBar" aria-label="Seus personagens"></div>
+    <button id="themeToggle" class="theme-btn" title="Alternar tema">☀</button>
+  </div>
   <div class="char-menu" id="charMenu" hidden></div>
 </div>
 
@@ -1376,6 +1410,12 @@ textarea.autogrow { resize: none; overflow: hidden; }
 <p class="hint">Dados salvos localmente neste navegador. Use Exportar JSON para backup.</p>
 
 </div><!-- /card -->
+
+<!-- Vida e stamina que acompanham a rolagem: anéis no canto inferior direito -->
+<button class="vitals-hud" id="vitalsHud" title="Vida e stamina">
+  <span class="hud-ring hp" id="hudHp"><svg viewBox="0 0 36 36" aria-hidden="true"><circle class="hud-track" cx="18" cy="18" r="15.915"/><circle class="hud-fill" id="hudHpFill" cx="18" cy="18" r="15.915"/></svg><span class="hud-val" id="hudHpVal">20</span><span class="hud-temp" id="hudHpTemp"></span><span class="hud-lbl">PV</span></span>
+  <span class="hud-ring sp" id="hudSp"><svg viewBox="0 0 36 36" aria-hidden="true"><circle class="hud-track" cx="18" cy="18" r="15.915"/><circle class="hud-fill" id="hudSpFill" cx="18" cy="18" r="15.915"/></svg><span class="hud-val" id="hudSpVal">20</span><span class="hud-temp" id="hudSpTemp"></span><span class="hud-lbl">PS</span></span>
+</button>
 
 <!-- Lixeira -->
 <button class="trash-fab" id="trashBtn" title="Lixeira" aria-label="Lixeira">🗑<span class="trash-count" id="trashCount" hidden></span></button>
@@ -1759,13 +1799,35 @@ function updateStickyHeader(){
   spBar.style.width=spPct+'%';
   $('stickyHpVal').textContent=hp+'/'+hpMax+tempSuffix('hpTemp');
   $('stickySpVal').textContent=sp+'/'+spMax+tempSuffix('spTemp');
+  // Anéis no canto: esvaziam conforme cai; amarelo até 50%, vermelho em 25% ou menos
+  const ring=(id,val,max,tempId)=>{
+    const pct=Math.max(0,Math.min(100,Math.round(val/max*100)));
+    $(id+'Fill').style.strokeDasharray=pct+' 100';
+    $(id+'Val').textContent=val;
+    $(id).classList.toggle('crit',pct<=25);$(id).classList.toggle('warn',pct>25&&pct<=50);
+    const t=getTemp(tempId);$(id+'Temp').textContent=t?'+'+t:'';
+  };
+  ring('hudHp',hp,hpMax,'hpTemp');ring('hudSp',sp,spMax,'spTemp');
+  const desc='PV '+hp+' de '+hpMax+tempSuffix('hpTemp')+', PS '+sp+' de '+spMax+tempSuffix('spTemp')+'. Clique para ir até Vida & Stamina';
+  $('vitalsHud').title=desc;$('vitalsHud').setAttribute('aria-label',desc);
 }
+// Os anéis aparecem só quando "Vida & Stamina" não está na tela (rolou, outra aba ou seção fechada)
 function checkStickyScroll(){
-  const show=window.scrollY>80;
-  $('stickyHeader').classList.toggle('visible',show);
-  document.body.classList.toggle('sticky-active',show);
+  const r=$('hpSection').getBoundingClientRect();
+  const onScreen=r.height>0&&r.bottom>60&&r.top<window.innerHeight-60;
+  $('vitalsHud').classList.toggle('show',!onScreen);
 }
 window.addEventListener('scroll',checkStickyScroll,{passive:true});
+window.addEventListener('resize',checkStickyScroll);
+document.addEventListener('click',()=>requestAnimationFrame(checkStickyScroll));
+$('vitalsHud').addEventListener('click',()=>{
+  const tab=document.querySelector('.tab-btn[data-tab="principal"]');
+  if(!tab.classList.contains('active'))tab.click();
+  const body=$('hpSection').closest('.section-body');
+  const h=body&&document.querySelector('h2[aria-controls="'+body.id+'"]');
+  if(h&&h.classList.contains('collapsed'))h.click();
+  requestAnimationFrame(()=>$('hpSection').scrollIntoView({behavior:'smooth',block:'center'}));
+});
 $('charName').addEventListener('input',updateStickyHeader);
 
 /* ===== TEMA CLARO/ESCURO ===== */
@@ -3110,7 +3172,7 @@ if(!tryLoadFromURL()){/* localStorage already loaded */}
 // Link colado na mesma aba só troca o "#": a página não recarrega, então escuta a mudança
 window.addEventListener('hashchange',tryLoadFromURL);
 refreshHP();refreshSP();updateFama();
-updateStickyHeader();
+updateStickyHeader();checkStickyScroll();
 updateCondBadge(parseInt($('condSlider').value)||0);
 updatePassives();
 sortSkills();
