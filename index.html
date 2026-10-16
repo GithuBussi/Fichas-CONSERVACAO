@@ -25,7 +25,9 @@ body {
   min-height: 100vh;
   padding: 12px;
   display: flex;
-  justify-content: center;
+  flex-direction: column; /* bolinhas dos personagens em cima, folha embaixo */
+  align-items: center;
+  justify-content: flex-start;
 }
 .card {
   background: #22222c;
@@ -768,6 +770,16 @@ body.light .coll-card.armor-card { background: color-mix(in srgb, var(--c-sab) 9
   display: flex; align-items: center; justify-content: center; cursor: pointer; transition: transform .15s;
 }
 .char-del:hover { transform: scale(1.15); background: #ff5f5e; }
+/* Com mouse: o ✕ só aparece com o mouse em cima (ou se o personagem estiver selecionado).
+   Sem mouse (celular): só nos selecionados, depois de segurar o dedo na bolinha. */
+@media (hover: hover) {
+  .char-del { opacity: 0; pointer-events: none; transition: opacity .15s, transform .15s; }
+  .char-item:hover .char-del, .char-item:focus-within .char-del, .char-item.sel .char-del { opacity: 1; pointer-events: auto; }
+}
+@media (hover: none) { .char-item:not(.sel) .char-del { display: none; } }
+/* Bolinhas fora da folha, logo acima dela, no fundo da página */
+.chars-wrap { width: 100%; max-width: 580px; display: flex; flex-direction: column; gap: 8px; margin-bottom: 10px; }
+.chars-wrap .chars-bar { margin: 0; padding: 6px 10px 2px; }
 body.light .char-del { border-color: #fff; }
 /* Botão da lixeira: pequeno, no canto inferior esquerdo, acompanha a rolagem */
 .trash-fab {
@@ -997,11 +1009,13 @@ textarea.autogrow { resize: none; overflow: hidden; }
   </div>
 </div>
 
-<div class="card">
+<!-- PERSONAGENS (bolinhas no estilo stories), fora da folha -->
+<div class="chars-wrap">
+  <div class="chars-bar" id="charsBar" aria-label="Seus personagens"></div>
+  <div class="char-menu" id="charMenu" hidden></div>
+</div>
 
-<!-- PERSONAGENS (bolinhas no estilo stories) -->
-<div class="chars-bar" id="charsBar" aria-label="Seus personagens"></div>
-<div class="char-menu" id="charMenu" hidden></div>
+<div class="card">
 
 <!-- TABS -->
 <div class="tabs">
@@ -3039,9 +3053,9 @@ function renderChars(){
     // Segurar o dedo (celular) também seleciona
     b.addEventListener('pointerdown',e=>{if(e.pointerType==='mouse')return;clearTimeout(b._lpT);b._lpT=setTimeout(()=>{b._longPress=true;toggleSelect(c.id);if(navigator.vibrate)navigator.vibrate(15);},550);});
     ['pointerup','pointerleave','pointercancel'].forEach(ev=>b.addEventListener(ev,()=>clearTimeout(b._lpT)));
-    const item=document.createElement('div');item.className='char-item';item.appendChild(b);
-    // ✕ vermelho no aberto e nos selecionados
-    if(isCur||sel){
+    const item=document.createElement('div');item.className='char-item'+(sel?' sel':'');item.appendChild(b);
+    // ✕ vermelho no aberto e nos selecionados (no computador só aparece com o mouse em cima)
+    {
       const x=document.createElement('button');x.className='char-del';x.textContent='✕';
       const n=new Set([...selectedChars,c.id]).size;
       x.title=selectedChars.size&&n>1?'Excluir os '+n+' personagens selecionados':'Excluir '+(c.name||'este personagem');
