@@ -877,6 +877,90 @@ body.light h2.section-toggle:hover { color: #4a6adf; }
 body.light .skill-sort-btn { border-color: #ccc; color: #666; }
 body.light .skill-sort-btn.active { border-color: #4a6adf; color: #4a6adf; background: rgba(74,106,223,0.1); }
 
+/* ===== TEMA: uma paleta só, preenchida por cada modo (escuro e claro) =====
+   A moldura (fundo da página + folha) tem mais presença; o conteúdo fica em blocos
+   discretos. Cores de destaque em tom médio: sem brilhos atrás dos números.
+   Os seletores usam :is(body,body.light) para valer por cima das regras antigas do tema
+   claro sem precisar apagá-las. */
+:root {
+  --bg: #0e0e13; --frame: #1f1f29; --frame-edge: rgba(255,255,255,0.08);
+  --surface: #191921; --surface-2: #2a2a36; --border: #353541; --track: #3a3a46;
+  --text: #f0f0f0; --text-2: #cfcfda; --muted: #8b8b9a;
+  --accent: #7b93ff; --accent-soft: rgba(123,147,255,0.12);
+  --danger: #e5605f; --ok: #5cbf60; --sp: #a77bff; --des-ink: #7ed957;
+}
+body.light {
+  --bg: #dde0ea; --frame: #ffffff; --frame-edge: rgba(30,30,80,0.10);
+  --surface: #f3f4f8; --surface-2: #e5e7ef; --border: #d3d6e1; --track: #cdd0dc;
+  --text: #1a1a2e; --text-2: #34344a; --muted: #67677c;
+  --accent: #4760d6; --accent-soft: rgba(71,96,214,0.09);
+  --danger: #c63b3a; --ok: #2e8a34; --sp: #7a45d6; --des-ink: #3d8a1c;
+}
+:is(body,body.light) { background: var(--bg); color: var(--text); }
+/* Moldura: borda, sombra mais funda e uma faixa fina com as cores dos atributos no topo */
+:is(body,body.light) .card {
+  background: var(--frame); border: 1px solid var(--frame-edge); position: relative;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.55), 0 2px 0 rgba(255,255,255,0.03) inset;
+}
+body.light .card { box-shadow: 0 14px 44px rgba(30,30,80,0.16); }
+.card::before {
+  content: ''; position: absolute; top: 0; left: 18px; right: 18px; height: 3px; border-radius: 0 0 3px 3px;
+  background: linear-gradient(90deg, var(--c-for), var(--c-con), var(--c-car), var(--c-des), var(--c-sab), var(--c-int), var(--c-sp));
+  opacity: .9;
+}
+/* Blocos internos: mesmo fundo e borda nos dois modos, sem sombra (o destaque é da moldura) */
+:is(body,body.light) :is(.quick-dmg, .load-readout, .tech-skill-total, .tech-sp-indicator, .photo-box, .passive-box,
+  .combat-box, .session-box, .fama-bar, .dmg-limit-box, .res-row, .coll-card, .special-box, .char-menu) {
+  background: var(--surface); border-color: var(--border); box-shadow: none;
+}
+:is(body,body.light) .death-dot { background: var(--surface); border-color: var(--border); }
+:is(body,body.light) .death-dot.marked { border-color: var(--danger); color: var(--danger); background: color-mix(in srgb, var(--danger) 12%, var(--surface)); box-shadow: none; }
+:is(body,body.light) .load-readout.over { color: var(--danger); border-color: var(--danger); }
+:is(body,body.light) .attr-box { background: color-mix(in srgb, var(--ac) 10%, var(--surface)); border-color: color-mix(in srgb, var(--ac) 32%, var(--border)); box-shadow: none; }
+:is(body,body.light) .def-card { background: color-mix(in srgb, var(--dc, #6c8cff) 8%, var(--surface)); border-color: color-mix(in srgb, var(--dc, #6c8cff) 30%, var(--border)); box-shadow: none; }
+:is(body,body.light) .coll-card.weapon-card { background: color-mix(in srgb, var(--c-for) 8%, var(--surface)); border-color: color-mix(in srgb, var(--c-for) 32%, var(--border)); }
+:is(body,body.light) .coll-card.armor-card { background: color-mix(in srgb, var(--c-sab) 8%, var(--surface)); border-color: color-mix(in srgb, var(--c-sab) 32%, var(--border)); }
+:is(body,body.light) .special-box { background: var(--accent-soft); border: 1px solid color-mix(in srgb, var(--accent) 40%, var(--border)); }
+:is(body,body.light) .coll-badge { background: var(--surface-2); color: var(--muted); }
+:is(body,body.light) .fama-pip { background: var(--surface-2); }
+:is(body,body.light) .fama-pip.active { background: var(--c-car); }
+/* Sem brilho atrás dos números (atrapalhava a leitura) */
+:is(body,body.light) :is(.def-total-box, .tech-skill-total) { text-shadow: none; background: transparent; }
+:is(body,body.light) .tech-sp-indicator { color: var(--sp); border-color: color-mix(in srgb, var(--sp) 45%, var(--border)); }
+:is(body,body.light) .passive-value { color: var(--accent); }
+/* No claro, números coloridos ficam num tom mais escuro da mesma cor, para dar contraste */
+body.light .attr-box input { color: color-mix(in srgb, var(--ac) 72%, #000); }
+body.light .def-total-box { color: color-mix(in srgb, var(--dc, #4760d6) 72%, #000); }
+body.light .skill-total { color: color-mix(in srgb, var(--sc, #4760d6) 72%, #000); }
+/* Textos */
+:is(body,body.light) h2 { color: var(--text); border-color: var(--border); }
+:is(body,body.light) :is(label.title, .combat-box label, .dmg-limit-box) { color: var(--text-2); }
+:is(body,body.light) :is(label.sub, .field label, .quick-dmg label, .maxrow, .combat-box .unit, .passive-box > label,
+  .passive-detail, .temp-hint, .hint, .autosave-row, .autosave-status, .money-top label) { color: var(--muted); }
+:is(body,body.light) .tab-btn { color: var(--muted); }
+/* Controles: barra dos sliders e bolinha sem brilho */
+:is(body,body.light) input[type="range"] { background: var(--track); }
+:is(body,body.light) input[type="range"]::-webkit-slider-thumb { background: var(--accent); box-shadow: none; }
+/* Botões em tom médio: cor no texto e na borda, com um fundo bem leve da mesma cor */
+:is(body,body.light) .q-btn.dmg { color: var(--danger); border-color: var(--danger); background: color-mix(in srgb, var(--danger) 8%, transparent); }
+:is(body,body.light) .q-btn.heal { color: var(--ok); border-color: var(--ok); background: color-mix(in srgb, var(--ok) 8%, transparent); }
+:is(body,body.light) .q-btn.sp-use { color: var(--sp); border-color: var(--sp); background: color-mix(in srgb, var(--sp) 8%, transparent); }
+:is(body,body.light) .q-btn.sp-heal { color: var(--des-ink); border-color: var(--des-ink); background: color-mix(in srgb, var(--des-ink) 8%, transparent); }
+:is(body,body.light) .primary-btn { background: var(--accent); }
+:is(body,body.light) .secondary-btn { border-color: color-mix(in srgb, var(--accent) 60%, var(--border)); color: var(--accent); }
+:is(body,body.light) .s-btn { border-color: var(--border); color: var(--text-2); }
+:is(body,body.light) .s-btn.active { border-color: var(--accent); color: var(--accent); }
+:is(body,body.light) .add-btn { border-color: var(--border); color: var(--muted); }
+:is(body,body.light) .add-btn:hover { border-color: var(--accent); color: var(--accent); }
+:is(body,body.light) #stickyHeader { background: color-mix(in srgb, var(--frame) 94%, transparent); border-color: var(--border); }
+:is(body,body.light) .trash-fab { background: var(--frame); border-color: var(--border); color: var(--text-2); }
+:is(body,body.light) .modal-box { background: var(--frame); border-color: var(--border); }
+:is(body,body.light) .char-ring { background: var(--surface); }
+body.light .temp-row input[type="number"], body.light .temp-tag { color: #127a88; }
+:is(body,body.light) .attr-box input { background: transparent; border: none; }
+:is(body,body.light) .tabs { border-bottom-color: var(--border); }
+:is(body,body.light) :is(.skill-header, .res-header) { border-bottom-color: var(--border); color: var(--muted); }
+
 /* CAIXAS DE TEXTO crescem com o conteúdo */
 textarea.autogrow { resize: none; overflow: hidden; }
 </style>
