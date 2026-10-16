@@ -347,7 +347,14 @@ body.death-3 #deathClose { opacity: 1; transform: scale(1); transition: transfor
 body.no-death-anim #deathVignette, body.no-death-anim #deathClose { display: none; }
 body.no-death-anim #deathOverlay.d3 { transition: background 2.5s ease; }
 body.no-death-anim #deathOverlay.d3 .death-content { transform: none; transition: opacity 4s cubic-bezier(.4,0,.2,1) .8s; }
-.death-anim-row { display: flex; justify-content: center; margin-top: -6px; }
+/* Chave pequena de animação, no canto superior direito da seção, logo abaixo da linha */
+.death-anim-row { display: flex; justify-content: flex-end; align-items: center; gap: 6px; margin: -10px 0 -14px; font-size: 11px; color: var(--muted, #888); }
+.death-anim-row label { cursor: pointer; }
+.switch { position: relative; width: 30px; height: 17px; border-radius: 9px; padding: 0; border: none; background: var(--track, #3a3a46); cursor: pointer; transition: background .2s; }
+.switch .knob { position: absolute; top: 2px; left: 2px; width: 13px; height: 13px; border-radius: 50%; background: #fff; transition: transform .2s; box-shadow: 0 1px 2px rgba(0,0,0,0.3); }
+.switch.on { background: var(--accent, #6c8cff); }
+.switch.on .knob { transform: translateX(13px); }
+.switch:focus-visible { outline: 2px solid var(--accent, #6c8cff); outline-offset: 2px; }
 
 /* SKILLS */
 .skill-table { display: flex; flex-direction: column; gap: 4px; }
@@ -881,8 +888,14 @@ body.light .char-menu { background: #e8e8f2; border-color: #ccc; }
 body.light .modal-box { background: #fff; border-color: #ddd; }
 body.light .modal-box p { color: #555; }
 
+/* ESPAÇAMENTO por proximidade: o que é do mesmo bloco fica junto, blocos diferentes se
+   afastam. Título → conteúdo 12px; entre blocos da seção 14px; entre seções 30px. */
+.tab-content.active { gap: 12px; }
+.section-body + h2 { margin-top: 18px; }
+#spSection { margin-top: 8px; }
+
 /* SEÇÕES QUE ABREM E FECHAM */
-.section-body { display: flex; flex-direction: column; gap: 18px; }
+.section-body { display: flex; flex-direction: column; gap: 14px; }
 .section-body[hidden] { display: none; }
 h2.section-toggle { cursor: pointer; user-select: none; border-radius: 4px; }
 h2.section-toggle:hover { color: #9fb4ff; }
@@ -1204,15 +1217,16 @@ textarea.autogrow { resize: none; overflow: hidden; }
 </div>
 
 <h2><span class="ico">☠</span>Marcas de morte</h2>
+<div class="death-anim-row" title="Liga ou desliga a animação das marcas de morte (bordas vermelhas e fumaça)">
+  <label for="deathAnimToggle">Animação</label>
+  <button class="switch" id="deathAnimToggle" role="switch" aria-checked="true" title="Liga ou desliga a animação das marcas de morte (bordas vermelhas e fumaça)"><span class="knob"></span></button>
+</div>
 <div class="death-row">
   <div class="death-dot" data-i="0" role="button" tabindex="0" aria-pressed="false" aria-label="1ª marca de morte" title="1ª marca de morte: clique para marcar ou desmarcar">✕</div>
   <div class="death-dot" data-i="1" role="button" tabindex="0" aria-pressed="false" aria-label="2ª marca de morte" title="2ª marca de morte: as bordas da tela ficam vermelhas">✕</div>
   <div class="death-dot" data-i="2" role="button" tabindex="0" aria-pressed="false" aria-label="3ª marca de morte" title="3ª marca de morte: o personagem cai em combate">✕</div>
 </div>
 <p id="deathMsg">Personagem morto</p>
-<div class="death-anim-row">
-  <button class="s-btn" id="deathAnimToggle" aria-pressed="true" title="Ativar ou desativar a animação das marcas de morte (bordas vermelhas e fumaça)">✦ Animação: ligada</button>
-</div>
 
 <h2><span class="ico">◉</span>Passivas</h2>
 <div class="passives-grid">
@@ -1951,9 +1965,8 @@ let deathAnimOn=true;
 function applyDeathAnim(){
   document.body.classList.toggle('no-death-anim',!deathAnimOn);
   const b=$('deathAnimToggle');
-  b.textContent=deathAnimOn?'✦ Animação: ligada':'✧ Animação: desligada';
-  b.setAttribute('aria-pressed',deathAnimOn?'true':'false');
-  b.classList.toggle('active',deathAnimOn);
+  b.setAttribute('aria-checked',deathAnimOn?'true':'false');
+  b.classList.toggle('on',deathAnimOn);
 }
 $('deathAnimToggle').addEventListener('click',()=>{
   deathAnimOn=!deathAnimOn;
