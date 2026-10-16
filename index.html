@@ -743,14 +743,57 @@ body.light .coll-card.armor-card { background: color-mix(in srgb, var(--c-sab) 9
 
 /* PERSONAGENS: bolinhas no estilo stories, deslizam para o lado quando não cabem */
 .chars-bar {
-  display: flex; gap: 12px; overflow-x: auto; scroll-snap-type: x proximity;
-  padding: 2px 2px 4px; margin-bottom: -6px; scrollbar-width: none;
+  display: flex; gap: 12px; overflow-x: auto; scroll-snap-type: x proximity; scroll-behavior: smooth;
+  padding: 6px 14px 4px; margin: 0 -14px -6px; scrollbar-width: none;
+  /* bordas esmaecidas: dá a ideia de que há mais bolinhas passando para o lado */
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 14px, #000 calc(100% - 14px), transparent);
+  mask-image: linear-gradient(to right, transparent, #000 14px, #000 calc(100% - 14px), transparent);
 }
 .chars-bar::-webkit-scrollbar { display: none; }
+.char-item { position: relative; flex: 0 0 auto; scroll-snap-align: center; }
 .char-story {
-  flex: 0 0 auto; width: 62px; display: flex; flex-direction: column; align-items: center; gap: 4px;
-  background: none; border: none; padding: 0; color: #aaa; font-size: 11px; scroll-snap-align: start;
+  width: 62px; display: flex; flex-direction: column; align-items: center; gap: 4px;
+  background: none; border: none; padding: 0; color: #aaa; font-size: 11px;
 }
+.char-story .char-ring { transition: transform .3s cubic-bezier(.2,.8,.2,1), border-color .3s, box-shadow .3s, opacity .3s; }
+.char-story:hover .char-ring { transform: scale(1.06); }
+.char-story:active .char-ring { transform: scale(0.94); }
+.char-story.just-opened .char-ring { animation: story-open .45s cubic-bezier(.2,.8,.2,1); }
+@keyframes story-open { 0% { transform: scale(.82); opacity: .4; } 100% { transform: scale(1); opacity: 1; } }
+.char-story.selected .char-ring { transform: scale(.9); box-shadow: 0 0 0 3px rgba(226,75,74,0.6); }
+.char-story.selected .char-name { color: #e24b4a; }
+.char-del {
+  position: absolute; top: -4px; right: 0; width: 20px; height: 20px; border-radius: 50%; padding: 0;
+  background: #e24b4a; color: #fff; border: 2px solid #22222c; font-size: 10px; font-weight: 900; line-height: 1;
+  display: flex; align-items: center; justify-content: center; cursor: pointer; transition: transform .15s;
+}
+.char-del:hover { transform: scale(1.15); background: #ff5f5e; }
+body.light .char-del { border-color: #fff; }
+/* Botão da lixeira: pequeno, no canto inferior esquerdo, acompanha a rolagem */
+.trash-fab {
+  position: fixed; left: 14px; bottom: 14px; z-index: 8500; width: 40px; height: 40px; border-radius: 50%;
+  background: #22222c; border: 1px solid #3a3a4a; color: #bbb; font-size: 17px; line-height: 1;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.45); opacity: .8; transition: opacity .2s, transform .2s;
+}
+.trash-fab:hover { opacity: 1; transform: scale(1.06); }
+.trash-count {
+  position: absolute; top: -4px; right: -4px; min-width: 18px; height: 18px; padding: 0 4px; border-radius: 9px;
+  background: #e24b4a; color: #fff; font-size: 10px; font-weight: 800; display: flex; align-items: center; justify-content: center;
+}
+.trash-count[hidden] { display: none; }
+body.light .trash-fab { background: #fff; border-color: #ccc; color: #555; }
+body { padding-bottom: 64px; }
+.trash-list { display: flex; flex-direction: column; gap: 10px; max-height: 55vh; overflow-y: auto; }
+.trash-row { display: flex; align-items: center; gap: 10px; }
+.trash-row .char-ring { width: 40px; height: 40px; flex: 0 0 auto; }
+.trash-row .char-initials { font-size: 13px; }
+.trash-info { flex: 1; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.trash-info strong { font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.trash-info span { font-size: 11px; color: #888; }
+.trash-empty { font-size: 13px; color: #888; }
+.danger-btn { background: #e24b4a; color: #fff; border: none; border-radius: 8px; padding: 11px 18px; font-size: 14px; font-weight: 700; }
+/* Folha e aba com o mesmo fundo: sem "caixa dentro da caixa" com outro tom de cinza */
+.tab-content.active { background: none; }
 .char-ring {
   position: relative; width: 54px; height: 54px; border-radius: 50%; padding: 2px;
   border: 2px solid #3a3a4a; background: #18181f; display: flex; align-items: center; justify-content: center;
@@ -781,7 +824,6 @@ body.light .coll-card.armor-card { background: color-mix(in srgb, var(--c-sab) 9
 .char-menu .s-btn.primary { border-color: #6c8cff; color: #9fb4ff; }
 .char-menu .s-btn.danger { border-color: rgba(226,75,74,0.6); color: #e24b4a; }
 .char-menu .s-btn.danger.confirm { background: #e24b4a; color: #fff; }
-.char-trash-title { flex-basis: 100%; font-size: 11px; color: #888; margin-top: 4px; }
 body.light .char-ring { background: #e8e8f2; border-color: #ccc; }
 body.light .char-story.active .char-name { color: #1a1a2e; }
 body.light .char-menu { background: #e8e8f2; border-color: #ccc; }
@@ -1236,6 +1278,29 @@ textarea.autogrow { resize: none; overflow: hidden; }
 <p class="hint">Dados salvos localmente neste navegador. Use Exportar JSON para backup.</p>
 
 </div><!-- /card -->
+
+<!-- Lixeira -->
+<button class="trash-fab" id="trashBtn" title="Lixeira" aria-label="Lixeira">🗑<span class="trash-count" id="trashCount" hidden></span></button>
+<div class="modal" id="trashModal" role="dialog" aria-modal="true" aria-labelledby="trashTitle" hidden>
+  <div class="modal-box">
+    <h3 id="trashTitle">🗑 Lixeira</h3>
+    <p>Personagens excluídos ficam aqui por 7 dias. Depois disso são apagados de vez.</p>
+    <div class="trash-list" id="trashList"></div>
+    <div class="modal-btns"><button class="s-btn" id="trashCloseBtn">Fechar</button></div>
+  </div>
+</div>
+
+<!-- Confirmação (excluir personagens) -->
+<div class="modal" id="confirmModal" role="alertdialog" aria-modal="true" aria-labelledby="confirmTitle" aria-describedby="confirmText" hidden>
+  <div class="modal-box">
+    <h3 id="confirmTitle"></h3>
+    <p id="confirmText"></p>
+    <div class="modal-btns">
+      <button class="danger-btn" id="confirmOkBtn"></button>
+      <button class="s-btn" id="confirmCancelBtn">Cancelar</button>
+    </div>
+  </div>
+</div>
 
 <!-- A ficha foi alterada em outra aba -->
 <div class="modal" id="staleModal" role="alertdialog" aria-modal="true" aria-labelledby="staleTitle" aria-describedby="staleText" hidden>
@@ -2671,7 +2736,7 @@ function initChars(){
   // Só grava a lista se algo mudou (migração ou recuperação). Abrir a ficha numa segunda
   // aba não pode, sozinho, avisar a primeira de que a ficha foi alterada.
   if(JSON.stringify(chars)!==before)saveCharsIndex();
-  renderChars();
+  renderChars();refreshTrashBtn();
 }
 /* Mais de uma aba: só uma pode gravar. Quando outra aba ou janela grava a ficha, esta
    para de salvar e pede para recarregar, em vez de gravar por cima do que a outra fez. */
@@ -2733,30 +2798,92 @@ function duplicateCurrent(){
   const d=getData();d.name=(d.name||'Personagem')+' (cópia)';
   if(createChar(d))showToast('✓ Cópia criada e aberta');
 }
-function deleteCurrent(){
+// Exclui um ou vários personagens. Primeiro todos vão para a lixeira; só depois de todos
+// gravados é que saem da lista (se faltar espaço no meio, nada é excluído).
+function deleteChars(ids){
   if(tabStale){showStale();return;}
-  const id=currentCharId,d=getData();
-  try{localStorage.setItem('rpgTrash:'+id,JSON.stringify({deletedAt:Date.now(),data:d}));}
-  catch(e){showToast('Sem espaço para mover para a lixeira.');return;}
-  chars.list=chars.list.filter(c=>c.id!==id);
+  ids=[...new Set(ids)];
+  const items=ids.map(id=>({id,data:id===currentCharId?(viewMode?readJSON('rpgSheet'):getData()):readJSON('rpgChar:'+id)})).filter(x=>x.data);
+  if(!items.length)return;
+  const now=Date.now(),written=[];
+  try{items.forEach(x=>{localStorage.setItem('rpgTrash:'+x.id,JSON.stringify({deletedAt:now,data:x.data}));written.push(x.id);});}
+  catch(e){written.forEach(id=>{try{localStorage.removeItem('rpgTrash:'+id);}catch(_){}});showToast('Sem espaço para mover para a lixeira.');return;}
+  items.forEach(x=>{if(x.id!==currentCharId)try{localStorage.removeItem('rpgChar:'+x.id);}catch(e){}});
+  const gone=new Set(items.map(x=>x.id));
+  chars.list=chars.list.filter(c=>!gone.has(c.id));
+  selectedChars.clear();
+  const msg=items.length>1?items.length+' personagens movidos para a lixeira':'Personagem movido para a lixeira';
+  refreshTrashBtn();
+  if(!gone.has(currentCharId)){saveCharsIndex();renderChars();showToast(msg);return;}
+  // O aberto foi excluído: abre o próximo da lista, ou começa um em branco se não sobrou nenhum
   const next=chars.list[0];
-  if(next&&openChar(next.id,false)){showToast('Personagem movido para a lixeira');return;}
-  // Era o único: começa um em branco no lugar
+  if(next&&openChar(next.id,false)){showToast(msg);return;}
+  leaveViewMode();
   currentCharId=newCharId();
   const blank=JSON.parse(JSON.stringify(blankSheet));blank._charId=currentCharId;
   try{localStorage.setItem('rpgSheet',JSON.stringify(blank));}catch(e){}
   chars.list=[metaFrom(blank,currentCharId)];chars.active=currentCharId;saveCharsIndex();
   loadFromData(blank);renderChars();closeCharMenu();
-  showToast('Personagem movido para a lixeira');
+  showToast(msg);
 }
 function restoreFromTrash(id){
   if(tabStale){showStale();return;}
   const t=readJSON('rpgTrash:'+id);if(!t)return;
   try{localStorage.setItem('rpgChar:'+id,JSON.stringify(t.data));localStorage.removeItem('rpgTrash:'+id);}
   catch(e){showToast('Sem espaço para restaurar.');return;}
-  chars.list.push(metaFrom(t.data,id));saveCharsIndex();renderChars();renderCharMenu();
+  chars.list.push(metaFrom(t.data,id));saveCharsIndex();renderChars();renderTrash();refreshTrashBtn();
   showToast('✓ '+(t.data.name||'Personagem')+' voltou para a lista');
 }
+
+/* Janela de confirmação (usada para excluir) */
+let confirmCb=null;
+function confirmBox(title,text,okLabel,cb){
+  $('confirmTitle').textContent=title;$('confirmText').textContent=text;$('confirmOkBtn').textContent=okLabel;
+  confirmCb=cb;$('confirmModal').hidden=false;$('confirmCancelBtn').focus(); // foco no Cancelar, por segurança
+}
+function closeConfirm(){$('confirmModal').hidden=true;confirmCb=null;}
+$('confirmOkBtn').addEventListener('click',()=>{const cb=confirmCb;closeConfirm();if(cb)cb();});
+$('confirmCancelBtn').addEventListener('click',closeConfirm);
+
+/* Seleção de vários personagens: Shift (ou Ctrl) + clique, ou segurar o dedo no celular */
+const selectedChars=new Set();
+function toggleSelect(id){if(selectedChars.has(id))selectedChars.delete(id);else selectedChars.add(id);renderChars();}
+function askDelete(id){
+  const ids=selectedChars.size?[...new Set([...selectedChars,id])]:[id];
+  const names=ids.map(i=>(chars.list.find(c=>c.id===i)||{}).name||'Sem nome');
+  const many=ids.length>1;
+  confirmBox(many?'Excluir '+ids.length+' personagens?':'Excluir '+names[0]+'?',
+    (many?names.join(', ')+' vão':names[0]+' vai')+' para a lixeira. Dá para restaurar por 7 dias pelo botão 🗑 no canto da tela.',
+    many?'Excluir os '+ids.length:'Excluir',()=>deleteChars(ids));
+}
+
+/* Lixeira: botão pequeno no canto inferior esquerdo e janela com os excluídos */
+function trashItems(){return lsKeys('rpgTrash:').map(k=>({id:k.slice(9),t:readJSON(k)})).filter(x=>x.t&&x.t.data).sort((a,b)=>b.t.deletedAt-a.t.deletedAt);}
+function refreshTrashBtn(){
+  const n=trashItems().length,c=$('trashCount');
+  c.hidden=!n;c.textContent=n;
+  $('trashBtn').title=n?'Lixeira: '+n+' personagem(ns) excluído(s)':'Lixeira (vazia)';
+  $('trashBtn').setAttribute('aria-label',$('trashBtn').title);
+}
+function renderTrash(){
+  const list=$('trashList');list.innerHTML='';
+  const items=trashItems();
+  if(!items.length){const p=document.createElement('p');p.className='trash-empty';p.textContent='A lixeira está vazia.';list.appendChild(p);return;}
+  items.forEach(x=>{
+    const d=x.t.data,dias=Math.max(0,Math.ceil((TRASH_MS-(Date.now()-x.t.deletedAt))/86400000));
+    const row=document.createElement('div');row.className='trash-row';
+    row.appendChild(storyRing({name:d.name,status:charStatus(d)},''));
+    const info=document.createElement('div');info.className='trash-info';
+    const nm=document.createElement('strong');nm.textContent=d.name||'Sem nome';info.appendChild(nm);
+    const sub=document.createElement('span');sub.textContent=[d.cls,d.level?'nível '+d.level:''].filter(Boolean).join(' · ')+(d.cls||d.level?' · ':'')+'apaga de vez em '+dias+' dia(s)';info.appendChild(sub);
+    row.appendChild(info);
+    const b=document.createElement('button');b.className='s-btn';b.textContent='↺ Restaurar';b.title='Volta '+(d.name||'este personagem')+' para a lista';
+    b.addEventListener('click',()=>restoreFromTrash(x.id));row.appendChild(b);
+    list.appendChild(row);
+  });
+}
+$('trashBtn').addEventListener('click',()=>{renderTrash();$('trashModal').hidden=false;$('trashCloseBtn').focus();});
+$('trashCloseBtn').addEventListener('click',()=>{$('trashModal').hidden=true;});
 /* Só visualizar a ficha de outra pessoa: nada é salvo até "Salvar" (que adiciona como novo) */
 function enterViewMode(data){
   flushAutoSave();
@@ -2791,37 +2918,63 @@ function storyRing(meta,thumb){
   return ring;
 }
 const statusText={ok:'',danger:' (em perigo)',dead:' (morto)'};
+let lastShownChar=null; // para animar e centralizar só quando o personagem aberto muda
 function renderChars(){
   const bar=$('charsBar');if(!bar)return;
   bar.innerHTML='';
+  const changed=lastShownChar!==(viewMode?'view':currentCharId);
+  lastShownChar=viewMode?'view':currentCharId;
   if(viewMode){
-    const b=document.createElement('button');b.className='char-story active viewing';
+    const b=document.createElement('button');b.className='char-story active viewing'+(changed?' just-opened':'');
     const d=getData();b.appendChild(storyRing({name:d.name,status:charStatus(d)},currentThumb()));
     const nm=document.createElement('span');nm.className='char-name';nm.textContent='👁 '+(d.name||'Ficha');b.appendChild(nm);
     b.title='Ficha de outra pessoa, só visualizando. Clique para ver as opções.';
-    b.addEventListener('click',toggleCharMenu);bar.appendChild(b);
+    b.addEventListener('click',toggleCharMenu);
+    const item=document.createElement('div');item.className='char-item';item.appendChild(b);bar.appendChild(item);
   }
   chars.list.forEach(c=>{
-    const b=document.createElement('button');b.className='char-story'+(c.id===currentCharId&&!viewMode?' active':'');
+    const isCur=c.id===currentCharId&&!viewMode,sel=selectedChars.has(c.id);
+    const b=document.createElement('button');
+    b.className='char-story'+(isCur?' active':'')+(sel?' selected':'')+(isCur&&changed?' just-opened':'');
     b.dataset.id=c.id;
-    const isCur=c.id===currentCharId&&!viewMode;
     b.appendChild(storyRing(c,isCur?currentThumb()||c.thumb:c.thumb));
     const nm=document.createElement('span');nm.className='char-name';nm.textContent=c.name||'Sem nome';b.appendChild(nm);
     const label=(c.name||'Personagem sem nome')+(c.cls?', '+c.cls:'')+(c.level?' nível '+c.level:'')+statusText[c.status||'ok'];
-    if(isCur){b.title=label+'. Clique para ver as opções.';b.setAttribute('aria-current','true');b.addEventListener('click',toggleCharMenu);}
-    else if(viewMode&&c.id===currentCharId){b.title='Voltar para '+label;b.addEventListener('click',backToMine);}
-    else{b.title='Abrir '+label;b.addEventListener('click',()=>openChar(c.id));}
-    b.setAttribute('aria-label',b.title);
-    bar.appendChild(b);
+    let action;
+    if(isCur){b.title=label+'. Clique para duplicar. Shift+clique para selecionar.';b.setAttribute('aria-current','true');action=toggleCharMenu;}
+    else if(viewMode&&c.id===currentCharId){b.title='Voltar para '+label;action=backToMine;}
+    else{b.title='Abrir '+label+'. Shift+clique para selecionar vários.';action=()=>openChar(c.id);}
+    if(sel)b.title=label+' (selecionado). Shift+clique para tirar da seleção.';
+    b.setAttribute('aria-label',b.title);b.setAttribute('aria-pressed',sel?'true':'false');
+    b.addEventListener('click',e=>{
+      if(b._longPress){b._longPress=false;return;}
+      if(e.shiftKey||e.ctrlKey||e.metaKey){toggleSelect(c.id);return;}
+      if(selectedChars.size){selectedChars.clear();renderChars();}
+      action();
+    });
+    // Segurar o dedo (celular) também seleciona
+    b.addEventListener('pointerdown',e=>{if(e.pointerType==='mouse')return;clearTimeout(b._lpT);b._lpT=setTimeout(()=>{b._longPress=true;toggleSelect(c.id);if(navigator.vibrate)navigator.vibrate(15);},550);});
+    ['pointerup','pointerleave','pointercancel'].forEach(ev=>b.addEventListener(ev,()=>clearTimeout(b._lpT)));
+    const item=document.createElement('div');item.className='char-item';item.appendChild(b);
+    // ✕ vermelho no aberto e nos selecionados
+    if(isCur||sel){
+      const x=document.createElement('button');x.className='char-del';x.textContent='✕';
+      const n=new Set([...selectedChars,c.id]).size;
+      x.title=selectedChars.size&&n>1?'Excluir os '+n+' personagens selecionados':'Excluir '+(c.name||'este personagem');
+      x.setAttribute('aria-label',x.title);
+      x.addEventListener('click',e=>{e.stopPropagation();askDelete(c.id);});
+      item.appendChild(x);
+    }
+    bar.appendChild(item);
   });
   const add=document.createElement('button');add.className='char-story char-add';
   add.innerHTML='<span class="char-ring">+</span><span class="char-name">Novo</span>';
   add.title='Criar um novo personagem em branco';add.setAttribute('aria-label',add.title);
   add.addEventListener('click',()=>{if(createChar())showToast('✓ Novo personagem criado');});
-  bar.appendChild(add);
-  const act=bar.querySelector('.char-story.active');if(act)act.scrollIntoView({block:'nearest',inline:'nearest'});
+  const addItem=document.createElement('div');addItem.className='char-item';addItem.appendChild(add);bar.appendChild(addItem);
+  if(changed){const act=bar.querySelector('.char-story.active');if(act)act.scrollIntoView({behavior:'smooth',block:'nearest',inline:'center'});}
 }
-/* Menu do personagem aberto: duplicar, excluir e lixeira */
+/* Menu do personagem aberto (duplicar) ou da ficha só visualizada */
 function renderCharMenu(){
   const m=$('charMenu');m.innerHTML='';
   const btn=(txt,title,cls,fn)=>{const b=document.createElement('button');b.className='s-btn '+(cls||'');b.textContent=txt;b.title=title;b.addEventListener('click',fn);m.appendChild(b);return b;};
@@ -2831,29 +2984,28 @@ function renderCharMenu(){
     return;
   }
   btn('⧉ Duplicar','Cria uma cópia deste personagem e abre a cópia','',duplicateCurrent);
-  const del=btn('🗑 Excluir','Move este personagem para a lixeira (dá para restaurar por 7 dias)','danger',()=>{
-    if(!del.classList.contains('confirm')){del.classList.add('confirm');del.textContent='Confirmar exclusão?';
-      clearTimeout(del._t);del._t=setTimeout(()=>{del.classList.remove('confirm');del.textContent='🗑 Excluir';},3000);return;}
-    deleteCurrent();
-  });
-  const trash=lsKeys('rpgTrash:').map(k=>({id:k.slice(9),t:readJSON(k)})).filter(x=>x.t);
-  if(trash.length){
-    const lab=document.createElement('div');lab.className='char-trash-title';lab.textContent='Lixeira (some depois de 7 dias):';m.appendChild(lab);
-    trash.sort((a,b)=>b.t.deletedAt-a.t.deletedAt).forEach(x=>{
-      const dias=Math.max(0,Math.ceil((TRASH_MS-(Date.now()-x.t.deletedAt))/86400000));
-      btn('↺ '+(x.t.data.name||'Sem nome'),'Restaurar este personagem (apaga de vez em '+dias+' dia(s))','',()=>restoreFromTrash(x.id));
-    });
-  }
 }
 function toggleCharMenu(){const m=$('charMenu');if(m.hidden){renderCharMenu();m.hidden=false;}else m.hidden=true;}
 function closeCharMenu(){$('charMenu').hidden=true;}
 $('charPhoto').addEventListener('load',()=>{if(!viewMode)renderChars();});
-// No computador, a rodinha do mouse desliza as bolinhas para o lado
+// No computador, a rodinha do mouse desliza as bolinhas para o lado, suavemente
 $('charsBar').addEventListener('wheel',e=>{
   const b=$('charsBar');if(b.scrollWidth<=b.clientWidth||Math.abs(e.deltaX)>Math.abs(e.deltaY))return;
-  e.preventDefault();b.scrollLeft+=e.deltaY;
+  e.preventDefault();
+  const max=b.scrollWidth-b.clientWidth;
+  if(b._target==null||Math.abs(b._target-b.scrollLeft)>b.clientWidth)b._target=b.scrollLeft;
+  b._target=Math.max(0,Math.min(max,b._target+e.deltaY*1.2));
+  b.scrollTo({left:b._target,behavior:'smooth'});
 },{passive:false});
-document.addEventListener('keydown',e=>{if(e.key!=='Escape')return;if(!$('incomingModal').hidden)closeIncoming();else closeCharMenu();});
+$('charsBar').addEventListener('contextmenu',e=>{if(e.target.closest('.char-story'))e.preventDefault();});
+document.addEventListener('keydown',e=>{
+  if(e.key!=='Escape')return;
+  if(!$('confirmModal').hidden)closeConfirm();
+  else if(!$('trashModal').hidden)$('trashModal').hidden=true;
+  else if(!$('incomingModal').hidden)closeIncoming();
+  else if(selectedChars.size){selectedChars.clear();renderChars();}
+  else closeCharMenu();
+});
 
 initChars();
 if(!tryLoadFromURL()){/* localStorage already loaded */}
