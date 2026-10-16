@@ -275,8 +275,8 @@ body.light .temp-tag { color: #127a88; }
 }
 #deathOverlay.d3 { background: rgba(0,0,0,0.88); pointer-events: all; }
 /* Texto e botão entram juntos, devagar e com zoom (depois da fumaça fechar), e saem rápido */
-#deathOverlay { transition: background .3s ease; }
-#deathOverlay.d3 { transition: background 3s ease 2s; }
+#deathOverlay { transition: background .3s ease, visibility 0s linear .3s; }
+#deathOverlay.d3 { transition: background 3s ease 2s, visibility 0s; }
 .death-content {
   width: 100%; display: flex; flex-direction: column; align-items: center; gap: 14px;
   padding: 34px 16px 30px; text-align: center;
@@ -301,6 +301,15 @@ body.light .temp-tag { color: #127a88; }
 }
 #deathUndoBtn:hover { border-color: #e24b4a; color: #fff; }
 #deathOverlay.d3 #deathUndoBtn { pointer-events: all; }
+.death-btns { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
+#deathViewBtn {
+  background: transparent; color: #9a8f86; border: 1px solid transparent; border-radius: 6px;
+  padding: 9px 16px; font-size: 13px; cursor: pointer; margin-top: 6px;
+}
+#deathViewBtn:hover { color: #d8cfc6; border-color: rgba(216,207,198,0.3); }
+/* Tela de morte fechada: some também para o teclado e para leitores de tela */
+#deathOverlay { visibility: hidden; }
+#deathOverlay.d3 { visibility: visible; }
 
 /* MARCAS DA MORTE: 2ª marca = bordas vermelhas se movendo; 3ª = a fumaça fecha em volta */
 #deathVignette, #deathClose { position: fixed; pointer-events: none; opacity: 0; }
@@ -335,6 +344,9 @@ body.light .temp-tag { color: #127a88; }
   50%  { transform: translate(-2%,1%) scale(0.98) rotate(-1.4deg); }
   100% { transform: translate(1.2%,-1.8%) scale(1.04) rotate(0.8deg); }
 }
+#deathVignette::before, #deathVignette::after { animation-play-state: paused; }
+body.death-2 #deathVignette::before, body.death-2 #deathVignette::after,
+body.death-3 #deathVignette::before, body.death-3 #deathVignette::after { animation-play-state: running; }
 body.death-2 #deathVignette { opacity: 0.6; transition: opacity 2.5s ease; }
 body.death-3 #deathVignette { opacity: 1; transition: opacity 2.5s ease; }
 #deathClose {
@@ -345,7 +357,7 @@ body.death-3 #deathVignette { opacity: 1; transition: opacity 2.5s ease; }
 body.death-3 #deathClose { opacity: 1; transform: scale(1); transition: transform 3.5s cubic-bezier(.55,0,.35,1), opacity 1.5s ease; }
 /* Animação desligada: sem bordas nem fumaça; a tela final aparece sem zoom */
 body.no-death-anim #deathVignette, body.no-death-anim #deathClose { display: none; }
-body.no-death-anim #deathOverlay.d3 { transition: background 2.5s ease; }
+body.no-death-anim #deathOverlay.d3 { transition: background 2.5s ease, visibility 0s; }
 body.no-death-anim #deathOverlay.d3 .death-content { transform: none; transition: opacity 4s cubic-bezier(.4,0,.2,1) .8s; }
 /* Chave pequena de animação, no canto superior direito da seção, logo abaixo da linha */
 .death-anim-row { display: flex; justify-content: flex-end; align-items: center; gap: 6px; margin: -10px 0 -14px; font-size: 11px; color: var(--muted, #888); }
@@ -571,7 +583,7 @@ body.light .money-top input[type="number"] { color: #8a7a00; }
   width: 42px; height: 34px; font-size: 22px; line-height: 1;
 }
 .diary-nav-btn:disabled { opacity: .3; cursor: default; }
-.diary-page-label { font-size: 12px; color: #888; font-weight: 700; }
+.diary-page-label { font-size: 12px; color: var(--muted, #888); font-weight: 700; }
 .diary-book {
   position: relative; display: flex; align-items: flex-start; gap: 12px;
   overflow-x: auto; scroll-snap-type: x mandatory; scroll-behavior: smooth;
@@ -639,7 +651,7 @@ button { cursor: pointer; }
   border-radius: 8px; padding: 10px 20px; font-size: 13px; font-weight: 700;
   box-shadow: 0 4px 20px rgba(0,0,0,0.5);
   opacity: 0; pointer-events: none; transition: opacity .25s, transform .25s;
-  z-index: 10000;
+  z-index: 10002; /* por cima das janelas (modais) */
 }
 #toastBox.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
@@ -719,7 +731,9 @@ body.light .cond-badge.cond-3 { background: rgba(226,75,74,0.15); }
 /* BLOCOS TINGIDOS: a cor do atributo vira um fundo sutil no bloco todo, no lugar da faixa lateral */
 .attr-box { border: 1px solid color-mix(in srgb, var(--ac) 35%, #3a3a4a); background: color-mix(in srgb, var(--ac) 10%, #18181f); box-shadow: none; }
 .def-card { border: 1px solid color-mix(in srgb, var(--dc, #6c8cff) 30%, #3a3a4a); background: color-mix(in srgb, var(--dc, #6c8cff) 8%, #18181f); box-shadow: none; }
-.skill-row { border: none; border-radius: 6px; background: color-mix(in srgb, var(--sc, #444) 8%, transparent); }
+@supports (background: color-mix(in srgb, red 50%, blue)) {
+  .skill-row { border: none; border-radius: 6px; background: color-mix(in srgb, var(--sc, #444) 8%, transparent); }
+}
 .skill-row:hover { background: color-mix(in srgb, var(--sc, #444) 14%, transparent); }
 .coll-card.weapon-card { border: 1px solid color-mix(in srgb, var(--c-for) 30%, #3a3a4a); background: color-mix(in srgb, var(--c-for) 7%, #18181f); }
 .coll-card.armor-card { border: 1px solid color-mix(in srgb, var(--c-sab) 30%, #3a3a4a); background: color-mix(in srgb, var(--c-sab) 7%, #18181f); }
@@ -764,6 +778,9 @@ body.light .coll-card.armor-card { background: color-mix(in srgb, var(--c-sab) 9
   width: 62px; display: flex; flex-direction: column; align-items: center; gap: 4px;
   background: none; border: none; padding: 0; color: #aaa; font-size: 11px;
 }
+/* iPhone: segurar o dedo não abre a prévia da imagem nem seleciona texto */
+.char-story { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; }
+.char-ring img { pointer-events: none; -webkit-user-drag: none; }
 .char-story .char-ring { transition: transform .3s cubic-bezier(.2,.8,.2,1), border-color .3s, box-shadow .3s, opacity .3s; }
 .char-story:hover .char-ring { transform: scale(1.06); }
 .char-story:active .char-ring { transform: scale(0.94); }
@@ -840,8 +857,10 @@ body { padding-bottom: 84px; } /* espaço para a lixeira e os anéis de vida no 
 .trash-row .char-initials { font-size: 13px; }
 .trash-info { flex: 1; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
 .trash-info strong { font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.trash-info span { font-size: 11px; color: #888; }
+.trash-info span { font-size: 11px; color: var(--muted, #888); }
 .trash-empty { font-size: 13px; color: #888; }
+:is(body,body.light) .trash-empty-btn { color: var(--danger); border-color: color-mix(in srgb, var(--danger) 45%, var(--border)); margin-left: auto; }
+.trash-empty-btn[disabled] { opacity: .4; cursor: default; }
 .danger-btn { background: #e24b4a; color: #fff; border: none; border-radius: 8px; padding: 11px 18px; font-size: 14px; font-weight: 700; }
 /* Folha e aba com o mesmo fundo: sem "caixa dentro da caixa" com outro tom de cinza */
 .tab-content.active { background: none; }
@@ -897,13 +916,17 @@ body.light .modal-box p { color: #555; }
 /* SEÇÕES QUE ABREM E FECHAM */
 .section-body { display: flex; flex-direction: column; gap: 14px; }
 .section-body[hidden] { display: none; }
-h2.section-toggle { cursor: pointer; user-select: none; border-radius: 4px; }
-h2.section-toggle:hover { color: #9fb4ff; }
-h2.section-toggle:focus-visible { outline: 2px solid #6c8cff; outline-offset: 3px; }
+h2.section-toggle { user-select: none; }
+.section-btn {
+  display: flex; align-items: center; gap: 7px; width: 100%; padding: 0; margin: 0; border: none; background: none;
+  color: inherit; font: inherit; letter-spacing: inherit; text-transform: inherit; text-align: left; cursor: pointer; border-radius: 4px;
+}
+.section-btn:hover { color: #9fb4ff; }
+.section-btn:focus-visible { outline: 2px solid #6c8cff; outline-offset: 3px; }
 .section-chev { display: inline-block; margin-left: auto; font-size: 13px; opacity: .55; transition: transform .2s ease; }
 h2.collapsed .section-chev { transform: rotate(-90deg); }
 h2.collapsed { opacity: .75; }
-body.light h2.section-toggle:hover { color: #4a6adf; }
+body.light .section-btn:hover { color: #4a6adf; }
 .coll-header:focus-visible, .death-dot:focus-visible, .photo-box:focus-visible { outline: 2px solid #6c8cff; outline-offset: 2px; }
 
 /* ORGANIZAR PERÍCIAS */
@@ -1018,6 +1041,12 @@ body.light .temp-row input[type="number"], body.light .temp-tag { color: #127a88
 :is(body,body.light) .tabs { border-bottom-color: var(--border); }
 :is(body,body.light) :is(.skill-header, .res-header) { border-bottom-color: var(--border); color: var(--muted); }
 
+/* Contraste no modo claro: nomes e iniciais das bolinhas, rótulos dos grupos de perícias */
+body.light .char-story { color: var(--text-2); }
+body.light .char-initials { color: var(--accent); }
+body.light .char-add .char-ring { color: var(--muted); border-color: var(--muted); }
+body.light .skill-group { color: color-mix(in srgb, var(--sc, #4760d6) 72%, #000); }
+
 /* CAIXAS DE TEXTO crescem com o conteúdo */
 textarea.autogrow { resize: none; overflow: hidden; }
 </style>
@@ -1045,11 +1074,14 @@ textarea.autogrow { resize: none; overflow: hidden; }
 <div id="deathVignette" aria-hidden="true"></div>
 <div id="deathClose" aria-hidden="true"></div>
 
-<div id="deathOverlay" role="alertdialog" aria-labelledby="deathTitle" aria-describedby="deathSubtitle">
+<div id="deathOverlay" role="alertdialog" aria-labelledby="deathTitle" aria-describedby="deathSubtitle" aria-hidden="true">
   <div class="death-content">
     <div id="deathTitle">⚰ CAIU EM COMBATE ⚰</div>
     <div id="deathSubtitle"></div>
-    <button id="deathUndoBtn" title="Apaga as 3 marcas de morte e volta para a ficha">↩ Desfazer</button>
+    <div class="death-btns">
+      <button id="deathUndoBtn" title="Apaga as 3 marcas de morte e volta para a ficha">↩ Desfazer</button>
+      <button id="deathViewBtn" title="Fecha esta tela e deixa o personagem morto (dá para escolher outro personagem lá em cima)">✕ Fechar</button>
+    </div>
   </div>
 </div>
 
@@ -1438,7 +1470,10 @@ textarea.autogrow { resize: none; overflow: hidden; }
     <h3 id="trashTitle">🗑 Lixeira</h3>
     <p>Personagens excluídos ficam aqui por 7 dias. Depois disso são apagados de vez.</p>
     <div class="trash-list" id="trashList"></div>
-    <div class="modal-btns"><button class="s-btn" id="trashCloseBtn">Fechar</button></div>
+    <div class="modal-btns">
+      <button class="s-btn" id="trashCloseBtn">Fechar</button>
+      <button class="s-btn trash-empty-btn" id="trashEmptyBtn" title="Apaga de vez todos os personagens da lixeira. Não dá para desfazer.">🗑 Esvaziar lixeira</button>
+    </div>
   </div>
 </div>
 
@@ -1461,6 +1496,7 @@ textarea.autogrow { resize: none; overflow: hidden; }
     <p id="staleText">A ficha foi alterada em outra aba ou janela. Para não gravar por cima do que foi feito lá, esta aba parou de salvar. Recarregue para continuar com a versão mais recente.</p>
     <div class="modal-btns">
       <button class="primary-btn" id="staleReloadBtn" title="Recarrega a página com a versão mais recente da ficha">↻ Recarregar agora</button>
+      <button class="secondary-btn" id="staleCopyBtn" title="Guarda o que você mudou nesta aba como um personagem novo, sem mexer no da outra aba">⧉ Guardar como cópia</button>
       <button class="s-btn" id="staleCloseBtn" title="Fecha o aviso; nada do que mudar nesta aba será salvo">Só olhar (sem salvar)</button>
     </div>
   </div>
@@ -1497,7 +1533,7 @@ function autoGrow(el){
 }
 function autoGrowAll(){document.querySelectorAll('textarea').forEach(autoGrow);}
 document.addEventListener('input',e=>{if(e.target.tagName==='TEXTAREA')autoGrow(e.target);});
-document.addEventListener('click',()=>requestAnimationFrame(autoGrowAll));
+document.addEventListener('click',e=>{if(e.target.closest('button,.coll-header,label'))requestAnimationFrame(autoGrowAll);});
 window.addEventListener('resize',()=>requestAnimationFrame(autoGrowAll));
 
 /* ===== DICAS E ACESSIBILIDADE ===== */
@@ -1581,20 +1617,25 @@ document.querySelectorAll('.tab-content').forEach(tab=>{
     let n=h.nextElementSibling;
     while(n&&n.tagName!=='H2'){const next=n.nextElementSibling;body.appendChild(n);n=next;}
     h.after(body);
-    h.classList.add('section-toggle');h.setAttribute('role','button');h.tabIndex=0;h.setAttribute('aria-controls',body.id);
-    const chev=document.createElement('span');chev.className='section-chev';chev.setAttribute('aria-hidden','true');chev.textContent='▾';h.appendChild(chev);
+    // O h2 continua sendo título (leitores de tela navegam por títulos); dentro dele, um botão
+    // de verdade abre e fecha a seção
+    h.classList.add('section-toggle');
+    const btn=document.createElement('button');btn.type='button';btn.className='section-btn';btn.setAttribute('aria-controls',body.id);
+    while(h.firstChild)btn.appendChild(h.firstChild);
+    const chev=document.createElement('span');chev.className='section-chev';chev.setAttribute('aria-hidden','true');chev.textContent='▾';btn.appendChild(chev);
+    h.appendChild(btn);
     const set=open=>{
-      h.classList.toggle('collapsed',!open);body.hidden=!open;h.setAttribute('aria-expanded',open?'true':'false');
-      h.title=(open?'Recolher':'Mostrar')+' a seção '+label;
+      h.classList.toggle('collapsed',!open);body.hidden=!open;btn.setAttribute('aria-expanded',open?'true':'false');
+      btn.title=(open?'Recolher':'Mostrar')+' a seção '+label;
     };
     set(!closedSections.includes(key));
-    const toggle=()=>{
+    btn.addEventListener('click',()=>{
       const open=body.hidden;set(open);
       closedSections=closedSections.filter(x=>x!==key);if(!open)closedSections.push(key);
       try{localStorage.setItem('rpgClosedSections',JSON.stringify(closedSections));}catch(e){}
-    };
-    h.addEventListener('click',toggle);
-    h.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();toggle();}});
+      // Diário aberto agora: só dá para posicionar as páginas quando elas estão visíveis
+      if(open&&body.querySelector('#diaryBook'))setTimeout(syncDiaryPosition,0);
+    });
   });
 });
 
@@ -1659,7 +1700,7 @@ function createResRow(d){
   const row=document.createElement('div');row.className='res-row';
   row.innerHTML=`
     <input type="text" class="res-type" list="damageTypeList" value="${esc(d?.type)}" placeholder="Tipo (ex: Geral, Cortante...)">
-    <input type="number" class="res-rd" value="${d?.rd??0}" min="0">
+    <input type="number" class="res-rd" value="${esc(d?.rd??0)}" min="0">
     <select class="res-rv">
       <option value="-" ${(!d?.rv||d.rv==='-')?'selected':''}>—</option>
       <option value="R" ${d?.rv==='R'?'selected':''}>Resistência (÷2)</option>
@@ -1838,8 +1879,8 @@ $('vitalsHud').addEventListener('click',()=>{
   const tab=document.querySelector('.tab-btn[data-tab="principal"]');
   if(!tab.classList.contains('active'))tab.click();
   const body=$('hpSection').closest('.section-body');
-  const h=body&&document.querySelector('h2[aria-controls="'+body.id+'"]');
-  if(h&&h.classList.contains('collapsed'))h.click();
+  const sb=body&&document.querySelector('.section-btn[aria-controls="'+body.id+'"]');
+  if(sb&&sb.closest('h2').classList.contains('collapsed'))sb.click();
   requestAnimationFrame(()=>$('hpSection').scrollIntoView({behavior:'smooth',block:'center'}));
 });
 $('charName').addEventListener('input',updateStickyHeader);
@@ -1923,13 +1964,20 @@ const origSave=save;
 let deathState=[false,false,false];
 const overlay=$('deathOverlay');
 // 1 marca: nada; 2 marcas: bordas vermelhas se movendo; 3 marcas: a fumaça fecha e aparece a tela final
+// "Ver a ficha" fecha a tela final sem apagar as marcas (volta a valer ao mudar as marcas ou de personagem)
+let deathDismissed=false;
+function dismissDeath(){deathDismissed=true;updateDeathOverlay();const d=document.querySelector('.death-dot');if(d)d.focus({preventScroll:true});}
 function updateDeathOverlay(){
   const n=deathState.filter(Boolean).length;
+  if(n<3)deathDismissed=false;
+  const showEnd=n===3&&!deathDismissed;
   overlay.classList.remove('d1','d2','d3');
-  document.body.classList.toggle('death-2',n===2);
-  document.body.classList.toggle('death-3',n===3);
+  overlay.setAttribute('aria-hidden',showEnd?'false':'true');
+  // Com a tela final fechada, um personagem morto fica só com as bordas vermelhas
+  document.body.classList.toggle('death-2',n===2||(n===3&&deathDismissed));
+  document.body.classList.toggle('death-3',showEnd);
   document.querySelectorAll('.death-dot').forEach(d=>d.setAttribute('aria-pressed',deathState[d.dataset.i]?'true':'false'));
-  if(n===3){
+  if(showEnd){
     overlay.classList.add('d3');
     const name=$('charName').value||'O personagem';
     $('deathTitle').textContent='⚰ '+name.toUpperCase()+' ⚰';
@@ -1953,6 +2001,7 @@ $('deathUndoBtn').addEventListener('click',()=>{
   $('deathMsg').style.visibility='hidden';
   updateDeathOverlay();
 });
+$('deathViewBtn').addEventListener('click',dismissDeath);
 
 /* Animação das marcas de morte: começa desligada no celular e quando o sistema pede menos movimento */
 let deathAnimOn=true;
@@ -2116,11 +2165,11 @@ function sortSkills(mode){
     }
     tbl.appendChild(x.r);
   });
-  document.querySelectorAll('.skill-sort-btn').forEach(b=>b.classList.toggle('active',b.dataset.sort===skillSort));
+  document.querySelectorAll('.skill-sort-btn').forEach(b=>{b.classList.toggle('active',b.dataset.sort===skillSort);b.setAttribute('aria-pressed',b.dataset.sort===skillSort?'true':'false');});
 }
 document.querySelectorAll('.skill-sort-btn').forEach(b=>b.addEventListener('click',()=>sortSkills(b.dataset.sort)));
 // No modo por atributo, trocar o atributo de uma perícia a leva para o grupo certo
-document.querySelectorAll('.skill-attr-select').forEach(s=>s.addEventListener('change',()=>{if(skillSort==='attr')sortSkills();}));
+document.querySelectorAll('.skill-attr-select').forEach(s=>s.addEventListener('change',()=>{if(skillSort==='attr'){sortSkills();s.focus({preventScroll:true});}}));
 
 /* ===== DEFESAS ===== */
 function calcDefenses(){
@@ -2180,8 +2229,10 @@ function makeCollCard(cfg){
 
   // header
   const hdr=document.createElement('div');hdr.className='coll-header';
-  hdr.title='Clique para abrir ou fechar';hdr.setAttribute('role','button');hdr.tabIndex=0;
-  hdr.addEventListener('keydown',e=>{if(e.target===hdr&&(e.key==='Enter'||e.key===' ')){e.preventDefault();card.classList.toggle('open');}});
+  hdr.title='Clique para abrir ou fechar';hdr.setAttribute('role','button');hdr.tabIndex=0;hdr.setAttribute('aria-expanded','false');
+  // Mantém o aria-expanded certo mesmo quando o cartão é aberto pelo código (ao criar ou carregar)
+  new MutationObserver(()=>hdr.setAttribute('aria-expanded',card.classList.contains('open')?'true':'false')).observe(card,{attributes:true,attributeFilter:['class']});
+  hdr.addEventListener('keydown',e=>{if(e.target===hdr&&(e.key==='Enter'||e.key===' ')){e.preventDefault();card.classList.toggle('open');hdr.setAttribute('aria-expanded',card.classList.contains('open')?'true':'false');requestAnimationFrame(autoGrowAll);}});
   const handle=document.createElement('div');handle.className='drag-handle';handle.textContent='⠿';handle.draggable=false;
   handle.title='Arraste para mudar a ordem';handle.setAttribute('aria-hidden','true');
   handle.addEventListener('mousedown',e=>e.stopPropagation());
@@ -2198,6 +2249,7 @@ function makeCollCard(cfg){
   hdr.addEventListener('click',e=>{
     if(e.target===handle||handle.contains(e.target))return;
     card.classList.toggle('open');
+    hdr.setAttribute('aria-expanded',card.classList.contains('open')?'true':'false');
   });
 
   // name/cost live update
@@ -2256,7 +2308,7 @@ makeDraggable($('techList'));
 function weaponBodyHTML(d){return `
 <div class="coll-row">
   <div><label class="sub">Nome</label><input type="text" class="f-name" value="${esc(d?.name)}"></div>
-  <div><label class="sub">Carga</label><input type="number" class="f-load" value="${d?.load||0}" step="0.1"></div>
+  <div><label class="sub">Carga</label><input type="number" class="f-load" value="${esc(d?.load||0)}" step="0.1"></div>
 </div>
 <div class="coll-row">
   <div><label class="sub">Dano</label><input type="text" class="f-dmg" value="${esc(d?.dmg)}"></div>
@@ -2280,7 +2332,7 @@ makeDraggable($('weaponList'));
 function armorBodyHTML(d){return `
 <div class="coll-row">
   <div><label class="sub">Nome</label><input type="text" class="f-name" value="${esc(d?.name)}"></div>
-  <div><label class="sub">Carga</label><input type="number" class="f-load" value="${d?.load||0}" step="0.1"></div>
+  <div><label class="sub">Carga</label><input type="number" class="f-load" value="${esc(d?.load||0)}" step="0.1"></div>
 </div>
 <div class="coll-row">
   <div><label class="sub">Bônus defesa</label><input type="text" class="f-cost" value="${esc(d?.cost??d?.bonus)}"></div>
@@ -2304,7 +2356,7 @@ function itemBodyHTML(d){
   return `
 <div class="coll-row">
   <div><label class="sub">Nome</label><input type="text" class="f-name" value="${esc(d?.name)}"></div>
-  <div><label class="sub">Carga</label><input type="number" class="f-load" value="${d?.load||0}" step="0.1"></div>
+  <div><label class="sub">Carga</label><input type="number" class="f-load" value="${esc(d?.load||0)}" step="0.1"></div>
 </div>
 <div class="coll-row">
   <div><label class="sub">Raridade</label><select class="f-rarity">${rarOpts}</select></div>
@@ -2432,7 +2484,7 @@ function createDiaryEntry(d){
   const rm=page.querySelector('.diary-remove');
   rm.addEventListener('click',()=>{
     if(!rm.classList.contains('confirm')){
-      rm.classList.add('confirm');rm.textContent='Remover página?';
+      rm.classList.add('confirm');rm.textContent='Remover página?';rm.setAttribute('aria-label','Confirmar: remover esta página');
       clearTimeout(rm._t);rm._t=setTimeout(()=>{rm.classList.remove('confirm');rm.textContent='✕';},3000);
       return;
     }
@@ -2474,12 +2526,15 @@ if('onscrollend' in window)$('diaryBook').addEventListener('scrollend',diarySync
 else $('diaryBook').addEventListener('scroll',()=>{clearTimeout(diarySettle);diarySettle=setTimeout(diarySyncFromScroll,250);},{passive:true});
 // Ao abrir a aba pela primeira vez, mostra a página mais recente
 let diaryOpened=false;
-document.querySelector('.tab-btn[data-tab="diario"]').addEventListener('click',()=>{
-  requestAnimationFrame(()=>{
-    if(!diaryOpened){diaryOpened=true;diaryGoTo(Math.max(0,diaryPages().length-2),true);}
-    updateDiaryNav();
-  });
-});
+// Posiciona o diário quando ele fica visível (aba aberta e seção não recolhida). Com a seção
+// recolhida as páginas não têm posição, então espera ela abrir.
+function syncDiaryPosition(){
+  if(!$('diaryBook').clientWidth)return;
+  if(!diaryOpened){diaryOpened=true;diaryGoTo(Math.max(0,diaryPages().length-2),true);}
+  else diaryGoTo(diaryIdx,true);
+  updateDiaryNav();
+}
+document.querySelector('.tab-btn[data-tab="diario"]').addEventListener('click',()=>{setTimeout(syncDiaryPosition,0);});
 $('addDiaryBtn').addEventListener('click',()=>{
   const text=$('diaryText').value.trim();
   if(!text){$('diaryText').focus();return;}
@@ -2612,8 +2667,27 @@ function restoreCollList(listId,items,bodyFn,extraClass,loadInputCb){
   });
 }
 
+// Completa uma ficha incompleta (JSON antigo ou parcial) com os valores da ficha em branco.
+// Sem isso, ao trocar de personagem, o campo que faltasse ficaria com o valor do anterior.
+function fillMissing(d){
+  if(!blankSheet)return d;
+  const b=JSON.parse(JSON.stringify(blankSheet)),out={...b,...d};
+  out.attrs={...b.attrs,...(d.attrs||{})};
+  out.specialAbility={...b.specialAbility,...(d.specialAbility||{})};
+  out.status=Array.isArray(d.status)?d.status:b.status;
+  out.death=Array.isArray(d.death)?d.death:b.death;
+  out.skills=b.skills.map((s,i)=>({...s,...((Array.isArray(d.skills)&&d.skills[i])||{})}));
+  if(Array.isArray(d.defenses)){
+    const have=new Set(d.defenses.map(x=>x.def));
+    out.defenses=d.defenses.concat(b.defenses.filter(x=>!have.has(x.def)));
+  }else out.defenses=b.defenses;
+  out._charId=d._charId;
+  return out;
+}
 function loadFromData(data){
   if(!data)return;
+  data=fillMissing(data);
+  deathDismissed=false;
   ['abilityList','techList','weaponList','armorList','itemList','contactList','diaryList'].forEach(id=>$(id).innerHTML='');
   $('charName').value=data.name||'';$('playerName').value=data.player||'';$('charClass').value=data.cls||'';$('charLevel').value=data.level||1;
   if(data.attrs){Object.keys(attrIds).forEach(k=>{$(attrIds[k]).value=data.attrs[k]??0;});}
@@ -2674,7 +2748,7 @@ function loadFromData(data){
   $('diaryList').innerHTML='';
   if(data.diary)data.diary.slice().reverse().forEach(d=>$('diaryList').appendChild(createDiaryEntry(d)));
   diaryOpened=false;diaryIdx=0;updateDiaryNav();
-  if(document.querySelector('.tab-content.active')?.dataset.tab==='diario'){diaryOpened=true;requestAnimationFrame(()=>diaryGoTo(Math.max(0,diaryPages().length-2),true));}
+  if(document.querySelector('.tab-content.active')?.dataset.tab==='diario')setTimeout(syncDiaryPosition,0);
   if(data.photo){
     showPhoto(data.photo);
     // Foto grande de antes desta versão: reduz só na tela. Ela vai para o armazenamento
@@ -2695,7 +2769,10 @@ function loadFromData(data){
   $('descPassado').value=data.descPassado||'';
   refreshHP();refreshSP();
   sortSkills();
+  updatePassives(); // passivas dependem das perícias: sem isto ficavam com os números do anterior
+  $('diaryTitle').value='';$('diaryText').value=''; // rascunho do diário não passa para outro personagem
   autoGrowAll();
+  lastSavedJson=JSON.stringify(getData()); // o que acabou de abrir já está salvo
 }
 
 function showToast(msg,ms=1800){
@@ -2712,25 +2789,34 @@ function showToast(msg,ms=1800){
   t._hideTimer=setTimeout(()=>t.classList.remove('show'),ms);
 }
 
-// Grava o personagem aberto (mesma chave de sempre) e atualiza a bolinha dele
-function writeCurrent(){
-  const d=getData();
+// Grava o personagem aberto (mesma chave de sempre) e atualiza a bolinha dele.
+// Só grava se algo mudou desde a última gravação ou carregamento: um clique sem edição
+// não regrava a ficha nem avisa as outras abas. Devolve false se a gravação foi barrada.
+let lastSavedJson=null;
+function writeCurrent(force){
+  const d=getData(),json=JSON.stringify(d);
+  if(!force&&json===lastSavedJson)return true;
   // Rede de segurança: se outra aba abriu outro personagem, a chave principal é dele agora.
   // Este personagem vai para o próprio slot e nada do outro é sobrescrito.
   const stored=readJSON('rpgSheet');
   if(stored&&stored._charId&&currentCharId&&stored._charId!==currentCharId){
-    localStorage.setItem('rpgChar:'+currentCharId,JSON.stringify(d));
-    markStale();return;
+    localStorage.setItem('rpgChar:'+currentCharId,json);
+    markStale();return false;
   }
-  localStorage.setItem('rpgSheet',JSON.stringify(d));
+  localStorage.setItem('rpgSheet',json);
+  // Cópia de segurança do aberto no próprio slot: se uma aba com a versão antiga gravar por
+  // cima da chave principal, o personagem volta por aqui (ver initChars)
+  try{localStorage.setItem('rpgChar:'+currentCharId,json);}catch(e){}
+  lastSavedJson=json;
   updateCurrentMeta(d);
+  return true;
 }
 function save(){
   if(tabStale){showStale();return;}
   clearTimeout(autoSaveTimer);autoSaveTimer=null;
   // Visualizando a ficha de outra pessoa: Salvar adiciona como personagem novo, sem tocar nos seus
   if(viewMode){if(createChar(getData()))showToast('✓ Adicionada aos seus personagens');return;}
-  try{writeCurrent();showToast('✓ Salvo na tela');refreshAutoSaveStatus(true);}
+  try{if(writeCurrent(true)){showToast('✓ Salvo na tela');refreshAutoSaveStatus(true);}}
   catch(e){showToast('Erro ao salvar (espaço cheio ou modo privado?)');}
 }
 
@@ -2754,7 +2840,7 @@ function autoSaveNow(){
   clearTimeout(autoSaveTimer);autoSaveTimer=null;
   if(!autoSaveOn||autoSavePaused||tabStale)return;
   try{
-    writeCurrent();
+    if(!writeCurrent())return;
     unsavedChanges=false;autoSaveFailed=false;refreshAutoSaveStatus(true);
   }catch(e){
     if(!autoSaveFailed)showToast('Erro no salvamento automático (espaço cheio ou modo privado?)');
@@ -2886,22 +2972,58 @@ function updateCurrentMeta(d){
   if(viewMode||!currentCharId)return;
   const m=metaFrom(d||getData(),currentCharId,currentThumb());
   const i=chars.list.findIndex(c=>c.id===currentCharId);
+  // Só regrava a lista (e redesenha as bolinhas) se nome, classe, nível, estado ou foto mudaram
+  const same=i>=0&&chars.active===currentCharId&&JSON.stringify({...chars.list[i],updated:0})===JSON.stringify({...m,updated:0});
+  if(same)return;
   if(i<0)chars.list.push(m);else chars.list[i]=m;
   chars.active=currentCharId;saveCharsIndex();renderChars();
 }
+// Volta todos os campos ao valor original do HTML. O Firefox restaura o que estava digitado
+// ao recarregar a página; sem isto a "ficha em branco" sairia com os dados de outro personagem.
+function resetFieldsToDefaults(){
+  document.querySelectorAll('.card input, .card textarea, .card select').forEach(el=>{
+    if(el.type==='file')return;
+    if(el.type==='checkbox'||el.type==='radio'){el.checked=el.defaultChecked;return;}
+    if(el.tagName==='SELECT'){const def=[...el.options].find(o=>o.defaultSelected);if(def)el.value=def.value;return;}
+    el.value=el.defaultValue;
+  });
+}
 function initChars(){
-  blankSheet=getData(); // ficha em branco, do jeito que a página abre
+  resetFieldsToDefaults();
+  blankSheet=JSON.parse(JSON.stringify(getData())); // cópia de verdade: nada da tela muda a ficha em branco depois
   const before=lsGet(CHARS_KEY);
   const idx=readJSON(CHARS_KEY);
   if(idx&&Array.isArray(idx.list))chars=idx;
-  const sheet=readJSON('rpgSheet');
+  let sheet=readJSON('rpgSheet');
+  // Aba antiga (versão anterior da ficha) gravou por cima: a chave principal tem uma ficha sem id
+  // e com outro nome que o personagem aberto. Guarda essa ficha como "(recuperada)" e reabre o
+  // aberto pela cópia de segurança dele, em vez de misturar os dois.
+  if(sheet&&!sheet._charId&&chars.list.length>1&&chars.active){
+    const act=chars.list.find(c=>c.id===chars.active),backup=readJSON('rpgChar:'+chars.active);
+    if(act&&backup&&(sheet.name||'')!==(act.name||'')){
+      const rid=newCharId();const rec={...sheet,_charId:rid,name:(sheet.name||'Ficha')+' (recuperada)'};
+      try{
+        localStorage.setItem('rpgChar:'+rid,JSON.stringify(rec));
+        chars.list.push(metaFrom(rec,rid));
+        backup._charId=chars.active;localStorage.setItem('rpgSheet',JSON.stringify(backup));sheet=backup;
+        setTimeout(()=>showToast('Uma ficha gravada por outra aba foi guardada como "'+rec.name+'"',5000),300);
+      }catch(e){}
+    }
+  }
   currentCharId=(sheet&&sheet._charId)||chars.active||newCharId();
   if(sheet)loadFromData(sheet);
+  else{
+    // Primeira vez neste navegador: grava a ficha em branco (não há nada para sobrescrever), para o
+    // personagem existir de verdade e não virar uma bolinha "fantasma" sem dados
+    const blank={...JSON.parse(JSON.stringify(blankSheet)),_charId:currentCharId};
+    try{localStorage.setItem('rpgSheet',JSON.stringify(blank));}catch(e){}
+    loadFromData(blank);
+  }
+  // Tira da lista personagens que não têm mais dados guardados (exceto o aberto)
+  chars.list=chars.list.filter(c=>c.id===currentCharId||lsGet('rpgChar:'+c.id)!==null);
   // Migração: a ficha única de antes vira o primeiro personagem da lista
   if(!chars.list.some(c=>c.id===currentCharId))chars.list.unshift(metaFrom(sheet||blankSheet,currentCharId));
   chars.active=currentCharId;
-  // Sobra de uma troca interrompida: a cópia do personagem aberto no próprio slot é repetida
-  if(sheet)try{localStorage.removeItem('rpgChar:'+currentCharId);}catch(e){}
   // Recupera personagens guardados que tenham ficado fora da lista
   lsKeys('rpgChar:').forEach(k=>{const id=k.slice(8);if(!chars.list.some(c=>c.id===id)){const d=readJSON(k);if(d)chars.list.push(metaFrom(d,id));}});
   // Lixeira: apaga de vez só o que passou de 7 dias
@@ -2913,7 +3035,34 @@ function initChars(){
 }
 /* Mais de uma aba: só uma pode gravar. Quando outra aba ou janela grava a ficha, esta
    para de salvar e pede para recarregar, em vez de gravar por cima do que a outra fez. */
-function showStale(){$('staleModal').hidden=false;$('staleReloadBtn').focus();}
+/* Janelas (modais): ao abrir, o resto da página fica inacessível (inert) e o Tab não sai da
+   janela; ao fechar, o foco volta para onde estava. */
+const modalOpeners={};
+function openModal(id,focusId){
+  const m=$(id);if(!m.hidden){if(focusId)$(focusId).focus();return;}
+  modalOpeners[id]=document.activeElement;
+  m.hidden=false;
+  ['.chars-wrap','.card','#trashBtn','#vitalsHud'].forEach(s=>{const el=document.querySelector(s);if(el)el.inert=true;});
+  const f=focusId?$(focusId):m.querySelector('button');if(f)f.focus();
+}
+function closeModal(id){
+  const m=$(id);if(m.hidden)return;
+  m.hidden=true;
+  if(!document.querySelector('.modal:not([hidden])'))['.chars-wrap','.card','#trashBtn','#vitalsHud'].forEach(s=>{const el=document.querySelector(s);if(el)el.inert=false;});
+  const back=modalOpeners[id];delete modalOpeners[id];
+  if(back&&document.contains(back)&&!back.closest('[inert]'))back.focus({preventScroll:true});
+}
+document.addEventListener('keydown',e=>{
+  if(e.key!=='Tab')return;
+  const m=[...document.querySelectorAll('.modal:not([hidden])')].pop();if(!m)return;
+  const f=[...m.querySelectorAll('button,input,select,textarea,[tabindex]:not([tabindex="-1"])')].filter(x=>!x.disabled&&x.offsetParent!==null);
+  if(!f.length)return;
+  const first=f[0],last=f[f.length-1];
+  if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus();}
+  else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();}
+  else if(!m.contains(document.activeElement)){e.preventDefault();first.focus();}
+});
+function showStale(){openModal('staleModal','staleReloadBtn');}
 function markStale(){
   if(tabStale)return;
   tabStale=true;clearTimeout(autoSaveTimer);autoSaveTimer=null;
@@ -2931,7 +3080,17 @@ window.addEventListener('storage',e=>{
   markStale();
 });
 $('staleReloadBtn').addEventListener('click',()=>location.reload());
-$('staleCloseBtn').addEventListener('click',()=>{$('staleModal').hidden=true;});
+$('staleCloseBtn').addEventListener('click',()=>closeModal('staleModal'));
+// Aba desatualizada: guarda o que foi feito aqui como um personagem novo, sem tocar no da outra aba
+$('staleCopyBtn').addEventListener('click',()=>{
+  const id=newCharId(),d=getData();d._charId=id;d.name=(d.name||'Personagem')+' (desta aba)';
+  try{
+    localStorage.setItem('rpgChar:'+id,JSON.stringify(d));
+    const idx=readJSON(CHARS_KEY)||{active:null,list:[]};if(!Array.isArray(idx.list))idx.list=[];
+    idx.list.push(metaFrom(d,id));localStorage.setItem(CHARS_KEY,JSON.stringify(idx));
+    showToast('✓ Guardada como "'+d.name+'". Recarregue para vê-la.',4500);
+  }catch(e){showToast('Sem espaço para guardar a cópia. Use ⬇ JSON.');}
+});
 
 // Abre outro personagem. saveCurrent=false quando o aberto acabou de ir para a lixeira.
 function openChar(id,saveCurrent=true){
@@ -2942,16 +3101,17 @@ function openChar(id,saveCurrent=true){
   try{
     if(saveCurrent){
       // 1. guarda o aberto: com o que está na tela, ou, se só visualizando, como estava salvo
-      const cur=viewMode?lsGet('rpgSheet'):JSON.stringify(getData());
-      if(cur){localStorage.setItem('rpgSheet',cur);localStorage.setItem('rpgChar:'+currentCharId,cur);}
+      let cur=viewMode?lsGet('rpgSheet'):JSON.stringify(getData());
+      if(!cur)cur=JSON.stringify({...JSON.parse(JSON.stringify(blankSheet)),_charId:currentCharId});
+      localStorage.setItem('rpgSheet',cur);localStorage.setItem('rpgChar:'+currentCharId,cur);
       if(!viewMode)updateCurrentMeta(JSON.parse(cur));
     }
-    // 2. abre o outro na chave principal
+    // 2. abre o outro na chave principal. O slot dele fica como cópia de segurança: protege
+    //    contra uma aba antiga que grave por cima da chave principal (ver initChars).
     target._charId=id;
     localStorage.setItem('rpgSheet',JSON.stringify(target));
   }catch(e){showToast('Sem espaço para trocar de personagem. Exporte um JSON e exclua algum.');return false;}
   currentCharId=id;chars.active=id;saveCharsIndex();
-  try{localStorage.removeItem('rpgChar:'+id);}catch(e){} // 3. o slot dele não é mais necessário
   leaveViewMode();
   loadFromData(target);
   renderChars();closeCharMenu();
@@ -2973,48 +3133,60 @@ function duplicateCurrent(){
 }
 // Exclui um ou vários personagens. Primeiro todos vão para a lixeira; só depois de todos
 // gravados é que saem da lista (se faltar espaço no meio, nada é excluído).
-function deleteChars(ids){
+// permanent=true: sem espaço para a lixeira, o jogador escolheu excluir de vez.
+function deleteChars(ids,permanent){
   if(tabStale){showStale();return;}
   ids=[...new Set(ids)];
-  const items=ids.map(id=>({id,data:id===currentCharId?(viewMode?readJSON('rpgSheet'):getData()):readJSON('rpgChar:'+id)})).filter(x=>x.data);
+  const items=ids.map(id=>({id,data:id===currentCharId?(viewMode?readJSON('rpgSheet'):getData()):readJSON('rpgChar:'+id)})).filter(x=>x.data||x.id===currentCharId);
   if(!items.length)return;
-  const now=Date.now(),written=[];
-  try{items.forEach(x=>{localStorage.setItem('rpgTrash:'+x.id,JSON.stringify({deletedAt:now,data:x.data}));written.push(x.id);});}
-  catch(e){written.forEach(id=>{try{localStorage.removeItem('rpgTrash:'+id);}catch(_){}});showToast('Sem espaço para mover para a lixeira.');return;}
-  items.forEach(x=>{if(x.id!==currentCharId)try{localStorage.removeItem('rpgChar:'+x.id);}catch(e){}});
+  if(!permanent){
+    const now=Date.now(),written=[];
+    try{items.forEach(x=>{if(!x.data)return;localStorage.setItem('rpgTrash:'+x.id,JSON.stringify({deletedAt:now,data:x.data}));written.push(x.id);});}
+    catch(e){
+      written.forEach(id=>{try{localStorage.removeItem('rpgTrash:'+id);}catch(_){}});
+      confirmBox('Sem espaço para a lixeira','O navegador está sem espaço para guardar '+(items.length>1?'esses personagens':'esse personagem')+' na lixeira. Quer excluir de vez? Não dá para desfazer. Se quiser guardar antes, cancele e use ⬇ JSON.',
+        'Excluir de vez',()=>deleteChars(ids,true));
+      return;
+    }
+  }
+  items.forEach(x=>{try{localStorage.removeItem('rpgChar:'+x.id);}catch(e){}});
   const gone=new Set(items.map(x=>x.id));
   chars.list=chars.list.filter(c=>!gone.has(c.id));
   selectedChars.clear();
-  const msg=items.length>1?items.length+' personagens movidos para a lixeira':'Personagem movido para a lixeira';
+  const n=items.length,msg=permanent?(n>1?n+' personagens excluídos de vez':'Personagem excluído de vez'):(n>1?n+' personagens movidos para a lixeira':'Personagem movido para a lixeira');
   refreshTrashBtn();
   if(!gone.has(currentCharId)){saveCharsIndex();renderChars();showToast(msg);return;}
-  // O aberto foi excluído: abre o próximo da lista, ou começa um em branco se não sobrou nenhum
-  const next=chars.list[0];
-  if(next&&openChar(next.id,false)){showToast(msg);return;}
+  // O aberto foi excluído: abre o próximo que tiver dados; se nenhum abrir, começa um em branco
+  // (sem tirar os outros da lista)
+  for(const c of chars.list.slice()){if(openChar(c.id,false)){showToast(msg);return;}}
   leaveViewMode();
   currentCharId=newCharId();
-  const blank=JSON.parse(JSON.stringify(blankSheet));blank._charId=currentCharId;
-  try{localStorage.setItem('rpgSheet',JSON.stringify(blank));}catch(e){}
-  chars.list=[metaFrom(blank,currentCharId)];chars.active=currentCharId;saveCharsIndex();
+  const blank={...JSON.parse(JSON.stringify(blankSheet)),_charId:currentCharId};
+  try{localStorage.setItem('rpgSheet',JSON.stringify(blank));}catch(e){showToast('Sem espaço no navegador. Exporte um JSON e exclua algum personagem.');}
+  chars.list.push(metaFrom(blank,currentCharId));chars.active=currentCharId;saveCharsIndex();
   loadFromData(blank);renderChars();closeCharMenu();
   showToast(msg);
 }
 function restoreFromTrash(id){
   if(tabStale){showStale();return;}
   const t=readJSON('rpgTrash:'+id);if(!t)return;
-  try{localStorage.setItem('rpgChar:'+id,JSON.stringify(t.data));localStorage.removeItem('rpgTrash:'+id);}
+  // Se esse personagem ainda existe (outra aba o trouxe de volta), restaura como cópia, sem sobrescrever
+  const exists=chars.list.some(c=>c.id===id)||lsGet('rpgChar:'+id)!==null;
+  const rid=exists?newCharId():id,data={...t.data,_charId:rid};
+  if(exists)data.name=(data.name||'Personagem')+' (restaurado)';
+  try{localStorage.setItem('rpgChar:'+rid,JSON.stringify(data));localStorage.removeItem('rpgTrash:'+id);}
   catch(e){showToast('Sem espaço para restaurar.');return;}
-  chars.list.push(metaFrom(t.data,id));saveCharsIndex();renderChars();renderTrash();refreshTrashBtn();
-  showToast('✓ '+(t.data.name||'Personagem')+' voltou para a lista');
+  chars.list.push(metaFrom(data,rid));saveCharsIndex();renderChars();renderTrash();refreshTrashBtn();
+  showToast('✓ '+(data.name||'Personagem')+' voltou para a lista');
 }
 
 /* Janela de confirmação (usada para excluir) */
 let confirmCb=null;
 function confirmBox(title,text,okLabel,cb){
   $('confirmTitle').textContent=title;$('confirmText').textContent=text;$('confirmOkBtn').textContent=okLabel;
-  confirmCb=cb;$('confirmModal').hidden=false;$('confirmCancelBtn').focus(); // foco no Cancelar, por segurança
+  confirmCb=cb;openModal('confirmModal','confirmCancelBtn'); // foco no Cancelar, por segurança
 }
-function closeConfirm(){$('confirmModal').hidden=true;confirmCb=null;}
+function closeConfirm(){closeModal('confirmModal');confirmCb=null;}
 $('confirmOkBtn').addEventListener('click',()=>{const cb=confirmCb;closeConfirm();if(cb)cb();});
 $('confirmCancelBtn').addEventListener('click',closeConfirm);
 
@@ -3041,6 +3213,7 @@ function refreshTrashBtn(){
 function renderTrash(){
   const list=$('trashList');list.innerHTML='';
   const items=trashItems();
+  $('trashEmptyBtn').disabled=!items.length;
   if(!items.length){const p=document.createElement('p');p.className='trash-empty';p.textContent='A lixeira está vazia.';list.appendChild(p);return;}
   items.forEach(x=>{
     const d=x.t.data,dias=Math.max(0,Math.ceil((TRASH_MS-(Date.now()-x.t.deletedAt))/86400000));
@@ -3055,8 +3228,17 @@ function renderTrash(){
     list.appendChild(row);
   });
 }
-$('trashBtn').addEventListener('click',()=>{renderTrash();$('trashModal').hidden=false;$('trashCloseBtn').focus();});
-$('trashCloseBtn').addEventListener('click',()=>{$('trashModal').hidden=true;});
+$('trashBtn').addEventListener('click',()=>{renderTrash();openModal('trashModal','trashCloseBtn');});
+$('trashCloseBtn').addEventListener('click',()=>closeModal('trashModal'));
+// Esvaziar a lixeira: pede confirmação deixando claro que não tem volta
+$('trashEmptyBtn').addEventListener('click',()=>{
+  const n=trashItems().length;
+  if(!n){showToast('A lixeira já está vazia');return;}
+  confirmBox('Esvaziar a lixeira?','Os '+n+' personagem(ns) da lixeira serão apagados de vez. Essa ação é irreversível: não dá para recuperar depois.','Esvaziar de vez',()=>{
+    lsKeys('rpgTrash:').forEach(k=>{try{localStorage.removeItem(k);}catch(e){}});
+    renderTrash();refreshTrashBtn();showToast('Lixeira esvaziada');
+  });
+});
 /* Só visualizar a ficha de outra pessoa: nada é salvo até "Salvar" (que adiciona como novo) */
 function enterViewMode(data){
   flushAutoSave();
@@ -3068,7 +3250,8 @@ function leaveViewMode(){
   viewMode=false;autoSavePaused=false;refreshAutoSaveStatus();
 }
 function backToMine(){
-  const d=readJSON('rpgSheet');leaveViewMode();if(d)loadFromData(d);renderChars();closeCharMenu();
+  const d=readJSON('rpgSheet')||{...JSON.parse(JSON.stringify(blankSheet)),_charId:currentCharId};
+  leaveViewMode();loadFromData(d);renderChars();closeCharMenu();
 }
 // Ficha recebida por link ou arquivo: pergunta o que fazer
 let incoming=null;
@@ -3076,9 +3259,9 @@ function askIncoming(data,source){
   if(!data||typeof data!=='object'){showToast('Ficha inválida');return;}
   incoming=data;
   $('incomingText').textContent='Você abriu a ficha "'+(data.name||'sem nome')+'" por '+(source==='link'?'um link':'um arquivo')+'. O que quer fazer?';
-  $('incomingModal').hidden=false;$('incomingAddBtn').focus();
+  openModal('incomingModal','incomingAddBtn');
 }
-function closeIncoming(){$('incomingModal').hidden=true;incoming=null;}
+function closeIncoming(){closeModal('incomingModal');incoming=null;}
 $('incomingAddBtn').addEventListener('click',()=>{const d=incoming;closeIncoming();if(createChar(d))showToast('✓ Adicionada aos seus personagens');});
 $('incomingViewBtn').addEventListener('click',()=>{const d=incoming;closeIncoming();enterViewMode(d);showToast('Só visualizando: nada será salvo');});
 $('incomingCancelBtn').addEventListener('click',closeIncoming);
@@ -3092,8 +3275,14 @@ function storyRing(meta,thumb){
 }
 const statusText={ok:'',danger:' (em perigo)',dead:' (morto)'};
 let lastShownChar=null; // para animar e centralizar só quando o personagem aberto muda
+// Depois de segurar o dedo, o toque que solta não pode abrir/limpar a seleção. A marca fica
+// num relógio do módulo (não no botão, que é recriado quando a seleção muda).
+let suppressStoryClickUntil=0;
 function renderChars(){
   const bar=$('charsBar');if(!bar)return;
+  // Guarda qual bolinha (ou ✕) tinha o foco, para devolver depois de redesenhar
+  const fa=document.activeElement,fItem=fa&&bar.contains(fa)?fa.closest('.char-item'):null;
+  const focusKey=fItem?((fItem.querySelector('.char-story')||{}).dataset||{}).id+(fa.classList.contains('char-del')?':del':''):null;
   bar.innerHTML='';
   const changed=lastShownChar!==(viewMode?'view':currentCharId);
   lastShownChar=viewMode?'view':currentCharId;
@@ -3118,15 +3307,15 @@ function renderChars(){
     else if(viewMode&&c.id===currentCharId){b.title='Voltar para '+label;action=backToMine;}
     else{b.title='Abrir '+label+'. Shift+clique para selecionar vários.';action=()=>openChar(c.id);}
     if(sel)b.title=label+' (selecionado). Shift+clique para tirar da seleção.';
-    b.setAttribute('aria-label',b.title);b.setAttribute('aria-pressed',sel?'true':'false');
+    b.setAttribute('aria-label',b.title);
     b.addEventListener('click',e=>{
-      if(b._longPress){b._longPress=false;return;}
+      if(Date.now()<suppressStoryClickUntil)return;
       if(e.shiftKey||e.ctrlKey||e.metaKey){toggleSelect(c.id);return;}
       if(selectedChars.size){selectedChars.clear();renderChars();}
       action();
     });
     // Segurar o dedo (celular) também seleciona
-    b.addEventListener('pointerdown',e=>{if(e.pointerType==='mouse')return;clearTimeout(b._lpT);b._lpT=setTimeout(()=>{b._longPress=true;toggleSelect(c.id);if(navigator.vibrate)navigator.vibrate(15);},550);});
+    b.addEventListener('pointerdown',e=>{if(e.pointerType==='mouse')return;clearTimeout(b._lpT);b._lpT=setTimeout(()=>{suppressStoryClickUntil=Date.now()+700;toggleSelect(c.id);if(navigator.vibrate)navigator.vibrate(15);},550);});
     ['pointerup','pointerleave','pointercancel'].forEach(ev=>b.addEventListener(ev,()=>clearTimeout(b._lpT)));
     const item=document.createElement('div');item.className='char-item'+(sel?' sel':'');item.appendChild(b);
     // ✕ vermelho no aberto e nos selecionados (no computador só aparece com o mouse em cima)
@@ -3146,6 +3335,10 @@ function renderChars(){
   add.addEventListener('click',()=>{if(createChar())showToast('✓ Novo personagem criado');});
   const addItem=document.createElement('div');addItem.className='char-item';addItem.appendChild(add);bar.appendChild(addItem);
   if(changed){const act=bar.querySelector('.char-story.active');if(act)act.scrollIntoView({behavior:'smooth',block:'nearest',inline:'center'});}
+  if(focusKey){
+    const [id,del]=focusKey.split(':'),nb=bar.querySelector('.char-story[data-id="'+id+'"]');
+    const t=nb&&(del?nb.parentElement.querySelector('.char-del'):nb);if(t)t.focus({preventScroll:true});
+  }
 }
 /* Menu do personagem aberto (duplicar) ou da ficha só visualizada */
 function renderCharMenu(){
@@ -3157,6 +3350,7 @@ function renderCharMenu(){
     return;
   }
   btn('⧉ Duplicar','Cria uma cópia deste personagem e abre a cópia','',duplicateCurrent);
+  btn('🗑 Excluir','Move este personagem para a lixeira (dá para restaurar por 7 dias)','danger',()=>{closeCharMenu();askDelete(currentCharId);});
 }
 function toggleCharMenu(){const m=$('charMenu');if(m.hidden){renderCharMenu();m.hidden=false;}else m.hidden=true;}
 function closeCharMenu(){$('charMenu').hidden=true;}
@@ -3164,18 +3358,23 @@ $('charPhoto').addEventListener('load',()=>{if(!viewMode)renderChars();});
 // No computador, a rodinha do mouse desliza as bolinhas para o lado, suavemente
 $('charsBar').addEventListener('wheel',e=>{
   const b=$('charsBar');if(b.scrollWidth<=b.clientWidth||Math.abs(e.deltaX)>Math.abs(e.deltaY))return;
-  e.preventDefault();
   const max=b.scrollWidth-b.clientWidth;
+  if((e.deltaY<0&&b.scrollLeft<=0)||(e.deltaY>0&&b.scrollLeft>=max-1))return; // na ponta: deixa a página rolar
+  e.preventDefault();
   if(b._target==null||Math.abs(b._target-b.scrollLeft)>b.clientWidth)b._target=b.scrollLeft;
   b._target=Math.max(0,Math.min(max,b._target+e.deltaY*1.2));
   b.scrollTo({left:b._target,behavior:'smooth'});
 },{passive:false});
 $('charsBar').addEventListener('contextmenu',e=>{if(e.target.closest('.char-story'))e.preventDefault();});
+// Rolagem por outro meio (dedo, trackpad, centralizar): o próximo giro da rodinha parte de onde está
+$('charsBar').addEventListener('scroll',()=>{const b=$('charsBar');clearTimeout(b._resetT);b._resetT=setTimeout(()=>{b._target=null;},200);},{passive:true});
 document.addEventListener('keydown',e=>{
   if(e.key!=='Escape')return;
   if(!$('confirmModal').hidden)closeConfirm();
-  else if(!$('trashModal').hidden)$('trashModal').hidden=true;
+  else if(!$('trashModal').hidden)closeModal('trashModal');
   else if(!$('incomingModal').hidden)closeIncoming();
+  else if(!$('staleModal').hidden)closeModal('staleModal');
+  else if($('deathOverlay').classList.contains('d3'))dismissDeath();
   else if(selectedChars.size){selectedChars.clear();renderChars();}
   else closeCharMenu();
 });
