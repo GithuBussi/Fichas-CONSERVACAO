@@ -1237,6 +1237,18 @@ textarea.autogrow { resize: none; overflow: hidden; }
 
 </div><!-- /card -->
 
+<!-- A ficha foi alterada em outra aba -->
+<div class="modal" id="staleModal" role="alertdialog" aria-modal="true" aria-labelledby="staleTitle" aria-describedby="staleText" hidden>
+  <div class="modal-box">
+    <h3 id="staleTitle">Ficha aberta em outra aba</h3>
+    <p id="staleText">A ficha foi alterada em outra aba ou janela. Para não gravar por cima do que foi feito lá, esta aba parou de salvar. Recarregue para continuar com a versão mais recente.</p>
+    <div class="modal-btns">
+      <button class="primary-btn" id="staleReloadBtn" title="Recarrega a página com a versão mais recente da ficha">↻ Recarregar agora</button>
+      <button class="s-btn" id="staleCloseBtn" title="Fecha o aviso; nada do que mudar nesta aba será salvo">Só olhar (sem salvar)</button>
+    </div>
+  </div>
+</div>
+
 <!-- Ficha recebida por link ou arquivo -->
 <div class="modal" id="incomingModal" role="dialog" aria-modal="true" aria-labelledby="incomingTitle" hidden>
   <div class="modal-box">
@@ -1252,6 +1264,7 @@ textarea.autogrow { resize: none; overflow: hidden; }
 <script>
 function $(id){return document.getElementById(id);}
 let currentCharId=null; // id do personagem aberto (ver "VÁRIOS PERSONAGENS")
+let tabStale=false;     // outra aba gravou a ficha: esta para de salvar (ver markStale)
 // Escapa texto inserido em HTML, para aspas e < não cortarem o que o jogador escreveu
 function esc(v){return String(v??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 
@@ -2464,10 +2477,18 @@ function showToast(msg,ms=1800){
 // Grava o personagem aberto (mesma chave de sempre) e atualiza a bolinha dele
 function writeCurrent(){
   const d=getData();
+  // Rede de segurança: se outra aba abriu outro personagem, a chave principal é dele agora.
+  // Este personagem vai para o próprio slot e nada do outro é sobrescrito.
+  const stored=readJSON('rpgSheet');
+  if(stored&&stored._charId&&currentCharId&&stored._charId!==currentCharId){
+    localStorage.setItem('rpgChar:'+currentCharId,JSON.stringify(d));
+    markStale();return;
+  }
   localStorage.setItem('rpgSheet',JSON.stringify(d));
   updateCurrentMeta(d);
 }
 function save(){
+  if(tabStale){showStale();return;}
   clearTimeout(autoSaveTimer);autoSaveTimer=null;
   // Visualizando a ficha de outra pessoa: Salvar adiciona como personagem novo, sem tocar nos seus
   if(viewMode){if(createChar(getData()))showToast('✓ Adicionada aos seus personagens');return;}
@@ -2493,7 +2514,7 @@ function refreshAutoSaveStatus(justSaved){
 }
 function autoSaveNow(){
   clearTimeout(autoSaveTimer);autoSaveTimer=null;
-  if(!autoSaveOn||autoSavePaused)return;
+  if(!autoSaveOn||autoSavePaused||tabStale)return;
   try{
     writeCurrent();
     unsavedChanges=false;autoSaveFailed=false;refreshAutoSaveStatus(true);
@@ -2503,7 +2524,7 @@ function autoSaveNow(){
   }
 }
 function scheduleAutoSave(){
-  if(!autoSaveOn||autoSavePaused)return;
+  if(!autoSaveOn||autoSavePaused||tabStale)return;
   clearTimeout(autoSaveTimer);autoSaveTimer=setTimeout(autoSaveNow,800);
 }
 function pauseAutoSave(){
@@ -2632,6 +2653,7 @@ function updateCurrentMeta(d){
 }
 function initChars(){
   blankSheet=getData(); // ficha em branco, do jeito que a página abre
+  const before=lsGet(CHARS_KEY);
   const idx=readJSON(CHARS_KEY);
   if(idx&&Array.isArray(idx.list))chars=idx;
   const sheet=readJSON('rpgSheet');
@@ -2646,10 +2668,36 @@ function initChars(){
   lsKeys('rpgChar:').forEach(k=>{const id=k.slice(8);if(!chars.list.some(c=>c.id===id)){const d=readJSON(k);if(d)chars.list.push(metaFrom(d,id));}});
   // Lixeira: apaga de vez só o que passou de 7 dias
   lsKeys('rpgTrash:').forEach(k=>{const t=readJSON(k);if(!t||Date.now()-t.deletedAt>TRASH_MS)try{localStorage.removeItem(k);}catch(e){}});
-  saveCharsIndex();renderChars();
+  // Só grava a lista se algo mudou (migração ou recuperação). Abrir a ficha numa segunda
+  // aba não pode, sozinho, avisar a primeira de que a ficha foi alterada.
+  if(JSON.stringify(chars)!==before)saveCharsIndex();
+  renderChars();
 }
+/* Mais de uma aba: só uma pode gravar. Quando outra aba ou janela grava a ficha, esta
+   para de salvar e pede para recarregar, em vez de gravar por cima do que a outra fez. */
+function showStale(){$('staleModal').hidden=false;$('staleReloadBtn').focus();}
+function markStale(){
+  if(tabStale)return;
+  tabStale=true;clearTimeout(autoSaveTimer);autoSaveTimer=null;
+  $('autoSaveStatus').textContent='Aba desatualizada: nada é salvo aqui. Recarregue a página.';
+  $('autoSaveStatus').classList.add('paused');
+  showStale();
+}
+window.addEventListener('storage',e=>{
+  if(tabStale||!(e.key===null||e.key==='rpgSheet'||e.key==='rpgChars'))return;
+  // Edição pendente aqui de um personagem que a outra aba não está usando: guarda no slot dele
+  if(autoSaveTimer&&!viewMode){
+    const s=readJSON('rpgSheet');
+    if(s&&s._charId&&s._charId!==currentCharId)try{localStorage.setItem('rpgChar:'+currentCharId,JSON.stringify(getData()));}catch(err){}
+  }
+  markStale();
+});
+$('staleReloadBtn').addEventListener('click',()=>location.reload());
+$('staleCloseBtn').addEventListener('click',()=>{$('staleModal').hidden=true;});
+
 // Abre outro personagem. saveCurrent=false quando o aberto acabou de ir para a lixeira.
 function openChar(id,saveCurrent=true){
+  if(tabStale){showStale();return false;}
   const target=readJSON('rpgChar:'+id);
   if(!target){showToast('Não encontrei os dados desse personagem');return false;}
   clearTimeout(autoSaveTimer);autoSaveTimer=null;
@@ -2673,6 +2721,7 @@ function openChar(id,saveCurrent=true){
 }
 // Cria um personagem (em branco, cópia ou vindo de link/JSON) e já abre
 function createChar(data){
+  if(tabStale){showStale();return null;}
   const id=newCharId();
   const d=JSON.parse(JSON.stringify(data||blankSheet));d._charId=id;
   try{localStorage.setItem('rpgChar:'+id,JSON.stringify(d));}
@@ -2685,6 +2734,7 @@ function duplicateCurrent(){
   if(createChar(d))showToast('✓ Cópia criada e aberta');
 }
 function deleteCurrent(){
+  if(tabStale){showStale();return;}
   const id=currentCharId,d=getData();
   try{localStorage.setItem('rpgTrash:'+id,JSON.stringify({deletedAt:Date.now(),data:d}));}
   catch(e){showToast('Sem espaço para mover para a lixeira.');return;}
@@ -2700,6 +2750,7 @@ function deleteCurrent(){
   showToast('Personagem movido para a lixeira');
 }
 function restoreFromTrash(id){
+  if(tabStale){showStale();return;}
   const t=readJSON('rpgTrash:'+id);if(!t)return;
   try{localStorage.setItem('rpgChar:'+id,JSON.stringify(t.data));localStorage.removeItem('rpgTrash:'+id);}
   catch(e){showToast('Sem espaço para restaurar.');return;}
