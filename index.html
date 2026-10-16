@@ -496,21 +496,54 @@ body.light .money-top input[type="number"] { color: #8a7a00; }
   background: #2a2a38; color: #9fb4ff; border-radius: 4px; padding: 2px 7px;
 }
 
-/* DIARY */
-.diary-new {
-  background: #18181f; border: 1px solid #3a3a4a; border-radius: 9px;
-  padding: 12px; display: flex; flex-direction: column; gap: 8px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+/* DIARY: páginas de papel lado a lado, da mais antiga para a mais nova */
+.diary-nav { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.diary-nav-btn {
+  background: transparent; border: 1px solid #555; color: #ccc; border-radius: 8px;
+  width: 42px; height: 34px; font-size: 22px; line-height: 1;
 }
-.diary-entry {
-  background: #18181f; border: 1px solid #3a3a4a; border-left: 4px solid var(--tab-diario);
-  border-radius: 8px; padding: 10px 12px; display: flex; flex-direction: column; gap: 4px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+.diary-nav-btn:disabled { opacity: .3; cursor: default; }
+.diary-page-label { font-size: 12px; color: #888; font-weight: 700; }
+.diary-book {
+  position: relative; display: flex; align-items: flex-start; gap: 12px;
+  overflow-x: auto; scroll-snap-type: x mandatory; scroll-behavior: smooth;
+  overscroll-behavior-x: contain; padding: 2px 2px 10px;
 }
-.diary-entry-header { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
-.diary-entry-title { font-weight: 700; font-size: 13px; }
-.diary-entry-date { font-size: 11px; color: #888; }
-.diary-entry-text { font-size: 13px; color: #ccc; white-space: pre-wrap; }
+.diary-pages { display: contents; }
+.diary-page {
+  flex: 0 0 100%; scroll-snap-align: start; min-height: 380px; position: relative;
+  background: #fdfbf5; color: #2b2b2b; border-radius: 3px 10px 10px 3px;
+  padding: 16px 16px 12px 36px; display: flex; flex-direction: column; gap: 6px;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.35), inset 6px 0 10px -6px rgba(0,0,0,0.25);
+  font-family: Georgia, "Times New Roman", serif;
+}
+.diary-page::before { content: ''; position: absolute; top: 0; bottom: 0; left: 26px; width: 1px; background: rgba(226,92,92,0.4); }
+.diary-page-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; min-height: 22px; }
+.diary-entry-date { font-size: 11px; color: #8a8270; font-style: italic; }
+.diary-remove {
+  background: transparent; border: 1px solid transparent; color: #b9a9a0; border-radius: 6px;
+  padding: 2px 7px; font-size: 12px; font-family: inherit;
+}
+.diary-remove:hover { color: #c0392b; border-color: rgba(192,57,43,0.4); }
+.diary-remove.confirm { color: #fff; background: #c0392b; border-color: #c0392b; }
+.card .diary-page input[type="text"] {
+  background: transparent; border: none; border-bottom: 1px dashed #d8d0c0; border-radius: 0;
+  color: #2b2b2b; font-family: inherit; font-size: 18px; font-weight: 700; padding: 2px 2px 6px;
+}
+.card .diary-page textarea {
+  background: transparent repeating-linear-gradient(to bottom, transparent 0 27px, #e2e6ee 27px 28px);
+  border: none; border-radius: 0; color: #2b2b2b; font-family: inherit;
+  font-size: 15px; line-height: 28px; padding: 0 2px; min-height: 224px;
+}
+.card .diary-page input[type="text"]:focus, .card .diary-page textarea:focus { outline: none; }
+.card .diary-page input[type="text"]:focus { border-bottom-color: #c9a96e; }
+.diary-page-num { text-align: center; font-size: 11px; color: #a39a88; margin-top: auto; padding-top: 6px; }
+.diary-add-btn {
+  align-self: flex-end; background: #2b2b2b; color: #fdfbf5; border: none; border-radius: 8px;
+  padding: 9px 14px; font-size: 13px; font-weight: 700; font-family: inherit;
+}
+body.light .diary-nav-btn { border-color: #bbb; color: #555; }
+body.light .diary-page { box-shadow: 0 3px 12px rgba(0,0,0,0.15), inset 6px 0 10px -6px rgba(0,0,0,0.15); border: 1px solid #e6e0d2; }
 
 /* BUTTONS */
 button { cursor: pointer; }
@@ -570,7 +603,7 @@ body.light { background: #f0f0f6; color: #1a1a2e; }
 body.light .card { background: #ffffff; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
 body.light h2 { color: #1a1a2e; border-color: rgba(0,0,0,0.12); text-shadow: none; }
 body.light input[type="text"], body.light textarea, body.light input[type="number"], body.light select { background: #e8e8f2; border-color: #ccc; color: #1a1a2e; }
-body.light .attr-box, body.light .combat-box, body.light .def-card, body.light .coll-card, body.light .special-box, body.light .session-box, body.light .fama-bar, body.light .diary-new, body.light .diary-entry, body.light .dmg-limit-box, body.light .res-row { background: #e8e8f2; border-color: #ccc; }
+body.light .attr-box, body.light .combat-box, body.light .def-card, body.light .coll-card, body.light .special-box, body.light .session-box, body.light .fama-bar, body.light .dmg-limit-box, body.light .res-row { background: #e8e8f2; border-color: #ccc; }
 body.light .bar-bg { background: #d4d4e0; }
 body.light .death-dot { background: #e0e0ee; border-color: #bbb; }
 body.light .tab-btn { color: #666; }
@@ -614,6 +647,22 @@ body.light .cond-badge.cond-3 { background: rgba(226,75,74,0.15); }
 .passive-box > label { font-size: 11px; color: #888; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
 .passive-value { font-size: 32px; font-weight: 900; color: #9fb4ff; line-height: 1.1; }
 .passive-detail { font-size: 11px; color: #666; }
+
+/* BLOCOS TINGIDOS: a cor do atributo vira um fundo sutil no bloco todo, no lugar da faixa lateral */
+.attr-box { border: 1px solid color-mix(in srgb, var(--ac) 35%, #3a3a4a); background: color-mix(in srgb, var(--ac) 10%, #18181f); box-shadow: none; }
+.def-card { border: 1px solid color-mix(in srgb, var(--dc, #6c8cff) 30%, #3a3a4a); background: color-mix(in srgb, var(--dc, #6c8cff) 8%, #18181f); box-shadow: none; }
+.skill-row { border: none; border-radius: 6px; background: color-mix(in srgb, var(--sc, #444) 8%, transparent); }
+.skill-row:hover { background: color-mix(in srgb, var(--sc, #444) 14%, transparent); }
+.coll-card.weapon-card { border: 1px solid color-mix(in srgb, var(--c-for) 30%, #3a3a4a); background: color-mix(in srgb, var(--c-for) 7%, #18181f); }
+.coll-card.armor-card { border: 1px solid color-mix(in srgb, var(--c-sab) 30%, #3a3a4a); background: color-mix(in srgb, var(--c-sab) 7%, #18181f); }
+body.light .attr-box { background: color-mix(in srgb, var(--ac) 12%, #fff); border-color: color-mix(in srgb, var(--ac) 40%, #ddd); }
+body.light .def-card { background: color-mix(in srgb, var(--dc, #6c8cff) 10%, #fff); border-color: color-mix(in srgb, var(--dc, #6c8cff) 35%, #ddd); }
+body.light .skill-row { background: color-mix(in srgb, var(--sc, #444) 10%, transparent); }
+body.light .coll-card.weapon-card { background: color-mix(in srgb, var(--c-for) 9%, #fff); border-color: color-mix(in srgb, var(--c-for) 35%, #ddd); }
+body.light .coll-card.armor-card { background: color-mix(in srgb, var(--c-sab) 9%, #fff); border-color: color-mix(in srgb, var(--c-sab) 35%, #ddd); }
+
+/* CAIXAS DE TEXTO crescem com o conteúdo */
+textarea.autogrow { resize: none; overflow: hidden; }
 </style>
 </head>
 <body>
@@ -961,12 +1010,20 @@ body.light .cond-badge.cond-3 { background: rgba(226,75,74,0.15); }
 <!-- ===== DIÁRIO ===== -->
 <div class="tab-content" data-tab="diario">
 <h2><span class="ico">📓</span>Diário do jogador</h2>
-<div class="diary-new">
-  <input type="text" id="diaryTitle" placeholder="Título da entrada (opcional)">
-  <textarea id="diaryText" rows="3" placeholder="O que aconteceu na sessão..."></textarea>
-  <button class="add-btn" id="addDiaryBtn">+ Adicionar entrada</button>
+<div class="diary-nav">
+  <button class="diary-nav-btn" id="diaryPrev" aria-label="Página anterior">‹</button>
+  <span id="diaryPageLabel" class="diary-page-label">Nova página</span>
+  <button class="diary-nav-btn" id="diaryNext" aria-label="Próxima página">›</button>
 </div>
-<div id="diaryList" class="item-list"></div>
+<div class="diary-book" id="diaryBook">
+  <div id="diaryList" class="diary-pages"></div>
+  <div class="diary-page diary-new-page">
+    <div class="diary-page-head"><span class="diary-entry-date">Nova página</span></div>
+    <input type="text" id="diaryTitle" placeholder="Título (opcional)">
+    <textarea id="diaryText" rows="8" placeholder="O que aconteceu na sessão..."></textarea>
+    <button class="diary-add-btn" id="addDiaryBtn">+ Adicionar ao diário</button>
+  </div>
+</div>
 </div>
 
 
@@ -976,7 +1033,6 @@ body.light .cond-badge.cond-3 { background: rgba(226,75,74,0.15); }
   <button class="secondary-btn" id="exportPdfBtn">⬇ PDF</button>
   <button class="secondary-btn" id="exportJsonBtn">⬇ JSON</button>
   <button class="secondary-btn" id="shareBtn">🔗 Compartilhar</button>
-  <label class="secondary-btn file-label">⬆ Importar<input type="file" id="importJsonInput" accept="application/json" style="display:none"></label>
   <label class="secondary-btn file-label">⬆ Importar<input type="file" id="importJsonInput" accept="application/json" style="display:none"></label>
 </div>
 <div class="autosave-row">
@@ -988,6 +1044,23 @@ body.light .cond-badge.cond-3 { background: rgba(226,75,74,0.15); }
 </div><!-- /card -->
 <script>
 function $(id){return document.getElementById(id);}
+// Escapa texto inserido em HTML, para aspas e < não cortarem o que o jogador escreveu
+function esc(v){return String(v??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+/* ===== CAIXAS DE TEXTO QUE CRESCEM ===== */
+// A altura acompanha o texto. Caixas escondidas (aba ou card fechado) são ajustadas quando aparecem.
+function autoGrow(el){
+  el.classList.add('autogrow');
+  if(!el.offsetParent)return;
+  const y=window.scrollY;
+  el.style.height='auto';
+  el.style.height=(el.scrollHeight+el.offsetHeight-el.clientHeight)+'px';
+  if(window.scrollY!==y)window.scrollTo(0,y);
+}
+function autoGrowAll(){document.querySelectorAll('textarea').forEach(autoGrow);}
+document.addEventListener('input',e=>{if(e.target.tagName==='TEXTAREA')autoGrow(e.target);});
+document.addEventListener('click',()=>requestAnimationFrame(autoGrowAll));
+window.addEventListener('resize',()=>requestAnimationFrame(autoGrowAll));
 
 /* ===== TABS ===== */
 document.querySelectorAll('.tab-btn').forEach(btn=>{
@@ -1049,7 +1122,7 @@ populateHpDmgType();
 function createResRow(d){
   const row=document.createElement('div');row.className='res-row';
   row.innerHTML=`
-    <input type="text" class="res-type" list="damageTypeList" value="${d?.type||''}" placeholder="Tipo (ex: Geral, Cortante...)">
+    <input type="text" class="res-type" list="damageTypeList" value="${esc(d?.type)}" placeholder="Tipo (ex: Geral, Cortante...)">
     <input type="number" class="res-rd" value="${d?.rd??0}" min="0">
     <select class="res-rv">
       <option value="-" ${(!d?.rv||d.rv==='-')?'selected':''}>—</option>
@@ -1517,14 +1590,14 @@ function makeCollCard(cfg){
 /* ===== HABILIDADES ===== */
 function abilityBodyHTML(d){return `
 <div class="coll-row">
-  <div><label class="sub">Nome</label><input type="text" class="f-name" value="${d?.name||''}"></div>
-  <div><label class="sub">Custo (PS)</label><input type="text" class="f-cost" value="${d?.cost||''}"></div>
+  <div><label class="sub">Nome</label><input type="text" class="f-name" value="${esc(d?.name)}"></div>
+  <div><label class="sub">Custo (PS)</label><input type="text" class="f-cost" value="${esc(d?.cost)}"></div>
 </div>
 <div class="coll-row">
-  <div><label class="sub">Duração</label><input type="text" class="f-duration" value="${d?.duration||''}"></div>
-  <div><label class="sub">Alcance</label><input type="text" class="f-range" value="${d?.range||''}"></div>
+  <div><label class="sub">Duração</label><input type="text" class="f-duration" value="${esc(d?.duration)}"></div>
+  <div><label class="sub">Alcance</label><input type="text" class="f-range" value="${esc(d?.range)}"></div>
 </div>
-<div><label class="sub" style="margin-top:6px">Descrição</label><textarea class="f-desc">${d?.desc||''}</textarea></div>`;}
+<div><label class="sub" style="margin-top:6px">Descrição</label><textarea class="f-desc">${esc(d?.desc)}</textarea></div>`;}
 
 $('addAbilityBtn').addEventListener('click',()=>{
   const card=makeCollCard({data:{},bodyHTML:abilityBodyHTML({})});
@@ -1535,14 +1608,14 @@ makeDraggable($('abilityList'));
 /* ===== TÉCNICAS ===== */
 function techBodyHTML(d){return `
 <div class="coll-row">
-  <div><label class="sub">Nome</label><input type="text" class="f-name" value="${d?.name||''}"></div>
-  <div><label class="sub">Gasto de PS</label><input type="text" class="f-cost" value="${d?.cost||''}"></div>
+  <div><label class="sub">Nome</label><input type="text" class="f-name" value="${esc(d?.name)}"></div>
+  <div><label class="sub">Gasto de PS</label><input type="text" class="f-cost" value="${esc(d?.cost)}"></div>
 </div>
 <div class="coll-row">
-  <div><label class="sub">Alcance</label><input type="text" class="f-range" value="${d?.range||''}"></div>
-  <div><label class="sub">Duração</label><input type="text" class="f-duration" value="${d?.duration||''}"></div>
+  <div><label class="sub">Alcance</label><input type="text" class="f-range" value="${esc(d?.range)}"></div>
+  <div><label class="sub">Duração</label><input type="text" class="f-duration" value="${esc(d?.duration)}"></div>
 </div>
-<div><label class="sub" style="margin-top:6px">Descrição</label><textarea class="f-desc">${d?.desc||''}</textarea></div>`;}
+<div><label class="sub" style="margin-top:6px">Descrição</label><textarea class="f-desc">${esc(d?.desc)}</textarea></div>`;}
 
 $('addTechBtn').addEventListener('click',()=>{
   const card=makeCollCard({data:{},bodyHTML:techBodyHTML({})});
@@ -1553,18 +1626,18 @@ makeDraggable($('techList'));
 /* ===== ARMAS ===== */
 function weaponBodyHTML(d){return `
 <div class="coll-row">
-  <div><label class="sub">Nome</label><input type="text" class="f-name" value="${d?.name||''}"></div>
+  <div><label class="sub">Nome</label><input type="text" class="f-name" value="${esc(d?.name)}"></div>
   <div><label class="sub">Carga</label><input type="number" class="f-load" value="${d?.load||0}" step="0.1"></div>
 </div>
 <div class="coll-row">
-  <div><label class="sub">Dano</label><input type="text" class="f-dmg" value="${d?.dmg||''}"></div>
-  <div><label class="sub">Alcance</label><input type="text" class="f-range" value="${d?.range||''}"></div>
+  <div><label class="sub">Dano</label><input type="text" class="f-dmg" value="${esc(d?.dmg)}"></div>
+  <div><label class="sub">Alcance</label><input type="text" class="f-range" value="${esc(d?.range)}"></div>
 </div>
 <div class="coll-row">
-  <div><label class="sub">Munição</label><input type="text" class="f-ammo" value="${d?.ammo||''}"></div>
-  <div><label class="sub">Alvo / Área</label><input type="text" class="f-target" value="${d?.target||''}"></div>
+  <div><label class="sub">Munição</label><input type="text" class="f-ammo" value="${esc(d?.ammo)}"></div>
+  <div><label class="sub">Alvo / Área</label><input type="text" class="f-target" value="${esc(d?.target)}"></div>
 </div>
-<div><label class="sub" style="margin-top:6px">Descrição</label><textarea class="f-desc">${d?.desc||''}</textarea></div>`;}
+<div><label class="sub" style="margin-top:6px">Descrição</label><textarea class="f-desc">${esc(d?.desc)}</textarea></div>`;}
 
 $('addWeaponBtn').addEventListener('click',()=>{
   const card=makeCollCard({data:{},bodyHTML:weaponBodyHTML({})});
@@ -1577,14 +1650,14 @@ makeDraggable($('weaponList'));
 /* ===== ARMADURAS ===== */
 function armorBodyHTML(d){return `
 <div class="coll-row">
-  <div><label class="sub">Nome</label><input type="text" class="f-name" value="${d?.name||''}"></div>
+  <div><label class="sub">Nome</label><input type="text" class="f-name" value="${esc(d?.name)}"></div>
   <div><label class="sub">Carga</label><input type="number" class="f-load" value="${d?.load||0}" step="0.1"></div>
 </div>
 <div class="coll-row">
-  <div><label class="sub">Bônus defesa</label><input type="text" class="f-cost" value="${d?.bonus||''}"></div>
+  <div><label class="sub">Bônus defesa</label><input type="text" class="f-cost" value="${esc(d?.cost??d?.bonus)}"></div>
   <div><label class="sub">Tipo</label><select class="f-armortype"><option value="leve" ${d?.armortype==='leve'?'selected':''}>Leve</option><option value="media" ${d?.armortype==='media'?'selected':''}>Média</option><option value="pesada" ${d?.armortype==='pesada'?'selected':''}>Pesada</option></select></div>
 </div>
-<div><label class="sub" style="margin-top:6px">Descrição</label><textarea class="f-desc">${d?.desc||''}</textarea></div>`;}
+<div><label class="sub" style="margin-top:6px">Descrição</label><textarea class="f-desc">${esc(d?.desc)}</textarea></div>`;}
 
 $('addArmorBtn').addEventListener('click',()=>{
   const card=makeCollCard({data:{},bodyHTML:armorBodyHTML({})});
@@ -1601,14 +1674,14 @@ function itemBodyHTML(d){
   let rarOpts='';for(let i=1;i<=6;i++)rarOpts+=`<option value="${i}" ${d?.rarity==i?'selected':''}>${i}</option>`;
   return `
 <div class="coll-row">
-  <div><label class="sub">Nome</label><input type="text" class="f-name" value="${d?.name||''}"></div>
+  <div><label class="sub">Nome</label><input type="text" class="f-name" value="${esc(d?.name)}"></div>
   <div><label class="sub">Carga</label><input type="number" class="f-load" value="${d?.load||0}" step="0.1"></div>
 </div>
 <div class="coll-row">
   <div><label class="sub">Raridade</label><select class="f-rarity">${rarOpts}</select></div>
   <div><label class="sub">Tamanho</label><select class="f-size">${szOpts}</select></div>
 </div>
-<div><label class="sub" style="margin-top:6px">Descrição</label><textarea class="f-desc">${d?.desc||''}</textarea></div>`;}
+<div><label class="sub" style="margin-top:6px">Descrição</label><textarea class="f-desc">${esc(d?.desc)}</textarea></div>`;}
 
 $('addItemBtn').addEventListener('click',()=>{
   const card=makeCollCard({data:{},bodyHTML:itemBodyHTML({}),onRemove:calcLoad});
@@ -1652,13 +1725,13 @@ function contactBodyHTML(d){
   const typeOpts=types.map(t=>`<option ${d?.type===t?'selected':''}>${t}</option>`).join('');
   return `
 <div class="coll-row">
-  <div style="flex:2"><label class="sub">Nome</label><input type="text" class="f-name" value="${d?.name||''}"></div>
+  <div style="flex:2"><label class="sub">Nome</label><input type="text" class="f-name" value="${esc(d?.name)}"></div>
   <div><label class="sub">Tipo</label><select class="contact-type">${typeOpts}</select></div>
 </div>
 <div class="coll-row">
-  <div><label class="sub">Categoria</label><input type="text" class="contact-category" placeholder="ex: Aliado, Inimigo..." value="${d?.category||''}"></div>
+  <div><label class="sub">Categoria</label><input type="text" class="contact-category" placeholder="ex: Aliado, Inimigo..." value="${esc(d?.category)}"></div>
 </div>
-<div><label class="sub" style="margin-top:4px">Descrição</label><textarea class="f-desc">${d?.desc||''}</textarea></div>`;
+<div><label class="sub" style="margin-top:4px">Descrição</label><textarea class="f-desc">${esc(d?.desc)}</textarea></div>`;
 }
 
 function createContactCard(d){
@@ -1687,7 +1760,7 @@ function rebuildCategoryFilter(){
   const current=sel.value;
   const cats=new Set();
   document.querySelectorAll('#contactList .contact-category').forEach(i=>{if(i.value.trim())cats.add(i.value.trim());});
-  sel.innerHTML='<option value="">Todas categorias</option>'+Array.from(cats).sort().map(c=>`<option value="${c}">${c}</option>`).join('');
+  sel.innerHTML='<option value="">Todas categorias</option>'+Array.from(cats).sort().map(c=>`<option value="${esc(c)}">${esc(c)}</option>`).join('');
   if(cats.has(current))sel.value=current;
 }
 
@@ -1707,29 +1780,86 @@ $('contactSearch').addEventListener('input',filterContacts);
 $('contactFilter').addEventListener('change',filterContacts);
 
 /* ===== DIÁRIO ===== */
+// Cada entrada é uma página: da mais antiga (esquerda) para a mais nova, e a última
+// é sempre a folha em branco para escrever. O formato salvo continua o mesmo de antes
+// (lista da mais nova para a mais antiga), por isso getDiaryData inverte a ordem.
 function createDiaryEntry(d){
-  const entry=document.createElement('div');
-  entry.className='diary-entry';
+  const page=document.createElement('div');
+  page.className='diary-page diary-entry';
   const date=d?.date||new Date().toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'});
-  entry.dataset.date=date;
-  entry.innerHTML=`
-    <div class="diary-entry-header">
-      <span class="diary-entry-title">${d?.title||'Entrada sem título'}</span>
-      <span class="diary-entry-date">${date}</span>
+  page.dataset.date=date;
+  page.innerHTML=`
+    <div class="diary-page-head">
+      <span class="diary-entry-date"></span>
+      <button class="diary-remove" title="Remover página">✕</button>
     </div>
-    <div class="diary-entry-text"></div>
-    <button class="remove-btn">Remover</button>`;
-  entry.querySelector('.diary-entry-text').textContent=d?.text||'';
-  entry.querySelector('.remove-btn').addEventListener('click',()=>entry.remove());
-  return entry;
+    <input type="text" class="diary-entry-title" placeholder="Sem título">
+    <textarea class="diary-entry-text" rows="8"></textarea>
+    <div class="diary-page-num"></div>`;
+  page.querySelector('.diary-entry-date').textContent=date;
+  page.querySelector('.diary-entry-title').value=d?.title||'';
+  page.querySelector('.diary-entry-text').value=d?.text||'';
+  // Remoção em dois cliques, para não apagar uma página sem querer
+  const rm=page.querySelector('.diary-remove');
+  rm.addEventListener('click',()=>{
+    if(!rm.classList.contains('confirm')){
+      rm.classList.add('confirm');rm.textContent='Remover página?';
+      clearTimeout(rm._t);rm._t=setTimeout(()=>{rm.classList.remove('confirm');rm.textContent='✕';},3000);
+      return;
+    }
+    page.remove();updateDiaryNav();
+  });
+  return page;
 }
+function diaryPages(){return Array.from($('diaryBook').querySelectorAll('.diary-page'));}
+// Página atual fica numa variável: as setas atualizam na hora (mesmo com cliques
+// rápidos durante a animação) e o deslize com o dedo atualiza quando a rolagem para.
+let diaryIdx=0,diarySettle=null;
+function diaryNearest(){
+  const sl=$('diaryBook').scrollLeft;let best=0,dist=Infinity;
+  diaryPages().forEach((p,i)=>{const dd=Math.abs(p.offsetLeft-sl);if(dd<dist){dist=dd;best=i;}});
+  return best;
+}
+function diaryGoTo(i,instant){
+  const pages=diaryPages();
+  diaryIdx=Math.max(0,Math.min(pages.length-1,i));
+  $('diaryBook').scrollTo({left:pages[diaryIdx].offsetLeft,behavior:instant?'instant':'smooth'});
+  updateDiaryNav();
+}
+function updateDiaryNav(){
+  const pages=diaryPages(),n=pages.length;
+  diaryIdx=Math.max(0,Math.min(n-1,diaryIdx));
+  const i=diaryIdx;
+  pages.forEach((p,k)=>{const num=p.querySelector('.diary-page-num');if(num)num.textContent='— '+(k+1)+' —';});
+  $('diaryPageLabel').textContent=i>=n-1?'Nova página':'Página '+(i+1)+' de '+(n-1);
+  $('diaryPrev').disabled=i<=0;
+  $('diaryNext').disabled=i>=n-1;
+}
+$('diaryPrev').addEventListener('click',()=>diaryGoTo(diaryIdx-1));
+$('diaryNext').addEventListener('click',()=>diaryGoTo(diaryIdx+1));
+function diarySyncFromScroll(){
+  const p=diaryPages()[diaryIdx];
+  if(!p||Math.abs($('diaryBook').scrollLeft-p.offsetLeft)>p.offsetWidth/2){diaryIdx=diaryNearest();updateDiaryNav();}
+}
+if('onscrollend' in window)$('diaryBook').addEventListener('scrollend',diarySyncFromScroll);
+else $('diaryBook').addEventListener('scroll',()=>{clearTimeout(diarySettle);diarySettle=setTimeout(diarySyncFromScroll,250);},{passive:true});
+// Ao abrir a aba pela primeira vez, mostra a página mais recente
+let diaryOpened=false;
+document.querySelector('.tab-btn[data-tab="diario"]').addEventListener('click',()=>{
+  requestAnimationFrame(()=>{
+    if(!diaryOpened){diaryOpened=true;diaryGoTo(Math.max(0,diaryPages().length-2),true);}
+    updateDiaryNav();
+  });
+});
 $('addDiaryBtn').addEventListener('click',()=>{
-  const title=$('diaryTitle').value.trim();
   const text=$('diaryText').value.trim();
-  if(!text)return;
-  const entry=createDiaryEntry({title:title||'Entrada sem título',text});
-  $('diaryList').insertBefore(entry,$('diaryList').firstChild);
+  if(!text){$('diaryText').focus();return;}
+  const page=createDiaryEntry({title:$('diaryTitle').value.trim(),text});
+  $('diaryList').appendChild(page);
   $('diaryTitle').value='';$('diaryText').value='';
+  autoGrowAll();updateDiaryNav();
+  diaryGoTo(diaryPages().indexOf(page));
+  showToast('✓ Página adicionada ao diário');
 });
 
 /* ===== FOTO ===== */
@@ -1774,10 +1904,10 @@ function getContactData(){
 }
 function getDiaryData(){
   return Array.from(document.querySelectorAll('#diaryList .diary-entry')).map(e=>({
-    title:e.querySelector('.diary-entry-title').textContent,
+    title:e.querySelector('.diary-entry-title').value,
     date:e.dataset.date,
-    text:e.querySelector('.diary-entry-text').textContent
-  }));
+    text:e.querySelector('.diary-entry-text').value
+  })).reverse();
 }
 function getData(){
   const skillData=[];
@@ -1888,7 +2018,9 @@ function loadFromData(data){
     filterContacts();
   }
   $('diaryList').innerHTML='';
-  if(data.diary)data.diary.forEach(d=>$('diaryList').appendChild(createDiaryEntry(d)));
+  if(data.diary)data.diary.slice().reverse().forEach(d=>$('diaryList').appendChild(createDiaryEntry(d)));
+  diaryOpened=false;diaryIdx=0;updateDiaryNav();
+  if(document.querySelector('.tab-content.active')?.dataset.tab==='diario'){diaryOpened=true;requestAnimationFrame(()=>diaryGoTo(Math.max(0,diaryPages().length-2),true));}
   if(data.photo){
     $('charPhoto').src=data.photo;$('charPhoto').style.display='block';
     $('photoPlaceholder').style.display='none';$('removePhotoBtn').style.display='block';
@@ -1903,6 +2035,7 @@ function loadFromData(data){
   $('descSonhos').value=data.descSonhos||'';
   $('descPassado').value=data.descPassado||'';
   refreshHP();refreshSP();
+  autoGrowAll();
 }
 
 function showToast(msg){
@@ -2046,6 +2179,8 @@ refreshHP();refreshSP();updateFama();
 updateStickyHeader();
 updateCondBadge(parseInt($('condSlider').value)||0);
 updatePassives();
+updateDiaryNav();
+autoGrowAll();
 
 // share button
 $('shareBtn').addEventListener('click',shareSheet);
